@@ -43,6 +43,7 @@
 
   /* Type scale — fluid via clamp(min, preferred, max).
     Comment shows the px range: mobile (~375px) → desktop (~1280px+). */
+  --text-xs:   clamp(0.75rem,   0.724rem + 0.110vw, 0.8125rem); /* 12 → 13px */
   --text-sm:   clamp(0.8125rem, 0.787rem + 0.110vw, 0.875rem); /* 13 → 14px */
   --text-base: clamp(1rem,      0.948rem + 0.221vw, 1.125rem); /* 16 → 18px */
   --text-lg:   clamp(1.125rem,  1.073rem + 0.221vw, 1.25rem);  /* 18 → 20px */
@@ -68,6 +69,12 @@
   /* Layout */
   --container-max: 1660px;
   --container-pad: 50px;
+
+  /* Breakpoints (for reference — CSS @media can't read custom properties,
+     so these values are used as literals throughout):
+       nav-collapse (desktop → drawer) : max-width 1200px
+       mobile refinements              : max-width 650px
+     (container padding also steps down at 1360px)  */
 
   /* Misc */
   --radius: 4px;
@@ -166,6 +173,24 @@ a:hover {
   max-width: var(--container-max);
   margin-inline: auto;
   padding-inline: var(--container-pad);
+}
+
+/* Ease the heavy 50px side padding down on smaller screens (also gives the
+   slimmed single-row header more room before it collapses at 1200px). */
+@media (max-width: 1360px) {
+  .container {
+    padding-inline: var(--space-8); /* 32px */
+  }
+}
+@media (max-width: 650px) {
+  .container {
+    padding-inline: var(--space-6); /* 24px */
+  }
+}
+
+/* Lock page scroll while the mobile drawer is open. */
+body.drawer-open {
+  overflow: hidden;
 }
 
 .visually-hidden {

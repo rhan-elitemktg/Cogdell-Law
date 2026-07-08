@@ -1,15 +1,170 @@
 ---
-// Site header — empty for now. Nav, logo, and CTA go here once the mockup lands.
+import { Image } from "astro:assets";
+import logoLight from "../assets/cogdell-logo-light.png";
+import MenuList from "./MenuList.astro";
+import MobileNav from "./MobileNav.astro";
+import { navItems } from "../data/navigation";
+
+const phone = "713-426-2244";
+const phoneHref = `tel:+1${phone.replace(/[^0-9]/g, "")}`;
+const pathname = Astro.url.pathname;
 ---
 
 <header class="site-header">
-  <div class="container">
-    {/* Header content goes here. */}
+  <div class="container header-inner">
+    <a href="/" class="logo" aria-label="Cogdell Law Firm — home">
+      <Image src={logoLight} alt="Cogdell Law Firm" densities={[1, 2]} />
+    </a>
+
+    <nav id="primary-nav" class="primary-nav" aria-label="Primary">
+      <MenuList items={navItems} pathname={pathname} />
+    </nav>
+
+    <div class="header-right">
+      <div class="header-cta">
+        <span class="cta-label">Call to Discuss Your Case</span>
+        <a href={phoneHref} class="cta-phone">{phone}</a>
+      </div>
+
+      <a href={phoneHref} class="call-icon" aria-label={`Call ${phone}`}>
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true">
+          <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.6.1.4 0 .7-.2 1l-2.3 2.2z" />
+        </svg>
+      </a>
+
+      <button
+        class="nav-toggle"
+        aria-controls="mobile-drawer"
+        aria-expanded="false"
+        aria-label="Open navigation menu"
+      >
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+      </button>
+    </div>
   </div>
 </header>
 
+<MobileNav pathname={pathname} phone={phone} phoneHref={phoneHref} />
+
 <style>
   .site-header {
-    /* Placeholder chrome — styling to be built from the mockup. */
+    background-color: var(--cog-navy);
+    color: var(--cog-white);
+  }
+
+  .header-inner {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-6);
+    padding-block: var(--space-6);
+  }
+
+  /* ---- Logo ---- */
+  .logo {
+    display: inline-flex;
+    flex-shrink: 0;
+    line-height: 0;
+  }
+  .logo :global(img) {
+    height: 3.5rem; /* 56px */
+    width: auto;
+  }
+
+  /* ---- Right-side actions ---- */
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    flex-shrink: 0;
+  }
+
+  /* ---- CTA (desktop) ---- */
+  .header-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    line-height: 1.2;
+  }
+  .cta-label {
+    font-family: var(--font-body);
+    /* Shrinks as we approach the tablet breakpoint so the label stays visible
+       without wrapping the nav: ~11px at 1200px → 14px at 1660px+. */
+    font-size: clamp(0.6875rem, 0.198rem + 0.652vw, 0.875rem);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--cog-accent);
+    white-space: nowrap;
+  }
+  .cta-phone {
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--cog-white);
+    text-decoration: none;
+    transition: color var(--transition);
+    white-space: nowrap;
+  }
+  .cta-phone:hover {
+    color: var(--cog-cream);
+  }
+
+  /* ---- Call icon (mobile) ---- */
+  .call-icon {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    color: var(--cog-accent);
+    transition: color var(--transition);
+  }
+  .call-icon:hover {
+    color: var(--cog-accent-dark);
+  }
+
+  /* ---- Hamburger (mobile) ---- */
+  .nav-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    background: none;
+    border: 0;
+    cursor: pointer;
+  }
+  .nav-toggle-bar {
+    width: 1.5rem;
+    height: 2px;
+    margin-inline: auto;
+    background-color: var(--cog-white);
+    transition: background-color var(--transition);
+  }
+
+  /* ---- Nav collapse (≤1200): swap desktop nav/CTA for call icon + hamburger ---- */
+  @media (max-width: 1200px) {
+    .primary-nav,
+    .header-cta {
+      display: none;
+    }
+    .call-icon,
+    .nav-toggle {
+      display: inline-flex;
+    }
+  }
+
+  /* ---- Mobile: shrink the logo ---- */
+  @media (max-width: 650px) {
+    .logo :global(img) {
+      height: 3rem; /* 48px */
+    }
   }
 </style>

@@ -1,0 +1,180 @@
+---
+import {
+  isOnTrail,
+  normalizePath,
+  pathMatches,
+  type NavItem,
+} from "../data/navigation";
+
+interface Props {
+  items: NavItem[];
+  depth?: number;
+  pathname: string;
+}
+
+const { items, depth = 0, pathname } = Astro.props;
+
+const current = normalizePath(pathname);
+const matches = (href?: string) => pathMatches(href, current);
+---
+
+<ul
+  class:list={[
+    "menu",
+    depth === 0 ? "menu--bar" : "menu--sub",
+    `menu--depth-${depth}`,
+  ]}
+>
+  {
+    items.map((item) => {
+      const hasChildren = !!item.children?.length;
+      const active = isOnTrail(item, current);
+      const Tag = item.href ? "a" : "button";
+      const linkProps = item.href
+        ? { href: item.href, "aria-current": matches(item.href) ? "page" : undefined }
+        : { type: "button" as const };
+      return (
+        <li class:list={["menu-item", { "menu-item--parent": hasChildren }]}>
+          <Tag
+            class:list={["nav-link", { active }]}
+            aria-haspopup={hasChildren ? "true" : undefined}
+            {...linkProps}
+          >
+            <span>{item.label}</span>
+            {hasChildren && depth === 0 && (
+              <svg class="caret caret--down" width="10" height="6" viewBox="0 0 10 6" aria-hidden="true">
+                <path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            )}
+            {hasChildren && depth > 0 && (
+              <svg class="caret caret--right" width="6" height="10" viewBox="0 0 6 10" aria-hidden="true">
+                <path d="M1 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            )}
+          </Tag>
+          {hasChildren && (
+            <Astro.self items={item.children} depth={depth + 1} pathname={pathname} />
+          )}
+        </li>
+      );
+    })
+  }
+</ul>
+
+<style>
+  .menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* ---- Top bar (depth 0) ---- */
+  .menu--bar {
+    display: flex;
+    align-items: center;
+    /* Fluid gap so the full nav never wraps on narrower desktops. */
+    gap: clamp(var(--space-2), 1vw, var(--space-6));
+  }
+
+  .menu-item {
+    position: relative;
+  }
+
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 0;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--cog-white);
+    background: none;
+    border: 0;
+    cursor: pointer;
+    white-space: nowrap; /* labels never break mid-word */
+    transition: color var(--transition);
+  }
+
+  .nav-link.active {
+    color: var(--cog-accent);
+  }
+
+  /* Main nav (top bar) hover/focus → accent */
+  .menu--bar > .menu-item > .nav-link:hover,
+  .menu--bar > .menu-item:hover > .nav-link,
+  .menu--bar > .menu-item:focus-within > .nav-link {
+    color: var(--cog-accent);
+  }
+
+  .caret {
+    flex-shrink: 0;
+    transition: transform var(--transition);
+  }
+  .menu--bar > .menu-item:hover > .nav-link .caret--down,
+  .menu--bar > .menu-item:focus-within > .nav-link .caret--down {
+    transform: rotate(180deg);
+  }
+
+  /* ---- Submenus (depth >= 1) ---- */
+  .menu--sub {
+    position: absolute;
+    min-width: 16rem;
+    background-color: var(--cog-navy);
+    border: 1px solid var(--cog-line-strong);
+    border-top: 3px solid var(--cog-accent); /* orange accent bar */
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(6px);
+    transition:
+      opacity var(--transition),
+      transform var(--transition),
+      visibility var(--transition);
+    z-index: 20;
+  }
+
+  /* First level opens below its top-bar parent … */
+  .menu--depth-1 {
+    top: 100%;
+    left: 0;
+  }
+  /* … deeper levels fly out to the right of their parent item. */
+  .menu--sub .menu--sub {
+    top: calc(-1 * var(--space-2));
+    left: 100%;
+    transform: translateX(6px);
+  }
+
+  .menu-item:hover > .menu--sub,
+  .menu-item:focus-within > .menu--sub {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+  }
+
+  /* Submenu links: block, sentence-case, padded, with hover fill. */
+  .menu--sub .nav-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: var(--space-3) var(--space-6);
+    font-size: var(--text-xs); /* slightly smaller than the main nav (--text-sm) */
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .menu--sub .nav-link:hover,
+  .menu--sub .menu-item:hover > .nav-link,
+  .menu--sub .menu-item:focus-within > .nav-link {
+    color: var(--cog-white);
+    background-color: var(--cog-navy-glow);
+  }
+
+  /* Below the tablet breakpoint the desktop nav is hidden entirely (Header
+     swaps in the mobile drawer), so no mobile styles are needed here. */
+</style>
