@@ -1,4 +1,4 @@
 import type { SchemaTypeDefinition } from "sanity";
+import { firmDetails } from "./firmDetails";
 
-// No content types yet — add schema definitions here and include them in the array.
-export const schemaTypes: SchemaTypeDefinition[] = [];
+export const schemaTypes: SchemaTypeDefinition[] = [firmDetails];

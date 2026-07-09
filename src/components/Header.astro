@@ -1,19 +1,46 @@
 ---
 import { Image } from "astro:assets";
-import logoLight from "../assets/cogdell-logo-light.png";
+import logoFallback from "../assets/cogdell-logo-light.png";
 import MenuList from "./MenuList.astro";
 import MobileNav from "./MobileNav.astro";
 import { navItems } from "../data/navigation";
+import { getFirmDetails } from "../sanity/lib/firmDetails";
+import { urlFor } from "../sanity/lib/image";
 
-const phone = "713-426-2244";
+const firm = await getFirmDetails();
+
+const firmName = firm?.title ?? "Cogdell Law";
+const phone = firm?.phone ?? "713-426-2244";
 const phoneHref = `tel:+1${phone.replace(/[^0-9]/g, "")}`;
 const pathname = Astro.url.pathname;
+
+// Logo: pull from Sanity when set, else the bundled light logo. Height matches
+// the `.logo img` display size (3.5rem = 56px); request 2× for retina.
+const LOGO_HEIGHT = 56;
+const sanityLogo = firm?.logo?.asset ? firm.logo : null;
+const logoDimensions = sanityLogo?.dimensions;
+const logoSrc = sanityLogo ? urlFor(sanityLogo).height(LOGO_HEIGHT * 2).url() : null;
+const logoWidth = logoDimensions
+  ? Math.round((logoDimensions.width / logoDimensions.height) * LOGO_HEIGHT)
+  : undefined;
 ---
 
 <header class="site-header">
   <div class="container header-inner">
-    <a href="/" class="logo" aria-label="Cogdell Law Firm — home">
-      <Image src={logoLight} alt="Cogdell Law Firm" densities={[1, 2]} />
+    <a href="/" class="logo" aria-label={`${firmName} — home`}>
+      {
+        sanityLogo ? (
+          <img
+            src={logoSrc}
+            width={logoWidth}
+            height={LOGO_HEIGHT}
+            alt={firmName}
+            decoding="async"
+          />
+        ) : (
+          <Image src={logoFallback} alt={firmName} densities={[1, 2]} />
+        )
+      }
     </a>
 
     <nav id="primary-nav" class="primary-nav" aria-label="Primary">
