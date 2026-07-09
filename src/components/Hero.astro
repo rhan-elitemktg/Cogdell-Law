@@ -1,0 +1,348 @@
+---
+import { getImage } from "astro:assets";
+import heroLandscape from "../assets/hero-b.jpg";
+import heroPortrait from "../assets/cogdell-seated-portrait.jpg";
+
+// Art direction: landscape on desktop, portrait on tablet/mobile.
+const heroDesktop = await getImage({
+  src: heroLandscape,
+  widths: [1200, 1600, 2000],
+  format: "webp",
+});
+const heroTablet = await getImage({
+  src: heroPortrait,
+  widths: [420, 640, 738],
+  format: "webp",
+});
+---
+
+<section class="hero">
+  <picture class="hero__picture">
+    <source
+      media="(max-width: 900px)"
+      srcset={heroTablet.srcSet.attribute}
+      sizes="100vw"
+      type="image/webp"
+    />
+    <source srcset={heroDesktop.srcSet.attribute} sizes="100vw" type="image/webp" />
+    <img
+      class="hero__img"
+      src={heroDesktop.src}
+      width={heroLandscape.width}
+      height={heroLandscape.height}
+      alt="Dan Cogdell seated in the firm's boardroom"
+      loading="eager"
+      fetchpriority="high"
+      decoding="async"
+    />
+  </picture>
+  <div class="hero__scrim"></div>
+
+  <div class="container hero__inner">
+    <div class="hero__content">
+      <p class="hero__eyebrow"><span class="hero__rule"></span>Houston Trial Lawyers</p>
+
+      <h1 class="hero__title">
+        <span class="hero__title-line hero__title-line--accent">The Trial Lawyers</span>
+        <span class="hero__title-line">Other Lawyers Call.</span>
+      </h1>
+
+      <p class="hero__lead">
+        Complex civil disputes, personal injury, white collar defense, and
+        high-stakes criminal cases in federal and state courts across the nation.
+      </p>
+
+      <div class="hero__actions">
+        <a href="/contact" class="btn btn--primary">
+          Schedule Consultation
+          <svg class="btn__icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+        </a>
+        <a href="/trial-experience" class="btn btn--outline">
+          Our Results
+          <svg class="btn__icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+        </a>
+      </div>
+    </div>
+
+    <figure class="hero__caption">
+      <figcaption class="hero__attribution">
+        <span class="hero__name">Dan Cogdell</span>
+        <span class="hero__role">Founding Attorney</span>
+      </figcaption>
+
+      <a href="#" class="hero__watch">
+        <span class="hero__play">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>
+        </span>
+        <span class="hero__watch-label">
+          <span class="hero__watch-sm">Watch</span>
+          <span class="hero__watch-film">The Firm Film</span>
+        </span>
+      </a>
+    </figure>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: clamp(600px, 82vh, 840px);
+    background-color: var(--cog-navy-deep);
+    overflow: hidden;
+    color: var(--cog-white);
+  }
+
+  .hero__picture {
+    display: contents;
+  }
+  .hero__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 70% center;
+  }
+
+  /* Darken the left so the text stays legible over the image. */
+  .hero__scrim {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(
+        to right,
+        var(--cog-navy-deep) 0%,
+        rgba(7, 16, 29, 0.85) 32%,
+        rgba(7, 16, 29, 0.25) 62%,
+        transparent 100%
+      ),
+      linear-gradient(to top, rgba(7, 16, 29, 0.6) 0%, transparent 35%);
+  }
+
+  .hero__inner {
+    position: relative;
+    min-height: inherit;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    gap: var(--space-8);
+    padding-block: var(--space-16);
+  }
+
+  /* ---- Content ---- */
+  .hero__content {
+    align-self: center;
+    max-width: 40rem;
+  }
+
+  .hero__eyebrow {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--cog-accent);
+  }
+  .hero__rule {
+    width: 2.5rem;
+    height: 2px;
+    background-color: var(--cog-accent);
+  }
+
+  .hero__title {
+    margin-block: var(--space-6);
+    font-family: var(--font-heading);
+    font-weight: 600;
+    line-height: 1.04;
+    font-size: clamp(2.75rem, 5vw, 4.75rem); /* 44 → 76px */
+  }
+  .hero__title-line {
+    display: block;
+    font-weight: bold;
+  }
+  .hero__title-line--accent {
+    font-style: italic;
+    color: var(--cog-cream);
+  }
+
+  .hero__lead {
+    max-width: 34rem;
+    font-size: var(--text-lg);
+    color: var(--cog-body);
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-top: var(--space-8);
+  }
+
+  /* ---- Caption bar (over the portrait) ---- */
+  .hero__caption {
+    grid-row: 2;
+    justify-self: end;
+    align-self: end;
+    display: flex;
+    align-items: stretch;
+    max-width: 100%;
+    margin: 0;
+    background-color: rgba(14, 27, 45, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(16px) saturate(120%);
+    -webkit-backdrop-filter: blur(16px) saturate(120%);
+  }
+  .hero__attribution {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--space-1);
+    padding: var(--space-4) var(--space-6);
+  }
+  .hero__name {
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    font-weight: 500;
+    line-height: 1.1;
+    white-space: nowrap;
+  }
+  .hero__role {
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--cog-accent);
+  }
+
+  .hero__watch {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-6);
+    border-left: 1px solid var(--cog-line-strong);
+    text-decoration: none;
+    color: var(--cog-white);
+    transition: background-color var(--transition);
+  }
+  .hero__watch:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+  .hero__play {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    border: 1px solid var(--cog-accent);
+    border-radius: 50%;
+    color: var(--cog-accent);
+    flex-shrink: 0;
+    transition: background-color var(--transition), color var(--transition);
+  }
+  .hero__play svg path {
+    fill: var(--cog-white);
+  }
+  /* Subtle pulse radiating outward to draw the eye to the play button. */
+  .hero__play::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1px solid var(--cog-accent);
+    opacity: 0;
+    pointer-events: none;
+    animation: hero-pulse 2.8s var(--ease) infinite;
+  }
+  @keyframes hero-pulse {
+    0% {
+      transform: scale(1);
+      opacity: 0.45;
+    }
+    70% {
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1.5);
+      opacity: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero__play::after {
+      animation: none;
+    }
+  }
+  .hero__watch:hover .hero__play {
+    background-color: var(--cog-accent);
+    color: var(--cog-white);
+  }
+  .hero__watch-label {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    line-height: 1.1;
+    white-space: nowrap;
+  }
+  .hero__watch-sm {
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--cog-navlink);
+  }
+  .hero__watch-film {
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    line-height: 1.1;
+  }
+
+  /* ---- Responsive ---- */
+  /* Tablet: caption spans full width, split into two equal halves. */
+  @media (max-width: 1024px) {
+    .hero__inner {
+      padding-block: var(--space-8);
+    }
+    .hero__content {
+      align-self: flex-end;
+    }
+    /* Portrait image → darken from the bottom up so the lower content reads. */
+    .hero__img {
+      object-position: center;
+    }
+    .hero__scrim {
+      background: linear-gradient(
+        to top,
+        var(--cog-navy-deep) 0%,
+        rgba(7, 16, 29, 0.75) 32%,
+        rgba(7, 16, 29, 0.25) 62%,
+        transparent 100%
+      );
+    }
+    .hero__caption {
+      justify-self: stretch;
+    }
+    .hero__attribution,
+    .hero__watch {
+      flex: 1 1 50%;
+      width: 50%;
+    }
+  }
+  @media (max-width: 650px) {
+    .hero__caption {
+      flex-direction: column;
+    }
+    .hero__attribution,
+    .hero__watch {
+      flex: none;
+      width: 100%;
+    }
+    .hero__watch {
+      border-left: none;
+      border-top: 1px solid var(--cog-line-strong);
+    }
+  }
+</style>
