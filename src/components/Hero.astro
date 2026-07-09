@@ -306,9 +306,6 @@ const heroTablet = await getImage({
     .hero__inner {
       padding-block: var(--space-8);
     }
-    .hero__content {
-      align-self: flex-end;
-    }
     /* Portrait image → darken from the bottom up so the lower content reads. */
     .hero__img {
       object-position: center;
@@ -329,6 +326,11 @@ const heroTablet = await getImage({
     .hero__watch {
       flex: 1 1 50%;
       width: 50%;
+    }
+  }
+  @media (max-width: 900px) {
+    .hero__content {
+      align-self: flex-end;
     }
   }
   @media (max-width: 650px) {

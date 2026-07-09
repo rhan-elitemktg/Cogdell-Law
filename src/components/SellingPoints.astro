@@ -1,0 +1,103 @@
+---
+// Selling-points bar under the hero. Static for now (can move to Sanity later).
+const points = [
+  { value: "40+", label: "Years of Trial Experience" },
+  { value: "Nationwide", label: "Federal & State Courts" },
+  { value: "Elite", label: "Top 2% of Trial Lawyers" },
+  { value: "Confidential", label: "Free Case Evaluation" },
+];
+---
+
+<section class="selling-points">
+  <div class="container selling-points__grid">
+    {
+      points.map((point) => (
+        <div class="selling-point">
+          <span class="selling-point__rule" aria-hidden="true"></span>
+          <span class="selling-point__value">{point.value}</span>
+          <span class="selling-point__label">{point.label}</span>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .selling-points {
+    background-color: var(--cog-navy);
+    color: var(--cog-white);
+    border-top: 1px solid var(--cog-line);
+    border-bottom: 1px solid var(--cog-line);
+  }
+  
+  .selling-points .container {
+    
+  }
+
+  .selling-points__grid {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .selling-point {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    /* Padding on the cell (not the grid) so dividers span the full height. */
+    padding-block: clamp(var(--space-12), 6vw, var(--space-12));
+    padding-inline: var(--space-8);
+    border-left: 1px solid var(--cog-line);
+    flex: 1;
+  }
+  .selling-point:first-child {
+    border-left: none;
+    padding-left: 0;
+  }
+  .selling-point:last-child {
+    padding-right: 0;
+  }
+
+  .selling-point__rule {
+    width: 2.5rem;
+    height: 2px;
+    background-color: var(--cog-accent);
+    margin-bottom: var(--space-6);
+  }
+
+  .selling-point__value {
+    font-family: var(--font-heading);
+    font-weight: 500;
+    line-height: 1.05;
+    font-size: clamp(1.5rem, 2.8vw, 2.75rem); /* ~24 → 44px */
+    color: var(--cog-white);
+  }
+
+  .selling-point__label {
+    margin-top: var(--space-3);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--cog-cream);
+  }
+
+  /* ---- Tablet & mobile: 2×2 grid with full dividers ---- */
+  @media (max-width: 900px) {
+    .selling-points__grid {
+      flex-wrap: wrap;
+    }
+  }
+
+  @media (max-width: 650px) {
+    .selling-point {
+      padding-inline: var(--space-6);
+    }
+    .selling-point:nth-child(odd) {
+      padding-inline-start: 0;
+    }
+    .selling-point__value {
+      font-size: clamp(1.375rem, 6vw, 2.25rem);
+    }
+  }
+</style>
