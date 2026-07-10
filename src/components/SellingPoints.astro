@@ -1,11 +1,18 @@
 ---
-// Selling-points bar under the hero. Static for now (can move to Sanity later).
-const points = [
+// Selling-points / stats bar. Defaults to the homepage set; pages can pass
+// their own `points`. Static for now (can move to Sanity later).
+interface Props {
+  points?: { value: string; label: string }[];
+}
+
+const defaultPoints = [
   { value: "40+", label: "Years of Trial Experience" },
   { value: "Nationwide", label: "Federal & State Courts" },
   { value: "Elite", label: "Top 2% of Trial Lawyers" },
   { value: "Confidential", label: "Free Case Evaluation" },
 ];
+
+const { points = defaultPoints } = Astro.props;
 ---
 
 <section class="selling-points">

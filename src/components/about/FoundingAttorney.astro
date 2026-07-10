@@ -1,0 +1,122 @@
+---
+// Our Firm "Founding Attorney" — study portrait left, career story right.
+import { Image } from "astro:assets";
+import Eyebrow from "../Eyebrow.astro";
+import portrait from "../../assets/consult-portrait.jpg";
+---
+
+<section class="founding">
+  <div class="container founding__inner">
+    <div class="founding__media">
+      <Image
+        src={portrait}
+        alt="Dan Cogdell seated in the firm's study"
+        widths={[640, 976]}
+        sizes="(max-width: 900px) 100vw, 42vw"
+        class="founding__photo lazy-fade"
+      />
+    </div>
+
+    <div class="founding__body">
+      <Eyebrow>Founding Attorney</Eyebrow>
+      <h2 class="founding__heading">
+        <span class="founding__heading-lead">A Career Built on</span>
+        <span class="founding__heading-strong">Winning the Unwinnable.</span>
+      </h2>
+      <p>
+        Mr. Cogdell knows the play before the opposition has even decided on the
+        game. He has spent his career collecting acquittals in cases written off
+        by others — including the sole acquittal in any Enron-related trial and
+        the defense of Clive Doyle following the siege of the Branch Davidian
+        compound in Waco.
+      </p>
+      <p>
+        He doesn't take cases he thinks he can win; he takes those he knows he
+        will. His work has drawn features in <em>The Texas Tribune</em> and
+        <em>Texas Monthly</em>, and coverage in national publications from CNN
+        to <em>The New York Times</em>.
+      </p>
+      <p>
+        The firm's attorneys, paralegals, and support staff live and breathe
+        victory. Choosing Cogdell Law Firm means choosing success — not just
+        navigating legal complexities, but partnering with a legal giant who
+        stands shoulder to shoulder with you.
+      </p>
+      <div class="founding__actions">
+        <a href="/#results" class="btn btn--primary">
+          View Trial Experience
+          <svg class="btn__icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .founding {
+    background-color: var(--cog-white);
+  }
+  .founding__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 640px) minmax(0, 790px);
+    justify-content: space-between;
+    column-gap: var(--space-16);
+    align-items: center;
+    padding-block: var(--space-section);
+  }
+
+  .founding__media {
+    align-self: stretch;
+    display: flex;
+  }
+  .founding__photo {
+    width: 100%;
+    height: 100%;
+    min-height: 320px;
+    object-fit: cover;
+    object-position: center top;
+  }
+
+  .founding__heading {
+    margin-top: var(--space-4); /* standard eyebrow → heading gap */
+    margin-bottom: var(--space-6);
+    font-family: var(--font-heading);
+    font-size: clamp(2.375rem, 4.2vw, 3.625rem); /* 38 → 58px */
+    line-height: 1.04;
+    letter-spacing: -0.01em;
+  }
+  .founding__heading-lead,
+  .founding__heading-strong {
+    display: block;
+  }
+  .founding__heading-lead {
+    font-style: italic;
+    font-weight: 500;
+    color: var(--cog-gold);
+  }
+  .founding__heading-strong {
+    font-weight: 700;
+    color: var(--cog-ink);
+  }
+
+  .founding__body p {
+    max-width: 660px;
+    margin-bottom: var(--space-4);
+    font-size: var(--text-base);
+    line-height: 1.7;
+    color: var(--cog-ink-body);
+  }
+  .founding__actions {
+    margin-top: var(--space-6);
+  }
+
+  @media (max-width: 900px) {
+    .founding__inner {
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: var(--space-8);
+    }
+    .founding__photo {
+      max-height: 480px;
+    }
+  }
+</style>

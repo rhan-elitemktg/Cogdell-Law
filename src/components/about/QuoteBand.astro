@@ -1,0 +1,99 @@
+---
+// Our Firm quote band — centered promise quote over a darkened boardroom photo.
+import { Image } from "astro:assets";
+import quoteBg from "../../assets/quote-boardroom.webp";
+---
+
+<section class="quote-band">
+  <Image
+    src={quoteBg}
+    alt=""
+    widths={[900, 1376]}
+    sizes="100vw"
+    class="quote-band__bg lazy-fade"
+  />
+  <div class="quote-band__overlay" aria-hidden="true"></div>
+
+  <figure class="quote-band__inner">
+    <span class="quote-band__mark" aria-hidden="true">“</span>
+    <blockquote class="quote-band__quote">
+      <p class="quote-band__text">
+        Where being the greatest isn't a boast —
+        <br/>
+        <span class="quote-band__accent"> it's a promise.</span>
+      </p>
+    </blockquote>
+    <figcaption class="quote-band__attr">Cogdell Law Firm</figcaption>
+  </figure>
+</section>
+
+<style>
+  .quote-band {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--cog-navy-deep);
+    color: var(--cog-white);
+  }
+  .quote-band__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+  .quote-band__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(
+      180deg,
+      rgba(7, 16, 29, 0.86) 0%,
+      rgba(7, 16, 29, 0.8) 50%,
+      rgba(7, 16, 29, 0.9) 100%
+    );
+  }
+
+  .quote-band__inner {
+    position: relative;
+    z-index: 2;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding-block: calc(var(--space-section) * 2);
+    padding-inline: var(--space-6);
+    text-align: center;
+  }
+  .quote-band__mark {
+    display: block;
+    font-family: var(--font-heading);
+    font-size: clamp(3.5rem, 6vw, 5rem);
+    line-height: 0.6;
+    color: var(--cog-accent);
+  }
+  .quote-band__quote {
+    margin: var(--space-6) 0 0;
+  }
+  .quote-band__text {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: clamp(1.75rem, 3.4vw, 2.75rem); /* 28 → 44px */
+    line-height: 1.25;
+    letter-spacing: -0.005em;
+    color: var(--cog-white);
+    text-wrap: balance;
+  }
+  .quote-band__accent {
+    font-style: italic;
+    color: var(--cog-cream);
+  }
+  .quote-band__attr {
+    margin-top: var(--space-6);
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--cog-navlink);
+  }
+</style>

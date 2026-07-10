@@ -1,0 +1,94 @@
+---
+// Our Firm "Who We Are" intro — heading left, copy + CTA right, on paper.
+import Eyebrow from "../Eyebrow.astro";
+---
+
+<section class="about-intro">
+  <div class="container about-intro__inner">
+    <div class="about-intro__head">
+      <Eyebrow>Who We Are</Eyebrow>
+      <h2 class="about-intro__heading">
+        <span class="about-intro__heading-lead">Not just a law firm —</span>
+        <span class="about-intro__heading-strong">the law firm of choice.</span>
+      </h2>
+    </div>
+
+    <div class="about-intro__body">
+      <p>
+        Cogdell Law Firm is the firm of choice for people facing charges for
+        federal white collar and criminal offenses, state felony charges, grand
+        jury investigations, medical kickback, securities fraud, and criminal
+        appeals. We are trial lawyers, brought in when the stakes are highest
+        and the case must be won in the courtroom.
+      </p>
+      <p>
+        Dan Cogdell is one of the elite 2% of attorneys admitted as a Fellow of
+        the American College of Trial Lawyers. His reputation for strategy and
+        skill isn't just respected — it's revered.
+      </p>
+      <div class="about-intro__actions">
+        <a href="/#practice" class="btn btn--primary">
+          Our Practice Areas
+          <svg class="btn__icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about-intro {
+    background-color: var(--cog-paper);
+  }
+  .about-intro__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: var(--space-16);
+    align-items: start;
+    padding-block: var(--space-section);
+  }
+
+  .about-intro__head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4); /* standard eyebrow → heading gap */
+  }
+  .about-intro__heading {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: clamp(2.375rem, 4.2vw, 3.625rem); /* 38 → 58px */
+    line-height: 1.04;
+    letter-spacing: -0.01em;
+  }
+  .about-intro__heading-lead,
+  .about-intro__heading-strong {
+    display: block;
+  }
+  .about-intro__heading-lead {
+    font-style: italic;
+    font-weight: 500;
+    color: var(--cog-gold);
+  }
+  .about-intro__heading-strong {
+    font-weight: 700;
+    color: var(--cog-ink);
+  }
+
+  .about-intro__body p {
+    max-width: 660px;
+    margin-bottom: var(--space-4);
+    font-size: var(--text-base);
+    line-height: 1.7;
+    color: var(--cog-ink-body);
+  }
+  .about-intro__actions {
+    margin-top: var(--space-6);
+  }
+
+  @media (max-width: 900px) {
+    .about-intro__inner {
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: var(--space-8);
+    }
+  }
+</style>
