@@ -1,12 +1,12 @@
 ---
 import { getImage } from "astro:assets";
-import heroLandscape from "../assets/hero-b.jpg";
+import heroLandscape from "../assets/hero-boardroom.jpg";
 import heroPortrait from "../assets/cogdell-seated-portrait.jpg";
 
 // Art direction: landscape on desktop, portrait on tablet/mobile.
 const heroDesktop = await getImage({
   src: heroLandscape,
-  widths: [1200, 1600, 2000],
+  widths: [1200, 1600, 1800],
   format: "webp",
 });
 const heroTablet = await getImage({
@@ -152,7 +152,8 @@ const heroTablet = await getImage({
   }
 
   .hero__title {
-    margin-block: var(--space-6);
+    margin-top: var(--space-4); /* standard eyebrow → heading gap */
+    margin-bottom: var(--space-6);
     font-family: var(--font-heading);
     font-weight: 600;
     line-height: 1.04;
