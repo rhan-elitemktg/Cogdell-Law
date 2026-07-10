@@ -1,0 +1,99 @@
+---
+// Homepage "As seen in" press strip — an infinite, slow marquee of outlet logos.
+import { Image } from "astro:assets";
+import cnn from "../assets/press/cnn.png";
+import cbs from "../assets/press/cbs.png";
+import foxNews from "../assets/press/fox-news.png";
+import washingtonPost from "../assets/press/washington-post.png";
+import houstonChronicle from "../assets/press/houston-chronicle.png";
+import dallasMorningNews from "../assets/press/dallas-morning-news.png";
+import laTimes from "../assets/press/la-times.png";
+import texasTribune from "../assets/press/texas-tribune.png";
+import chicagoTribune from "../assets/press/chicago-tribune.png";
+import austinStatesman from "../assets/press/austin-american-statesman.png";
+
+const logos = [
+  { src: cnn, alt: "CNN" },
+  { src: cbs, alt: "CBS" },
+  { src: foxNews, alt: "Fox News" },
+  { src: washingtonPost, alt: "The Washington Post" },
+  { src: houstonChronicle, alt: "Houston Chronicle" },
+  { src: dallasMorningNews, alt: "The Dallas Morning News" },
+  { src: laTimes, alt: "Los Angeles Times" },
+  { src: texasTribune, alt: "The Texas Tribune" },
+  { src: chicagoTribune, alt: "Chicago Tribune" },
+  { src: austinStatesman, alt: "Austin American-Statesman" },
+];
+---
+
+<section class="press" aria-label="Featured in the press">
+  <div class="press__viewport">
+    <ul class="press__track">
+      {
+        logos.map((logo) => (
+          <li class="press__item">
+            <Image src={logo.src} alt={logo.alt} class="press__logo" />
+          </li>
+        ))
+      }
+      {/* Duplicate set for a seamless loop */}
+      {
+        logos.map((logo) => (
+          <li class="press__item" aria-hidden="true">
+            <Image src={logo.src} alt="" class="press__logo" />
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .press {
+    padding-block: var(--space-8);
+    background-color: var(--cog-white);
+    border-bottom: 1px solid var(--cog-line-ink);
+  }
+  .press__viewport {
+    overflow: hidden;
+  }
+  .press__track {
+    display: flex;
+    align-items: center;
+    width: max-content;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    animation: press-marquee 50s linear infinite;
+  }
+  .press:hover .press__track {
+    animation-play-state: paused;
+  }
+  /* Spacing lives on the item (not `gap`) so each item carries its own trailing
+     gap — that keeps translateX(-50%) landing exactly one set over (seamless). */
+  .press__item {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    margin-inline-end: var(--space-16);
+  }
+  .press__logo {
+    width: auto;
+    height: 42px;
+    object-fit: contain;
+  }
+
+  @keyframes press-marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .press__track {
+      animation: none;
+    }
+  }
+</style>

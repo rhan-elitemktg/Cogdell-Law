@@ -1,0 +1,146 @@
+---
+// Homepage "Client Testimonials" section — header + three quote cards.
+import Eyebrow from "./Eyebrow.astro";
+
+const testimonials = [
+  {
+    quote:
+      "Dan Cogdell and his team gave us our lives back. When we were facing federal charges that carried decades in prison, they fought with a tenacity and strategic brilliance that resulted in a full acquittal. There are no words adequate to express our gratitude.",
+    author: "Former Client",
+    tag: "Federal Criminal Defense",
+  },
+  {
+    quote:
+      "From the first consultation, we knew we were in capable hands. The level of preparation was extraordinary — every motion, every argument was crafted with precision. They anticipated the prosecution at every turn and delivered a result we barely dared to hope for.",
+    author: "Former Client",
+    tag: "White Collar Defense",
+  },
+  {
+    quote:
+      "In a complex civil case with millions at stake, Cogdell Law Firm demonstrated why they are considered among the best trial lawyers in the country. Their courtroom presence is commanding, and their dedication to our case never wavered.",
+    author: "Former Client",
+    tag: "Complex Civil Litigation",
+  },
+];
+---
+
+<section class="testimonials">
+  <div class="container">
+    <div class="testimonials__head">
+      <Eyebrow>Client Testimonials</Eyebrow>
+      <h2 class="testimonials__heading">
+        <span class="testimonials__heading-lead">What Clients Are</span>
+        <span class="testimonials__heading-strong">Saying About Us.</span>
+      </h2>
+    </div>
+
+    <div class="testimonials__grid">
+      {
+        testimonials.map((t) => (
+          <article class="testimonials__card">
+            <div class="testimonials__stars" role="img" aria-label="5 out of 5 stars">
+              {Array.from({ length: 5 }).map(() => (
+                <svg class="testimonials__star" viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true"><path d="M11.48 3.5a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.563.563 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345z" />
+                </svg>
+              ))}
+            </div>
+            <p class="testimonials__quote">{t.quote}</p>
+            <div class="testimonials__footer">
+              <span class="testimonials__author">{t.author}</span>
+              <span class="testimonials__tag">{t.tag}</span>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .testimonials {
+    background-color: var(--cog-paper);
+  }
+  .testimonials .container {
+    padding-block: var(--space-section);
+  }
+
+  /* ---- Header ---- */
+  .testimonials__head {
+    margin-bottom: var(--space-12);
+  }
+  .testimonials__heading {
+    margin-top: var(--space-4); /* standard eyebrow → heading gap */
+    font-family: var(--font-heading);
+    font-size: clamp(2.375rem, 4.2vw, 3.625rem); /* 38 → 58px */
+    line-height: 1.04;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  .testimonials__heading-lead,
+  .testimonials__heading-strong {
+    display: block;
+  }
+  .testimonials__heading-lead {
+    font-style: italic;
+    font-weight: 500;
+    color: var(--cog-gold);
+  }
+  .testimonials__heading-strong {
+    font-weight: 700;
+    color: var(--cog-ink);
+  }
+
+  /* ---- Cards ---- */
+  .testimonials__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-8);
+  }
+  .testimonials__card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    padding: var(--space-8);
+    background-color: var(--cog-paper-card);
+    box-shadow: 0 12px 30px rgba(14, 27, 45, 0.08);
+  }
+  .testimonials__stars {
+    display: flex;
+    gap: var(--space-1);
+    color: var(--cog-accent);
+  }
+  .testimonials__quote {
+    flex: 1; /* fill so footers align across cards */
+    font-size: var(--text-base);
+    line-height: 1.7;
+    color: var(--cog-ink-body);
+  }
+  .testimonials__footer {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+    flex-direction: column;
+  }
+  .testimonials__author {
+    font-family: var(--font-heading);
+    font-size: var(--text-lg);
+    color: var(--cog-ink);
+  }
+  .testimonials__tag {
+    padding: var(--space-2) var(--space-3);
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--cog-white);
+    background-color: var(--cog-navy);
+  }
+
+  /* ---- Responsive ---- */
+  @media (max-width: 900px) {
+    .testimonials__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

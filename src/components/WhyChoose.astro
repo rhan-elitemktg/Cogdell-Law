@@ -1,0 +1,281 @@
+---
+// Homepage "Why Choose" band — full-bleed boardroom photo with a centered
+// header and a horizontal carousel of glassy feature cards.
+import { Image } from "astro:assets";
+import Eyebrow from "./Eyebrow.astro";
+import bgPhoto from "../assets/whychoose-bg.jpg";
+
+const icons: Record<string, string> = {
+  trophy:
+    '<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>',
+  landmark:
+    '<line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="10" x2="10" y1="18" y2="11"/><line x1="14" x2="14" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/><polygon points="12 2 20 7 4 7"/>',
+  check: '<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>',
+  shield:
+    '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><circle cx="12" cy="10" r="2"/><path d="M9 15a3 3 0 0 1 6 0"/>',
+};
+
+const features = [
+  {
+    icon: "trophy",
+    title: "Trial-First Approach",
+    body: "Insurance companies and prosecutors settle because they know we will try the case. That changes everything.",
+  },
+  {
+    icon: "landmark",
+    title: "National Reach",
+    body: "Licensed and experienced in federal courts across the country. Your case isn't limited by geography.",
+  },
+  {
+    icon: "check",
+    title: "Proven Track Record",
+    body: "Over 500 jury trials. Exposed corruption, won acquittals, and secured landmark verdicts.",
+  },
+  {
+    icon: "shield",
+    title: "Accessible & Personal",
+    body: "Dan Cogdell personally handles every case. No hand-offs to junior associates.",
+  },
+];
+---
+
+<section class="why-choose">
+  <Image
+    src={bgPhoto}
+    alt=""
+    widths={[1200, 1376]}
+    sizes="100vw"
+    class="why-choose__bg lazy-fade"
+  />
+  <div class="why-choose__overlay" aria-hidden="true"></div>
+
+  <div class="container why-choose__inner">
+    <div class="why-choose__head">
+    <Eyebrow center rule={false}>The Cogdell Difference</Eyebrow>
+      <h2 class="why-choose__heading">
+        <span class="why-choose__heading-lead">Why Choose</span>
+        <span class="why-choose__heading-strong">Cogdell Law Firm.</span>
+      </h2>
+    </div>
+
+    <div class="why-choose__controls">
+      <button class="why-choose__arrow" data-dir="prev" type="button" aria-label="Previous">
+        <svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true"><path d="M10.5 2.5L5 8l5.5 5.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="why-choose__arrow" data-dir="next" type="button" aria-label="Next">
+        <svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true"><path d="M5.5 2.5L11 8l-5.5 5.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+    <div class="why-choose__grid">
+      {
+        features.map((f) => (
+          <article class="why-choose__card">
+            <svg
+              class="why-choose__icon"
+              viewBox="0 0 24 24"
+              width="40"
+              height="40"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+              set:html={icons[f.icon]}
+            />
+            <h3 class="why-choose__card-title">{f.title}</h3>
+            <p class="why-choose__card-body">{f.body}</p>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .why-choose {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--cog-navy-deep);
+    color: var(--cog-white);
+  }
+
+  .why-choose__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 25%;
+  }
+  .why-choose__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(
+      180deg,
+      rgba(7, 16, 29, 0.78) 0%,
+      rgba(7, 16, 29, 0.5) 28%,
+      rgba(7, 16, 29, 0.5) 55%,
+      rgba(7, 16, 29, 0.85) 100%
+    );
+  }
+
+  .why-choose__inner {
+    position: relative;
+    z-index: 2;
+    padding-block: var(--space-section);
+  }
+
+  /* ---- Header ---- */
+  .why-choose__head {
+    max-width: 720px;
+    margin-inline: auto;
+    text-align: center;
+  }
+  .why-choose__heading {
+    margin-top: var(--space-4); /* standard eyebrow → heading gap */
+    font-family: var(--font-heading);
+    font-size: clamp(2.375rem, 4.4vw, 3.75rem); /* 38 → 60px */
+    line-height: 1.04;
+    letter-spacing: -0.01em;
+  }
+  .why-choose__heading-lead,
+  .why-choose__heading-strong {
+    display: block;
+  }
+  .why-choose__heading-lead {
+    font-style: italic;
+    font-weight: 500;
+    color: var(--cog-cream);
+  }
+  .why-choose__heading-strong {
+    font-weight: 700;
+    color: var(--cog-white);
+  }
+
+  /* ---- Carousel controls ---- */
+  .why-choose__controls {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-2);
+    margin-block: var(--space-8);
+  }
+  .why-choose__arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 50%;
+    background-color: transparent;
+    color: var(--cog-white);
+    cursor: pointer;
+    transition:
+      background-color var(--transition),
+      border-color var(--transition);
+  }
+  .why-choose__arrow:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: var(--cog-white);
+  }
+
+  /* ---- Cards carousel ---- */
+  .why-choose__grid {
+    display: flex;
+    gap: var(--space-6);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    /* Bleed to the right screen edge so the next card peeks off-screen. */
+    margin-inline-end: calc(-1 * var(--container-pad));
+    padding-inline-end: var(--container-pad);
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .why-choose__grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .why-choose__card {
+    display: flex;
+    flex: 0 0 30%;
+    flex-direction: column;
+    gap: var(--space-4);
+    scroll-snap-align: start;
+    padding: var(--space-8);
+    background-color: rgba(12, 21, 38, 0.72);
+    border: 1px solid var(--cog-line);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    transition:
+      background-color var(--transition),
+      transform var(--transition);
+  }
+  .why-choose__card:hover {
+    background-color: rgba(12, 21, 38, 0.86);
+    transform: translateY(-4px);
+  }
+  .why-choose__icon {
+    color: var(--cog-accent);
+  }
+  .why-choose__card-title {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: var(--text-xl);
+    line-height: 1.1;
+    color: var(--cog-white);
+  }
+  .why-choose__card-body {
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    color: var(--cog-body);
+  }
+
+  /* ---- Responsive ---- */
+  @media (max-width: 1360px) {
+    .why-choose__grid {
+      margin-inline-end: calc(-1 * var(--space-8));
+      padding-inline-end: var(--space-8);
+    }
+  }
+  /* Tablet/mobile: whole cards (no bleed) so a partial card never peeks on the
+     left — the fractional peek only divides cleanly on desktop. */
+  @media (max-width: 900px) {
+    .why-choose__grid {
+      margin-inline-end: 0;
+      padding-inline-end: 0;
+    }
+    .why-choose__card {
+      flex-basis: calc(50% - var(--space-3)); /* two whole cards */
+    }
+  }
+  @media (max-width: 650px) {
+    .why-choose__card {
+      flex-basis: 100%; /* one whole card */
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>(".why-choose").forEach((root) => {
+    const scroller = root.querySelector<HTMLElement>(".why-choose__grid");
+    if (!scroller) return;
+    const step = () => {
+      const card = scroller.querySelector<HTMLElement>(".why-choose__card");
+      return card ? card.offsetWidth + 24 : 320;
+    };
+    root
+      .querySelector('[data-dir="prev"]')
+      ?.addEventListener("click", () =>
+        scroller.scrollBy({ left: -step(), behavior: "smooth" })
+      );
+    root
+      .querySelector('[data-dir="next"]')
+      ?.addEventListener("click", () =>
+        scroller.scrollBy({ left: step(), behavior: "smooth" })
+      );
+  });
+</script>

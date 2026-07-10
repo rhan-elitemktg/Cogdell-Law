@@ -1,0 +1,193 @@
+---
+// Homepage "Where We Practice" band — Houston-based / nationwide reach, with a
+// US map that highlights Texas and marks Houston.
+import Eyebrow from "./Eyebrow.astro";
+import { US_BASE_PATH, TX_PATH, US_MAP_VIEWBOX, HOUSTON } from "../data/us-states";
+
+const stats = [
+  { label: "Principal Office", value: "Houston, Texas" },
+  { label: "State Courts", value: "Throughout Texas" },
+  { label: "Federal Courts", value: "Nationwide" },
+];
+---
+
+<section class="practice-reach">
+  <div class="container practice-reach__inner">
+    <div class="practice-reach__body">
+      <Eyebrow>Where We Practice</Eyebrow>
+      <h2 class="practice-reach__heading">
+        <span class="practice-reach__heading-lead">Based in Houston.</span>
+        <span class="practice-reach__heading-strong">Available Nationwide.</span>
+      </h2>
+      <p class="practice-reach__lede">
+        Our principal office is in downtown Houston, but our practice reaches
+        every federal courtroom in the country. We regularly try cases across
+        Texas and in federal districts nationwide — wherever our clients need us,
+        we go.
+      </p>
+      <dl class="practice-reach__stats">
+        {
+          stats.map((s) => (
+            <div class="practice-reach__stat">
+              <dt class="practice-reach__stat-label">{s.label}</dt>
+              <dd class="practice-reach__stat-value">{s.value}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+
+    <div class="practice-reach__map">
+      <svg viewBox={US_MAP_VIEWBOX} role="img" aria-label="United States map with Texas highlighted and Houston marked">
+        <path class="prm__base" d={US_BASE_PATH}></path>
+        <path class="prm__texas" d={TX_PATH}></path>
+        <g class="prm__marker" transform={`translate(${HOUSTON.x} ${HOUSTON.y})`}>
+          <circle class="prm__pulse" r="11"></circle>
+          <circle class="prm__dot" r="5"></circle>
+          <text class="prm__label" x="14" y="4">Houston</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<style>
+  .practice-reach {
+    background-color: var(--cog-navy-deep);
+    color: var(--cog-white);
+  }
+  .practice-reach__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: var(--space-16);
+    align-items: center;
+    padding-block: var(--space-section);
+  }
+
+  /* ---- Copy ---- */
+  .practice-reach__heading {
+    margin-top: var(--space-4); /* standard eyebrow → heading gap */
+    font-family: var(--font-heading);
+    font-size: clamp(2.375rem, 4.2vw, 3.625rem); /* 38 → 58px */
+    line-height: 1.04;
+    letter-spacing: -0.01em;
+  }
+  .practice-reach__heading-lead,
+  .practice-reach__heading-strong {
+    display: block;
+  }
+  .practice-reach__heading-lead {
+    font-style: italic;
+    font-weight: 500;
+    color: var(--cog-cream);
+  }
+  .practice-reach__heading-strong {
+    font-weight: 700;
+    color: var(--cog-white);
+  }
+  .practice-reach__lede {
+    max-width: 520px;
+    margin-top: var(--space-6);
+    font-size: var(--text-base);
+    line-height: 1.7;
+    color: var(--cog-body);
+  }
+
+  /* ---- Stats ---- */
+  .practice-reach__stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-12);
+    margin: var(--space-12) 0 0;
+  }
+  .practice-reach__stat {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .practice-reach__stat-label {
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--cog-accent);
+  }
+  .practice-reach__stat-value {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    color: var(--cog-white);
+  }
+
+  /* ---- Map ---- */
+  .practice-reach__map {
+    padding: var(--space-8);
+    border: 1px solid var(--cog-line);
+    background-color: rgba(255, 255, 255, 0.02);
+  }
+  .practice-reach__map svg {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  .prm__base {
+    fill: rgba(255, 255, 255, 0.07);
+    stroke: none;
+  }
+  .prm__texas {
+    fill: rgba(226, 90, 38, 0.22);
+    stroke: none;
+  }
+  .prm__dot {
+    fill: var(--cog-accent);
+  }
+  .prm__pulse {
+    fill: var(--cog-accent);
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: prm-pulse 2.6s var(--ease) infinite;
+  }
+  @keyframes prm-pulse {
+    0% {
+      transform: scale(0.5);
+      opacity: 0.5;
+    }
+    70% {
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1.7);
+      opacity: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .prm__pulse {
+      animation: none;
+      opacity: 0;
+    }
+  }
+  .prm__label {
+    fill: var(--cog-accent);
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  /* ---- Responsive ---- */
+  @media (max-width: 900px) {
+    .practice-reach__inner {
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: var(--space-12);
+    }
+  }
+  @media (max-width: 650px) {
+    /* Each stat on its own line. */
+    .practice-reach__stats {
+      flex-direction: column;
+      gap: var(--space-6);
+    }
+  }
+</style>
