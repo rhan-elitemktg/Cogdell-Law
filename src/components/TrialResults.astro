@@ -1,0 +1,407 @@
+---
+// Trial Experience "Notable Results" — intro + filterable grid of verdicts.
+import Eyebrow from "./Eyebrow.astro";
+
+const filters = [
+  { id: "all", label: "All Results" },
+  { id: "landmark", label: "Landmark Cases" },
+  { id: "federal", label: "Federal Victories" },
+  { id: "fraud", label: "Fraud & White Collar" },
+];
+
+const cases = [
+  {
+    category: "landmark",
+    categoryLabel: "Landmark Case",
+    outcome: "Charges Dropped",
+    name: "Texas Attorney General",
+    note: "Amid the political frenzy surrounding the impeachment saga of Texas Attorney General Ken Paxton, Mr. Cogdell didn't just enter the fray — he dominated it. With a mere three months to ready his arsenal, he and his team stormed into battle before the Texas Senate. It ended in a triumphant smackdown of 16 charges and the outright dismissal of the remaining four.",
+  },
+  {
+    category: "landmark",
+    categoryLabel: "Landmark Case",
+    outcome: "Acquitted",
+    name: "The Enron Scandal",
+    note: "One of — if not the — greatest corporate corruption cases in the history of the world was Enron. Executives scrambled to secure the best legal minds money could buy, mostly from the glitzy towers of New York. But not Sheila Kahanek. She placed her faith in Mr. Cogdell, who turned what seemed like an insurmountable legal Everest into a mere speed bump on the road to exoneration, while the others faltered under the weight of guilty verdicts.",
+  },
+  {
+    category: "landmark",
+    categoryLabel: "Landmark Case",
+    outcome: "Acquitted",
+    name: "Waco & the Branch Davidians",
+    note: "Mr. Cogdell took up the defense of Clive Doyle, who faced charges over the deaths of federal agents at the Waco siege. Despite relentless media bias, he achieved a remarkable victory: his client was acquitted of all charges — against a backdrop of six other defendants convicted on multiple counts. His skill and tenacity became the focal point of the 2019 documentary and the 2025 Showtime series Waco: The Aftermath.",
+  },
+  {
+    category: "federal",
+    categoryLabel: "Federal Victory",
+    outcome: "Acquitted",
+    name: "Prosecutorial Misconduct",
+    note: "In a case marred by prosecutorial misconduct, Mr. Cogdell's client emerged victorious. A United States District Judge issued a judgment of acquittal, uncovering instances of misconduct and holding the prosecution accountable.",
+  },
+  {
+    category: "federal",
+    categoryLabel: "Federal Victory",
+    outcome: "Acquitted",
+    name: "Corruption Acquittal",
+    note: "In a riveting legal saga, the former New Orleans City Attorney was acquitted of conspiracy, bribery, and corruption charges — while multiple co-defendants faced convictions, underscoring our firm's commitment to justice.",
+  },
+  {
+    category: "fraud",
+    categoryLabel: "White Collar",
+    outcome: "Acquitted",
+    name: "Bribery Acquittal",
+    note: "In the widely publicized “Houston City Hall Bribery Case,” Mr. Cogdell and his client faced the battleground in two separate trials. Remarkably, his client — a former state district judge and city council member — was acquitted of all charges, including bribery and corruption, while multiple co-defendants faced convictions and imprisonment.",
+  },
+  {
+    category: "fraud",
+    categoryLabel: "Health Care Fraud",
+    outcome: "Acquitted",
+    name: "Surgeon Fraud Acquittal",
+    note: "In a high-profile legal saga, Mr. Cogdell's client — an orthopedic surgeon — was acquitted of all charges leveled against them, which included wire fraud, health care fraud, and insurance fraud.",
+  },
+  {
+    category: "fraud",
+    categoryLabel: "Health Care Fraud",
+    outcome: "Dismissed",
+    name: "Physician Victory",
+    note: "In an exceptionally challenging legal battle, an alternative-treatment physician found themselves acquitted of multiple charges. The remaining charges were ultimately dismissed by the government following two separate trials.",
+  },
+  {
+    category: "fraud",
+    categoryLabel: "Federal Fraud",
+    outcome: "Acquitted",
+    name: "Conspiracy Acquittal",
+    note: "In the District Court for the Southern District of Texas, Mr. Cogdell's client was accused of bank fraud. After a rigorous trial, his client prevailed — acquitted of all charges, including conspiracy, wire fraud, and bank fraud — while all others involved were convicted of multiple federal offenses.",
+  },
+  {
+    category: "fraud",
+    categoryLabel: "Federal Fraud",
+    outcome: "Acquitted",
+    name: "Mail Fraud Acquittal",
+    note: "The former President and CEO of Continental Savings and Loan faced a barrage of accusations, including conspiracy, bank fraud, mail fraud, and wire fraud. Thanks to Mr. Cogdell's expertise, the client emerged unscathed — acquitted of all charges.",
+  },
+  {
+    category: "fraud",
+    categoryLabel: "Federal Fraud",
+    outcome: "Acquitted",
+    name: "Wire Fraud Acquittal",
+    note: "Dubbed the “NASA Operation Lightning Strike Trial,” Mr. Cogdell's client faced charges of wire fraud, mail fraud, and defrauding the United States government. Once again, his strategic defense led to a favorable outcome, with the client acquitted of all charges.",
+  },
+  {
+    category: "fraud",
+    categoryLabel: "White Collar",
+    outcome: "Mistrial",
+    name: "Pharmacy Fraud Mistrial",
+    note: "A pharmacy owner was charged with wire fraud and mail fraud. The trial judge granted the court's own mistrial motion based on prosecutorial misconduct following six weeks in trial.",
+  },
+  {
+    category: "fraud",
+    categoryLabel: "White Collar",
+    outcome: "Acquitted",
+    name: "Insurance Fraud Acquittal",
+    note: "Mr. Cogdell's client, a surgeon, faced a daunting legal battle. After a rigorous trial, the client emerged triumphant — acquitted of all charges, including insurance fraud and practicing medicine without a license.",
+  },
+  {
+    category: "fraud",
+    categoryLabel: "White Collar",
+    outcome: "Dismissed",
+    name: "Judge's Dismissal",
+    note: "A state district judge faced accusations of tampering with a governmental record. Remarkably, all charges against the judge were dismissed prior to trial.",
+  },
+  {
+    category: "fraud",
+    categoryLabel: "Health Care Fraud",
+    outcome: "Dismissed",
+    name: "Psychiatric Fraud Victory",
+    note: "Dubbed the “Spring Shadows Glenn Psychiatric Fraud Trial,” Mr. Cogdell's clients found themselves embroiled in a high-profile prosecution. Despite an exhaustive six-month trial, the client's case was ultimately dismissed, with the individual acquitted of all charges.",
+  },
+  {
+    category: "fraud",
+    categoryLabel: "White Collar",
+    outcome: "No-Billed",
+    name: "Innocence Preserved",
+    note: "A cardiovascular and thoracic physician faced scrutiny during a euthanasia investigation. Mr. Cogdell's client emerged unscathed as the grand jury “no-billed” the case. Following a Texas State Medical Board investigation, the client prevailed, further solidifying their innocence.",
+  },
+];
+---
+
+<section class="trial">
+  <div class="container trial__inner">
+    <header class="trial__head">
+      <div class="trial__head-left">
+        <Eyebrow>Notable Results</Eyebrow>
+        <h2 class="trial__heading">
+          <span class="trial__heading-lead">Your Path to</span>
+          <span class="trial__heading-strong">Legal Victory.</span>
+        </h2>
+      </div>
+      <div class="trial__head-right">
+        <p>
+          Legal triumphs are tradition, not chance, at Cogdell Law Firm. Dan
+          Cogdell reigns supreme in the Lone Star State — and beyond. With a
+          track record that reads like a roster of the greatest American
+          criminal case acquittals, his firm stands as a fortress for its
+          clients. From defending Texas Attorney General Ken Paxton, Enron
+          litigation, the Branch Davidian trial, and many others, his courtroom
+          odysseys continue to hit the silver screen by way of documentaries and
+          a Showtime series.
+        </p>
+        <p>
+          Mr. Cogdell has been said to possess one of the sharpest legal minds
+          in the country. Armed to the teeth with razor-sharp intellect, he
+          unleashes unwavering defense of his clients — whether it's criminal
+          accusations like federal white collar and criminal offenses, criminal
+          appeals, state felony charges, grand jury investigations, medical
+          kickback or securities fraud.
+        </p>
+      </div>
+    </header>
+
+    <div class="trial__filters" role="group" aria-label="Filter results by case type">
+      {
+        filters.map((f, i) => (
+          <button class="trial__filter" type="button" data-filter={f.id} aria-pressed={i === 0 ? "true" : "false"}>
+            {f.label}
+          </button>
+        ))
+      }
+    </div>
+
+    <div class="trial__grid" id="trial-grid">
+      {
+        cases.map((c) => (
+          <article class="trial__card" data-category={c.category}>
+            <div class="trial__card-top">
+              <span class="trial__tag">{c.outcome}</span>
+              <span class="trial__cat">{c.categoryLabel}</span>
+            </div>
+            <h3 class="trial__name">{c.name}</h3>
+            <p class="trial__note">{c.note}</p>
+          </article>
+        ))
+      }
+    </div>
+
+    <p class="trial__disclaimer">
+      Prior results do not guarantee a similar outcome. A representative
+      selection — a fuller record is available on request.
+    </p>
+  </div>
+</section>
+
+<style>
+  .trial {
+    background-color: var(--cog-paper);
+  }
+  .trial__inner {
+    padding-block: var(--space-section);
+  }
+
+  /* ---- Header ---- */
+  .trial__head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: var(--space-16);
+    align-items: start;
+    margin-bottom: var(--space-12);
+  }
+  .trial__head-left {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4); /* standard eyebrow → heading gap */
+  }
+  .trial__heading {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: clamp(2.375rem, 4.2vw, 3.625rem); /* 38 → 58px */
+    line-height: 1.04;
+    letter-spacing: -0.01em;
+  }
+  .trial__heading-lead,
+  .trial__heading-strong {
+    display: block;
+  }
+  .trial__heading-lead {
+    font-style: italic;
+    font-weight: 500;
+    color: var(--cog-gold);
+  }
+  .trial__heading-strong {
+    font-weight: 700;
+    color: var(--cog-ink);
+  }
+  .trial__head-right p {
+    margin-bottom: var(--space-4);
+    font-size: var(--text-base);
+    line-height: 1.7;
+    color: var(--cog-ink-body);
+  }
+  .trial__head-right p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* ---- Filters ---- */
+  .trial__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-bottom: var(--space-8);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--cog-line-ink);
+  }
+  .trial__filter {
+    padding: var(--space-2) var(--space-4);
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--cog-ink-body);
+    background-color: transparent;
+    border: 1px solid var(--cog-line-ink);
+    cursor: pointer;
+    transition:
+      color var(--transition),
+      background-color var(--transition),
+      border-color var(--transition);
+  }
+  .trial__filter:hover {
+    border-color: var(--cog-ink-muted);
+  }
+  .trial__filter[aria-pressed="true"] {
+    color: var(--cog-white);
+    background-color: var(--cog-navy);
+    border-color: var(--cog-navy);
+  }
+
+  /* ---- Grid ---- */
+  .trial__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-6);
+    align-items: stretch;
+  }
+  .trial__card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: var(--space-8);
+    background-color: var(--cog-paper-card);
+    border: 1px solid var(--cog-line-ink);
+    border-top: 3px solid var(--cog-accent);
+    transition:
+      transform var(--transition),
+      box-shadow var(--transition);
+  }
+  .trial__card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 40px rgba(14, 27, 45, 0.1);
+  }
+  .trial__card[hidden] {
+    display: none;
+  }
+  .trial__card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+  .trial__tag {
+    padding: 4px 12px;
+    font-family: var(--font-body);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--cog-accent);
+    border: 1px solid var(--cog-accent);
+    border-radius: 100px;
+    white-space: nowrap;
+  }
+  .trial__cat {
+    font-family: var(--font-body);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--cog-ink-muted);
+    text-align: right;
+  }
+  .trial__name {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: var(--text-2xl);
+    line-height: 1.15;
+    color: var(--cog-ink);
+  }
+  .trial__note {
+    font-size: var(--text-sm);
+    line-height: 1.65;
+    color: var(--cog-ink-body);
+  }
+  .trial__disclaimer {
+    margin-top: var(--space-8);
+    font-family: var(--font-heading);
+    font-style: italic;
+    font-size: var(--text-sm);
+    color: var(--cog-ink-muted);
+  }
+
+  /* ---- Responsive ---- */
+  @media (max-width: 900px) {
+    .trial__head {
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: var(--space-8);
+    }
+    .trial__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  @media (max-width: 650px) {
+    .trial__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>(".trial").forEach((root) => {
+    const filters = root.querySelectorAll<HTMLButtonElement>(".trial__filter");
+    const cards = root.querySelectorAll<HTMLElement>(".trial__card");
+
+    filters.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        filters.forEach((b) => b.setAttribute("aria-pressed", "false"));
+        btn.setAttribute("aria-pressed", "true");
+
+        const f = btn.dataset.filter;
+        const reduce = window.matchMedia(
+          "(prefers-reduced-motion: reduce)",
+        ).matches;
+
+        let shown = 0;
+        cards.forEach((c) => {
+          const show = f === "all" || c.dataset.category === f;
+          c.hidden = !show;
+          if (show && !reduce) {
+            // Stagger the entrance by visible position (not DOM index).
+            c.animate(
+              [
+                { opacity: 0, transform: "translateY(14px)" },
+                { opacity: 1, transform: "translateY(0)" },
+              ],
+              {
+                duration: 400,
+                delay: shown * 45,
+                easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+                fill: "backwards",
+              },
+            );
+            shown++;
+          }
+        });
+      });
+    });
+  });
+</script>

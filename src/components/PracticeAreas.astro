@@ -1,7 +1,15 @@
 ---
 import Eyebrow from "./Eyebrow.astro";
-// Homepage "Practice Areas" band — light paper section with a navy card grid.
-// Icon-only cards (no photos). Static for now (can move to Sanity later).
+// "Practice Areas" band — light section with a navy card grid. Icon-only cards
+// (no photos). Static for now (can move to Sanity later).
+//
+// `background` sets the section ground: "paper" (default, warm off-white) or
+// "card" (near-white --cog-paper-card) to break up a page that already runs
+// paper above/below.
+interface Props {
+  background?: "paper" | "card";
+}
+const { background = "paper" } = Astro.props;
 
 // Lucide-style icon inner-paths (viewBox 0 0 24 24), rendered inline via set:html.
 const icons: Record<string, string> = {
@@ -51,7 +59,7 @@ const practiceAreas = [
 ];
 ---
 
-<section class="practice" id="practice">
+<section class:list={["practice", background === "card" && "practice--card"]} id="practice">
   <div class="container">
     <div class="practice__head">
       <div class="practice__head-left">
@@ -103,6 +111,10 @@ const practiceAreas = [
 <style>
   .practice {
     background-color: var(--cog-paper);
+    padding-bottom: var(--space-section);
+  }
+  .practice--card {
+    background-color: var(--cog-paper-card);
   }
 
   /* ---- Header ---- */
@@ -152,7 +164,6 @@ const practiceAreas = [
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1px;
-    margin-bottom: var(--space-section);
     background-color: var(--cog-navy-glow);
     border: 1px solid var(--cog-navy-glow);
   }
