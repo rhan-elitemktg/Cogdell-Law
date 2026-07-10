@@ -1,0 +1,134 @@
+---
+// Homepage "Why Cogdell" band — full-bleed courthouse-steps photo with a
+// bottom-solid scrim and centered firm story + CTA.
+import { Image } from "astro:assets";
+import Eyebrow from "./Eyebrow.astro";
+import bgPhoto from "../assets/firm-steps.jpg";
+---
+
+<section class="firm-story">
+  <Image
+    src={bgPhoto}
+    alt=""
+    widths={[1200, 1376]}
+    sizes="100vw"
+    class="firm-story__bg"
+  />
+  <div class="firm-story__overlay" aria-hidden="true"></div>
+
+  <div class="firm-story__inner">
+    <Eyebrow center rule={false} tone="white">Why Cogdell Law Firm</Eyebrow>
+    <h2 class="firm-story__heading">
+      <span class="firm-story__heading-lead">The Firm the Opposition</span>
+      <span class="firm-story__heading-strong"> Doesn't Want to Face.</span>
+    </h2>
+
+    <p class="firm-story__body">
+      When the gavel sounds, and the courtroom doors swing open, there's one name
+      that makes the opposition quake in their polished loafers: Cogdell Law Firm.
+      It isn't just a law firm; it's the law firm of choice for people facing
+      charges for federal white collar and criminal offenses, state felony
+      charges, grand jury investigations, medical kickback, securities fraud or
+      criminal appeals.
+    </p>
+    <p class="firm-story__body">
+      Dan Cogdell is one of the elite 2% of attorneys admitted to the Fellow
+      American College of Trial Lawyers. His reputation for strategy and skill
+      isn't just respected, it's revered. Mr. Cogdell knows the play before the
+      opposition's even decided on the game. Settlements are his specialty, but
+      should a trial beckon, he's the maestro ready to conduct a legal symphony
+      like no other.
+    </p>
+    <p class="firm-story__body">
+      Mr. Cogdell has spent his career collecting acquittals in cases written off
+      by others. Impossible isn't in his lexicon — it's just another word for
+      challenge. He doesn't take cases he thinks he can win; he takes those he
+      knows he will.
+    </p>
+
+    <div class="firm-story__actions">
+      <a href="/our-firm" class="btn btn--primary">
+        About the Firm
+        <svg class="btn__icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .firm-story {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--cog-navy-deep);
+    color: var(--cog-white);
+  }
+
+  .firm-story__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+  /* Show the photo up top, then settle into solid navy where the copy sits. */
+  .firm-story__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(
+      180deg,
+      rgba(7, 16, 29, 0.5) 0%,
+      rgba(7, 16, 29, 0.7) 28%,
+      rgba(7, 16, 29, 0.92) 52%,
+      var(--cog-navy-deep) 78%
+    );
+  }
+
+  .firm-story__inner {
+    position: relative;
+    z-index: 2;
+    max-width: 980px;
+    margin-inline: auto;
+    padding-block: var(--space-section);
+    padding-inline: var(--space-6);
+    text-align: center;
+  }
+
+  .firm-story__heading {
+    margin-top: var(--space-4); /* standard eyebrow → heading gap */
+    font-family: var(--font-heading);
+    font-size: clamp(2.375rem, 4.4vw, 3.75rem); /* 38 → 60px */
+    line-height: 1.04;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  .firm-story__heading-lead {
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(2.75rem, 5.3vw, 4.5rem); /* 44 → 72px, larger than the bold line */
+    color: var(--cog-cream);
+    line-height: 1.25;
+  }
+  .firm-story__heading-strong {
+    font-weight: 700;
+    color: var(--cog-white);
+  }
+
+  .firm-story__body {
+    max-width: 760px;
+    margin-inline: auto;
+    margin-top: var(--space-6);
+    font-size: var(--text-base);
+    line-height: 1.7;
+    color: var(--cog-white);
+  }
+  .firm-story__body:first-of-type {
+    margin-top: var(--space-8);
+  }
+
+  .firm-story__actions {
+    margin-top: var(--space-8);
+  }
+</style>

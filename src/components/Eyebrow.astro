@@ -3,15 +3,17 @@
 // The rule is always accent; `tone` sets the label color (accent on paper,
 // light on dark CTA bands). The eyebrow → heading gap is owned by the parent.
 interface Props {
-  tone?: "accent" | "light";
+  tone?: "accent" | "light" | "white";
+  center?: boolean;
+  rule?: boolean;
   class?: string;
 }
 
-const { tone = "accent", class: className } = Astro.props;
+const { tone = "accent", center = false, rule = true, class: className } = Astro.props;
 ---
 
-<p class:list={["eyebrow", `eyebrow--${tone}`, className]}>
-  <span class="eyebrow__rule" aria-hidden="true"></span>
+<p class:list={["eyebrow", `eyebrow--${tone}`, { "eyebrow--center": center }, className]}>
+  {rule && <span class="eyebrow__rule" aria-hidden="true"></span>}
   <slot />
 </p>
 
@@ -27,11 +29,17 @@ const { tone = "accent", class: className } = Astro.props;
     letter-spacing: 0.18em;
     text-transform: uppercase;
   }
+  .eyebrow--center {
+    justify-content: center;
+  }
   .eyebrow--accent {
     color: var(--cog-accent);
   }
   .eyebrow--light {
     color: var(--cog-navlink);
+  }
+  .eyebrow--white {
+    color: var(--cog-white);
   }
   .eyebrow__rule {
     width: 24px;
