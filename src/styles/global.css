@@ -260,3 +260,23 @@ body.drawer-open {
   border-color: var(--cog-white);
   background-color: rgba(255, 255, 255, 0.06);
 }
+
+/* Solid light button for dark sections — ink label with an accent arrow. */
+.btn--light {
+  background-color: var(--cog-white);
+  color: var(--cog-ink);
+}
+.btn--light:hover {
+  background-color: var(--cog-paper);
+  color: var(--cog-ink);
+}
+.btn--light .btn__icon {
+  color: var(--cog-accent);
+}
+
+/* Buttons go full-width on mobile (parent must allow it, i.e. block/stretch). */
+@media (max-width: 650px) {
+  .btn {
+    width: 100%;
+  }
+}

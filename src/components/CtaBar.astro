@@ -1,0 +1,82 @@
+---
+import Eyebrow from "./Eyebrow.astro";
+// Homepage CTA bar — sits directly under the Video Band. Three-up on desktop:
+// eyebrow + heading, supporting copy, and a Schedule Consultation button.
+---
+
+<section class="ctabar">
+  <div class="container ctabar__inner">
+    <div class="ctabar__lead">
+      <Eyebrow tone="light">When the Stakes Are Highest</Eyebrow>
+      <h2 class="ctabar__heading">
+        <span class="ctabar__heading-lead">Call</span> Cogdell Law Firm.
+      </h2>
+    </div>
+
+    <p class="ctabar__body">
+      Our attorneys have tried the most difficult cases in federal and state
+      courts across the country. If you are facing a serious charge or a
+      high-stakes dispute, call us before you say anything to anyone else.
+    </p>
+
+    <div class="ctabar__action">
+      <a href="/contact" class="btn btn--light">
+        Schedule Consultation
+        <svg class="btn__icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .ctabar {
+    background-color: var(--cog-navy-deep);
+    border-top: 1px solid var(--cog-line);
+    color: var(--cog-white);
+  }
+  .ctabar__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+    column-gap: var(--space-16);
+    align-items: center;
+    padding-block: var(--space-16);
+  }
+
+  .ctabar__heading {
+    margin-top: var(--space-4); /* standard eyebrow → heading gap */
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: clamp(1.875rem, 3vw, 2.75rem); /* 30 → 44px */
+    line-height: 1.04;
+    letter-spacing: -0.01em;
+    color: var(--cog-white);
+  }
+  .ctabar__heading-lead {
+    font-style: italic;
+    font-weight: 500;
+    color: var(--cog-cream);
+  }
+
+  .ctabar__body {
+    max-width: 520px;
+    font-size: var(--text-base);
+    line-height: 1.7;
+    color: var(--cog-body);
+  }
+
+  .ctabar__action {
+    justify-self: end;
+  }
+
+  /* ---- Responsive ---- */
+  @media (max-width: 900px) {
+    .ctabar__inner {
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: var(--space-8);
+      align-items: start;
+    }
+    .ctabar__action {
+      justify-self: stretch;
+    }
+  }
+</style>

@@ -2,6 +2,7 @@
 // Homepage full-bleed "Litigation Boutique" band — team photo with a bottom
 // scrim; eyebrow + lockup on the left, positioning statement + link on the right.
 import { Image } from "astro:assets";
+import Eyebrow from "./Eyebrow.astro";
 import teamPhoto from "../assets/team-group.png";
 ---
 
@@ -19,10 +20,7 @@ import teamPhoto from "../assets/team-group.png";
 
   <div class="container video-band__inner">
     <div class="video-band__lead">
-      <p class="video-band__eyebrow">
-        <span class="video-band__eyebrow-rule" aria-hidden="true"></span>
-        A Litigation Boutique
-      </p>
+      <Eyebrow>A Litigation Boutique</Eyebrow>
       <h2 class="video-band__heading">
         <span class="video-band__heading-italic">Built for the Highest Stakes —</span>
         <span class="video-band__heading-bold">Civil and Criminal.</span>
@@ -69,16 +67,19 @@ import teamPhoto from "../assets/team-group.png";
     object-fit: cover;
     object-position: center top;
   }
-  /* Darken from the bottom up so the photo reads clear while the copy stays legible. */
+  /* Darken from the bottom up so the photo reads clear while the copy stays legible.
+     The bottom 20px is fully solid navy before it feathers, so the band blends
+     seamlessly into the solid CTA bar below. */
   .video-band__overlay {
     position: absolute;
     inset: 0;
     background: linear-gradient(
-      180deg,
-      rgba(7, 16, 29, 0.15) 0%,
-      rgba(7, 16, 29, 0) 32%,
-      rgba(7, 16, 29, 0.6) 64%,
-      rgba(7, 16, 29, 0.95) 100%
+      to top,
+      rgba(7, 16, 29, 1) 0,
+      rgba(7, 16, 29, 1) 20px,
+      rgba(7, 16, 29, 0.6) 36%,
+      rgba(7, 16, 29, 0) 68%,
+      rgba(7, 16, 29, 0.15) 100%
     );
   }
 
@@ -90,25 +91,6 @@ import teamPhoto from "../assets/team-group.png";
     column-gap: var(--space-16);
     align-items: end;
     padding-block-end: var(--space-16);
-  }
-
-  /* ---- Eyebrow (with leading rule) ---- */
-  .video-band__eyebrow {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    font-family: var(--font-body);
-    font-size: var(--text-xs);
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--cog-accent);
-  }
-  .video-band__eyebrow-rule {
-    width: 24px;
-    height: 2px;
-    background-color: var(--cog-accent);
-    flex-shrink: 0;
   }
 
   /* ---- Heading lockup ---- */

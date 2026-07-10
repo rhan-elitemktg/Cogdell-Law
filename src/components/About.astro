@@ -2,6 +2,7 @@
 // Homepage "About" band — two columns on paper: firm story + Notable Results
 // carousel on the left, courthouse photo with brand seal + pull-quote on the right.
 import { Image } from "astro:assets";
+import Eyebrow from "./Eyebrow.astro";
 import aboutPhoto from "../assets/about-courthouse.jpg";
 
 const results = [
@@ -42,10 +43,7 @@ const results = [
   <div class="container about__inner">
     <!-- Left column: story + notable results -->
     <div class="about__col">
-      <p class="about__eyebrow">
-        <span class="about__eyebrow-rule" aria-hidden="true"></span>
-        Texas Criminal Defense Lawyer
-      </p>
+      <Eyebrow>Texas Criminal Defense Lawyer</Eyebrow>
       <h2 class="about__title">
         <span class="about__title-lead">Four Decades of</span>
         <span class="about__title-strong">High-Profile Victories</span>
@@ -73,10 +71,7 @@ const results = [
 
       <div class="about__results">
         <div class="about__results-head">
-          <p class="about__eyebrow">
-            <span class="about__eyebrow-rule" aria-hidden="true"></span>
-            Notable Results
-          </p>
+          <Eyebrow>Notable Results</Eyebrow>
           <div class="about__arrows">
             <button class="about__arrow" data-dir="prev" type="button" aria-label="Previous results">
               <svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true"><path d="M10.5 2.5L5 8l5.5 5.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -154,25 +149,6 @@ const results = [
      long text wrap/scroll internally instead of forcing horizontal overflow. */
   .about__col {
     min-width: 0;
-  }
-
-  /* ---- Eyebrow (with leading rule) ---- */
-  .about__eyebrow {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    font-family: var(--font-body);
-    font-size: var(--text-xs);
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--cog-accent);
-  }
-  .about__eyebrow-rule {
-    width: 24px;
-    height: 2px;
-    background-color: var(--cog-accent);
-    flex-shrink: 0;
   }
 
   /* ---- Heading lockup ---- */
