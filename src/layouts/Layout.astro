@@ -19,6 +19,8 @@ const fullTitle = title === SITE_NAME ? title : `${title} | ${SITE_NAME}`;
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    {/* Flag JS up front so the lazy-image fade only hides images when it can un-hide them. */}
+    <script is:inline>document.documentElement.classList.add("js");</script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
@@ -31,5 +33,19 @@ const fullTitle = title === SITE_NAME ? title : `${title} | ${SITE_NAME}`;
     <Header />
     <slot />
     <Footer />
+    <script>
+      // Fade each lazy image in once it decodes (covers the already-cached case).
+      document
+        .querySelectorAll<HTMLImageElement>("img.lazy-fade")
+        .forEach((img) => {
+          if (img.complete) {
+            img.classList.add("is-loaded");
+          } else {
+            img.addEventListener("load", () => img.classList.add("is-loaded"), {
+              once: true,
+            });
+          }
+        });
+    </script>
   </body>
 </html>

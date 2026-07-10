@@ -197,6 +197,26 @@ body.drawer-open {
   overflow: hidden;
 }
 
+/* ---- Lazy-image fade-in --------------------------------- */
+/* Add `lazy-fade` to any below-the-fold <Image>; it fades in when it decodes.
+   Opacity is gated behind `.js` (set on <html> at load) so images still render
+   if scripting is off. The transition stays ungated + low-specificity so a
+   component can extend it (e.g. an image that also transitions transform). */
+.lazy-fade {
+  transition: opacity 0.7s var(--ease);
+}
+.js .lazy-fade {
+  opacity: 0;
+}
+.js .lazy-fade.is-loaded {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lazy-fade {
+    transition: none;
+  }
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;

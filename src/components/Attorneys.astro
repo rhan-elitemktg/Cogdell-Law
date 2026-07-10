@@ -70,7 +70,7 @@ const attorneys = [
                 alt={a.name}
                 widths={[300, 460, 600, 790]}
                 sizes="(max-width: 650px) 80vw, (max-width: 900px) 44vw, 22vw"
-                class="attorneys__photo-img"
+                class="attorneys__photo-img lazy-fade"
               />
               <span class="attorneys__bar" aria-hidden="true" />
             </div>
@@ -164,7 +164,10 @@ const attorneys = [
     height: 100%;
     object-fit: cover;
     object-position: center top;
-    transition: transform 0.6s var(--ease);
+    /* Keep the fade-in opacity transition alongside the hover-zoom. */
+    transition:
+      transform 0.6s var(--ease),
+      opacity 0.7s var(--ease);
   }
   .attorneys__card:hover .attorneys__photo-img {
     transform: scale(1.045);
