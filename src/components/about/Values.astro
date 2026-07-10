@@ -1,0 +1,182 @@
+---
+// Our Firm "What Drives Us" band — three value cards over the firm-steps photo.
+import { Image } from "astro:assets";
+import Eyebrow from "../Eyebrow.astro";
+import bgPhoto from "../../assets/firm-steps.jpg";
+
+const icons: Record<string, string> = {
+  sparkles:
+    '<path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/>',
+  gavel:
+    '<path d="m14 13-7.5 7.5c-.83.83-2.17.83-3 0a2.12 2.12 0 0 1 0-3L11 10"/><path d="m16 16 6-6"/><path d="m8 8 6-6"/><path d="m9 7 8 8"/><path d="m21 11-8-8"/>',
+  users:
+    '<path d="M16 19v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="3"/><path d="M22 19v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+};
+
+const values = [
+  {
+    icon: "sparkles",
+    title: "Impossible Isn't in the Lexicon",
+    body: "Mr. Cogdell has built a career collecting acquittals in cases written off by others. To him, impossible is just another word for challenge.",
+  },
+  {
+    icon: "gavel",
+    title: "We Try the Cases Others Settle",
+    body: "Settlements are a specialty, but should a trial beckon, he is the maestro ready to conduct a legal symphony like no other.",
+  },
+  {
+    icon: "users",
+    title: "Shoulder to Shoulder",
+    body: "Choosing Cogdell Law Firm means partnering with a legal giant who stands with you, from first call through verdict, in the pursuit of justice.",
+  },
+];
+---
+
+<section class="values">
+  <Image
+    src={bgPhoto}
+    alt=""
+    widths={[900, 1376]}
+    sizes="100vw"
+    class="values__bg lazy-fade"
+  />
+  <div class="values__overlay" aria-hidden="true"></div>
+
+  <div class="container values__inner">
+    <div class="values__head">
+      <Eyebrow center>What Drives Us</Eyebrow>
+      <h2 class="values__heading">
+        <span class="values__heading-lead">The Standard</span>
+        <span class="values__heading-strong"> We Hold.</span>
+      </h2>
+    </div>
+
+    <div class="values__grid">
+      {
+        values.map((v) => (
+          <article class="values__card">
+            <svg
+              class="values__icon"
+              viewBox="0 0 24 24"
+              width="30"
+              height="30"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+              set:html={icons[v.icon]}
+            />
+            <h3 class="values__card-title">{v.title}</h3>
+            <p class="values__card-body">{v.body}</p>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .values {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--cog-navy-deep);
+    color: var(--cog-white);
+  }
+  .values__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+  .values__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(
+      180deg,
+      rgba(7, 16, 29, 0.9) 0%,
+      rgba(7, 16, 29, 0.82) 100%
+    );
+  }
+
+  .values__inner {
+    position: relative;
+    z-index: 2;
+    padding-block: calc(var(--space-section) * 2);
+  }
+
+  /* ---- Head ---- */
+  .values__head {
+    max-width: 720px;
+    margin-inline: auto;
+    margin-bottom: var(--space-12);
+    text-align: center;
+  }
+  .values__heading {
+    margin-top: var(--space-4); /* standard eyebrow → heading gap */
+    font-family: var(--font-heading);
+    font-size: clamp(2.375rem, 4.2vw, 3.625rem); /* 38 → 58px */
+    line-height: 1.04;
+    letter-spacing: -0.01em;
+  }
+  .values__heading-lead {
+    font-style: italic;
+    font-weight: 500;
+    color: var(--cog-cream);
+  }
+  .values__heading-strong {
+    font-weight: 700;
+    color: var(--cog-white);
+  }
+
+  /* ---- Cards ---- */
+  .values__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-6);
+  }
+  .values__card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: var(--space-8);
+    background-color: rgba(12, 21, 38, 0.72);
+    border: 1px solid var(--cog-line);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+  }
+  .values__icon {
+    color: var(--cog-accent);
+  }
+  .values__card-title {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: var(--text-xl);
+    line-height: 1.15;
+    color: var(--cog-white);
+  }
+  .values__card-body {
+    font-size: var(--text-sm);
+    line-height: 1.65;
+    color: var(--cog-body);
+  }
+
+  /* ---- Responsive ---- */
+  @media (max-width: 900px) {
+    .values__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 650px) {
+    /* Drop the eyebrow's leading accent rule on mobile (rule lives in Eyebrow). */
+    .values__head :global(.eyebrow__rule) {
+      display: none;
+    }
+  }
+</style>

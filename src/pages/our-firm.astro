@@ -1,0 +1,52 @@
+---
+import Layout from "../layouts/Layout.astro";
+import PageHero from "../components/PageHero.astro";
+import AboutIntro from "../components/about/AboutIntro.astro";
+import SellingPoints from "../components/SellingPoints.astro";
+import QuoteBand from "../components/about/QuoteBand.astro";
+import FoundingAttorney from "../components/about/FoundingAttorney.astro";
+import OriginStory from "../components/about/OriginStory.astro";
+import Values from "../components/about/Values.astro";
+import Consult from "../components/Consult.astro";
+// Same courthouse shot as the homepage About section (the live site's /about hero).
+import heroImage from "../assets/about-courthouse.jpg";
+import consultBoardroom from "../assets/whychoose-bg.jpg";
+
+const stats = [
+  { value: "40+", label: "Years of Trial Experience" },
+  { value: "500+", label: "Jury Trials" },
+  { value: "Top 2%", label: "Fellow, American College of Trial Lawyers" },
+  { value: "Nationwide", label: "Federal & State Courts" },
+];
+---
+
+<Layout
+  title="About the Firm"
+  description="For more than four decades, Cogdell Law Firm has defended the cases others call unwinnable. Learn about founding attorney Dan Cogdell and our trial team."
+>
+  <PageHero
+    eyebrow="About Cogdell Law Firm"
+    titleLead="The Firm the Opposition"
+    titleStrong="Doesn't Want to Face."
+    lede="When the courtroom doors swing open, there's one name that makes the opposition think twice. For more than four decades, Cogdell Law Firm has defended the cases others call unwinnable — and won."
+    image={heroImage}
+    imageAlt="Dan Cogdell outside the courthouse"
+  >
+    <a href="#contact" class="btn btn--primary">
+      Schedule Consultation
+      <svg class="btn__icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+    </a>
+    <a href="/attorneys" class="btn btn--outline">
+      Meet Our Attorneys
+      <svg class="btn__icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+    </a>
+  </PageHero>
+
+  <AboutIntro />
+  <SellingPoints points={stats} />
+  <QuoteBand />
+  <FoundingAttorney />
+  <OriginStory />
+  <Values />
+  <Consult photo={consultBoardroom} photoAlt="The Cogdell Law Firm team in the boardroom" />
+</Layout>

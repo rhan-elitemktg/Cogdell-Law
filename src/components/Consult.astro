@@ -1,8 +1,20 @@
 ---
-// Homepage "Schedule Your Consultation" band — contact form + portrait.
+// "Schedule Your Consultation" band — contact form + photo. Defaults to the
+// study portrait; pages can pass their own `photo`.
 import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
 import Eyebrow from "./Eyebrow.astro";
-import consultPhoto from "../assets/consult-portrait.jpg";
+import defaultPhoto from "../assets/consult-portrait.jpg";
+
+interface Props {
+  photo?: ImageMetadata;
+  photoAlt?: string;
+}
+
+const {
+  photo = defaultPhoto,
+  photoAlt = "Dan Cogdell seated in the firm's study",
+} = Astro.props;
 ---
 
 <section class="consult" id="contact">
@@ -55,8 +67,8 @@ import consultPhoto from "../assets/consult-portrait.jpg";
 
     <div class="consult__media">
       <Image
-        src={consultPhoto}
-        alt="Dan Cogdell seated in the firm's study"
+        src={photo}
+        alt={photoAlt}
         widths={[640, 976]}
         sizes="(max-width: 900px) 100vw, 45vw"
         class="consult__photo lazy-fade"
