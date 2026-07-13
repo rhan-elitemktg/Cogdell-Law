@@ -5,6 +5,7 @@ import PracticeGrid from "../../components/practice/PracticeGrid.astro";
 import CtaBar from "../../components/CtaBar.astro";
 import Consult from "../../components/Consult.astro";
 import { topLevelCards } from "../../data/practice-areas";
+import heroImage from "../../assets/firm-steps.jpg";
 
 // A closing "get in touch" card fills the grid's last cell (5 areas leave one
 // empty in a 3-col grid) and gives an easy path to the consult form.
@@ -28,7 +29,7 @@ const gridCards = [
     eyebrow="Practice Areas"
     titleLead="Experienced Federal Criminal Defense"
     titleStrong="When The Stakes Are High"
-    lede=""
+    image={heroImage}
   >
     <a href="#contact" class="btn btn--primary">
       Schedule a Consultation

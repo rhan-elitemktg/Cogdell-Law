@@ -13,6 +13,8 @@ interface Props {
   image?: ImageMetadata; // omit for a plain navy hero (no photo)
   imageAlt?: string;
   imagePosition?: string;
+  align?: "left" | "center"; // content-column position — text stays left (default left)
+  contentMaxWidth?: string; // content column width (default 720px)
 }
 
 const {
@@ -23,6 +25,8 @@ const {
   image,
   imageAlt = "",
   imagePosition = "center 30%",
+  align = "left",
+  contentMaxWidth = "720px",
 } = Astro.props;
 ---
 
@@ -43,7 +47,12 @@ const {
   {image && <div class="page-hero__overlay" aria-hidden="true" />}
 
   <div class="container page-hero__inner">
-    <div class="page-hero__content">
+    <div
+      class:list={[
+        "page-hero__content",
+        align === "center" && "page-hero__content--center",
+      ]}
+    >
       <Eyebrow>{eyebrow}</Eyebrow>
       <h1 class="page-hero__title">
         {titleLead && <span class="page-hero__title-lead">{titleLead}</span>}
@@ -57,7 +66,7 @@ const {
   </div>
 </section>
 
-<style define:vars={{ imagePosition }}>
+<style define:vars={{ imagePosition, contentMaxWidth }}>
   .page-hero {
     position: relative;
     overflow: hidden;
@@ -74,7 +83,7 @@ const {
   }
   /* Extra bottom room so an overlapping section (e.g. contact cards) clears the lede. */
   .page-hero--plain .page-hero__inner {
-    padding-bottom: calc(var(--space-section) + var(--space-12));
+    padding-bottom: calc(var(--space-section));
   }
 
   .page-hero__bg {
@@ -106,7 +115,12 @@ const {
     padding-block: var(--space-section);
   }
   .page-hero__content {
-    max-width: 720px;
+    max-width: var(--contentMaxWidth);
+  }
+  /* Centers the content column in the container (so it sits above a centered
+     body column) — the text, eyebrow, and buttons stay left-aligned. */
+  .page-hero__content--center {
+    margin-inline: auto;
   }
 
   .page-hero__title {
