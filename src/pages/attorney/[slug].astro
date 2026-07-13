@@ -1,0 +1,26 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import AttorneyHero from "../../components/attorney/AttorneyHero.astro";
+import AttorneyBio from "../../components/attorney/AttorneyBio.astro";
+import Consult from "../../components/Consult.astro";
+import { getAttorneyPaths, type Attorney } from "../../data/attorneys";
+
+export function getStaticPaths() {
+  return getAttorneyPaths();
+}
+
+interface Props {
+  attorney: Attorney;
+}
+
+const { attorney } = Astro.props;
+const description = `${attorney.name}, ${attorney.role} at Cogdell Law Firm.${
+  attorney.bio?.[0] ? ` ${attorney.bio[0]}` : ""
+}`;
+---
+
+<Layout title={attorney.name} description={description}>
+  <AttorneyHero attorney={attorney} />
+  <AttorneyBio attorney={attorney} />
+  <Consult />
+</Layout>
