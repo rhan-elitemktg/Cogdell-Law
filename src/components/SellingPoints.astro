@@ -34,8 +34,6 @@ const { points = defaultPoints } = Astro.props;
 <style>
   .selling-points {
     background-color: var(--cog-navy);
-    border-top: 1px solid var(--cog-line);
-    border-bottom: 1px solid var(--cog-line);
     
     .inner {
       display: flex;
@@ -44,7 +42,7 @@ const { points = defaultPoints } = Astro.props;
     
     .selling-point {
       padding: var(--space-12) var(--space-8);
-      border-right: 1px solid var(--cog-line);
+      border-right: 1px solid var(--cog-navy-glow);
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -86,16 +84,16 @@ const { points = defaultPoints } = Astro.props;
       .selling-point {
         flex-basis: 50%;
         border-right: 0;
-        padding: var(--space-8) var(--space-4);
+        padding: var(--space-8) var(--space-8);
         &:first-child {
-          border-right: 1px solid var(--cog-line);
-          border-bottom: 1px solid var(--cog-line);
+          border-right: 1px solid var(--cog-navy-glow);
+          border-bottom: 1px solid var(--cog-navy-glow);
         }
         &:nth-child(2) {
-          border-bottom: 1px solid var(--cog-line);
+          border-bottom: 1px solid var(--cog-navy-glow);
         }
         &:nth-child(3) {
-          border-right: 1px solid var(--cog-line);
+          border-right: 1px solid var(--cog-navy-glow);
         }
       }
     }
