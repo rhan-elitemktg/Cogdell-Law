@@ -1,0 +1,152 @@
+---
+// Full testimonials wall — trial-experience card styling (paper cards, accent
+// top rule, serif accents) in a masonry column layout, since testimonial
+// lengths vary widely. No filter tabs.
+import Eyebrow from "./Eyebrow.astro";
+import { testimonials } from "../data/testimonials";
+---
+
+<section class="twall">
+  <div class="container twall__inner">
+    <header class="twall__head">
+      <div class="twall__head-left">
+        <Eyebrow>Client Testimonials</Eyebrow>
+        <h2 class="twall__heading">
+          <span class="twall__heading-lead">In Their</span>
+          <span class="twall__heading-strong">Own Words.</span>
+        </h2>
+      </div>
+      <div class="twall__head-right">
+        <p>
+          Across four decades of high-stakes trials, the people Dan Cogdell has
+          defended have shared what representation at the highest level meant to
+          them — often at the most difficult moment of their lives.
+        </p>
+      </div>
+    </header>
+
+    <div class="twall__grid">
+      {
+        testimonials.map((t) => (
+          <figure class="twall__card">
+            <span class="twall__mark" aria-hidden="true">&ldquo;</span>
+            <blockquote class="twall__quote">{t.quote}</blockquote>
+            <figcaption class="twall__author">{t.author}</figcaption>
+          </figure>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .twall {
+    background-color: var(--cog-paper);
+  }
+  .twall__inner {
+    padding-block: var(--space-section);
+  }
+
+  /* ---- Header (matches TrialResults) ---- */
+  .twall__head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: var(--space-16);
+    align-items: start;
+    margin-bottom: var(--space-12);
+  }
+  .twall__head-left {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+  .twall__heading {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: clamp(2.375rem, 4.2vw, 3.625rem);
+    line-height: 1.04;
+    letter-spacing: -0.01em;
+  }
+  .twall__heading-lead,
+  .twall__heading-strong {
+    display: block;
+  }
+  .twall__heading-lead {
+    font-style: italic;
+    font-weight: 500;
+    color: var(--cog-gold);
+  }
+  .twall__heading-strong {
+    font-weight: 700;
+    color: var(--cog-ink);
+  }
+  .twall__head-right p {
+    margin: 0;
+    font-size: var(--text-base);
+    line-height: 1.7;
+    color: var(--cog-ink-body);
+  }
+
+  /* ---- Masonry wall ---- */
+  .twall__grid {
+    columns: 3;
+    column-gap: var(--space-6);
+  }
+  .twall__card {
+    break-inside: avoid;
+    margin: 0 0 var(--space-6);
+    padding: var(--space-8);
+    background-color: var(--cog-paper-card);
+    border: 1px solid var(--cog-line-ink);
+    border-top: 3px solid var(--cog-accent);
+  }
+  .twall__mark {
+    display: block;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 3.5rem;
+    line-height: 0.7;
+    color: var(--cog-gold);
+  }
+  .twall__quote {
+    margin: var(--space-4) 0 0;
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    color: var(--cog-ink-body);
+  }
+  .twall__author {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--cog-ink-muted);
+  }
+  .twall__author::before {
+    content: "";
+    flex-shrink: 0;
+    width: 24px;
+    height: 2px;
+    background-color: var(--cog-accent);
+  }
+
+  /* ---- Responsive ---- */
+  @media (max-width: 900px) {
+    .twall__head {
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: var(--space-8);
+    }
+    .twall__grid {
+      columns: 2;
+    }
+  }
+  @media (max-width: 650px) {
+    .twall__grid {
+      columns: 1;
+    }
+  }
+</style>

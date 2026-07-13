@@ -1,0 +1,89 @@
+/** A single client testimonial. `author` is the attribution as shown (initials,
+ *  "Former Client", etc.) — the byline dash/rule is added by the component. */
+export interface Testimonial {
+  quote: string;
+  author: string;
+}
+
+export const testimonials: Testimonial[] = [
+  {
+    quote:
+      "Thank you both for the help, kindness and hospitality that you unreservedly gave me during my recent unforeseen extended stay in Houston. The fact that you welcomed a complete stranger into the bosom of your family and gave your friendship at a time of need demonstrates what truly wonderful people you are. Despite what lies in store for me in the future, I will never forget your act of kindness and the way in which you helped me to regain my dignity after the dehumanizing experience of the previous two days.",
+    author: "P.W.",
+  },
+  {
+    quote:
+      "Dan is consistently professional, informative and 100% honest. Dan Cogdell is the only attorney we would ever recommend, period.",
+    author: "DHS Criminal Defense Client",
+  },
+  {
+    quote:
+      "You possess the qualities I admire most in your profession: honesty, dedication, integrity and the willingness to stand behind your client at all times. Excellence is more than competence. You are excellent.",
+    author: "M. K.",
+  },
+  {
+    quote:
+      "Dan Cogdell made me feel from the first day he took my case that it would all work out fine. His knowledge of the legal system and responsiveness to my case took away any anxiety that I had. I would not hesitate to hire him again if needed and would recommend him to anyone wanting an attorney that will “go to bat” for you. No wonder he is so highly regarded in the legal community.",
+    author: "Tami",
+  },
+  {
+    quote:
+      "I was pulled over for a routine speeding ticket. The police officer claimed I ran over his foot. I was arrested and put in jail for aggravated assault on a police officer. I spent over 24+ hours in jail. I have never been so scared or humiliated in my life. My sister in Georgia did all the leg-work to help me find a preeminent attorney. We both decided there was no price too high for freedom. After my interview, I knew Dan was the one, even though I still had one more interview to go. During my hearings, it was unbelievably reassuring the reception Mr. Cogdell gets when entering the court room. I knew I was in good hands.",
+    author: "Former Client",
+  },
+  {
+    quote:
+      "Thank you for appearing on my show, Johnnie Cochran Tonight. It was a pleasure to have you come and share your thoughts and views with my audience. Unfortunately these serious racial crimes are occurring, but if we continue to educate our viewers on the legal system, we can combat these incidents. On behalf of the entire staff, please accept my sincere gratitude for your time. I have tremendous respect for your work and look forward to working with you again in the future.",
+    author: "J. C.",
+  },
+  {
+    quote:
+      "I was charged with interference of 911 call class A as well as charged with Assault of a family member class A. Dan was able to get both charges dismissed and expunged off my record. Until Dan Cogdell, I didn’t think lawyers actually cared about their clients, but I was dead wrong. Dan treated me with respect, believed in my innocence and made sure I would never have to worry about this again. I can not thank him enough for believing in me and giving me my life back!",
+    author: "J.C.",
+  },
+  {
+    quote:
+      "From the beginning of our situation, Dan always provided us a sense of comfort and confidence, knowing that he had the knowledge needed to process through. Although we thought, from the beginning, that we could fight the charges and leave the situation without any jail time, that did not happen. Although it was disappointing that we had to accept the plea deal, it was with confidence and understanding that we made the right decision. Dan provided enough detail to feel comfortable, without too much legal information that would have confused the situation. He was always responsive when needed.",
+    author: "Former Client",
+  },
+  {
+    quote:
+      "Having witnessed the three best attorneys in Houston over a four-week trial, I can honestly say, as I told you during the course of the trial, you were significantly superior. You could actually sense the jury’s excitement when you stood up to cross examine the next witness, and the jury was spellbound by your expertise and performance.",
+    author: "D. S.",
+  },
+  {
+    quote:
+      "I wanted to let you know that Mr. Cogdell is untouchable. You want to fight a case? He will. He saved my life on a charge that could have left me on welfare for life. Thank you, Dan. I would be in a ditch today. Now I have a house, wife, kids, dogs, cats, and my life back. Thank you so much.",
+    author: "Lew M.",
+  },
+  {
+    quote:
+      "The intensity of your focus and preparation is nothing short of incredible. Your grasp of detail and nuance in complex transactions prove intellectual skills worthy of any adversary. Your “in your face” trial skills held the courtroom’s attention at every word and act, and blunted the government’s attacks at every assault. Not a day passed that I was not thankful and proud that I chose you to defend me.",
+    author: "L. R.",
+  },
+  {
+    quote:
+      "Dan let me know exactly how the process was going to go. He’s extremely knowledgeable and straightforward. He was able to get everything dismissed! There were no hidden fees. His office staff was always helpful and pleasant. More than anything, Dan doesn’t bs with clients and he knows what he’s doing.",
+    author: "M.G.",
+  },
+  {
+    quote:
+      "I was in a car accident where I was driving and my best friend was killed. Dan worked with me for three years to achieve a deferred adjudication. It was a devastating event; a conviction for manslaughter would have ended my career and severely muted the remainder of my life. Dan saved my life.",
+    author: "Former Client",
+  },
+  {
+    quote:
+      "Please accept my deepest thanks for your involvement in my defense in the criminal litigation. Your participation was very important. Personally, I was very impressed with your great presentations and, at the same time, the attention to the details and reactions of our adversaries.",
+    author: "S. B.",
+  },
+  {
+    quote:
+      "We were referred to Dan Cogdell regarding a criminal defense case by a well-known Houston attorney. After we initially met Dan, we knew he could be entrusted to defend our family member. Our decision was not just based on the fact that he was a power-house attorney, but more importantly to us, that he truly cared. Over the course of 3 years, Dan shared all updates and answered all questions personally — most of the time within only 1 hour. Dan was and is consistently professional, informative and 100% honest. Dan Cogdell is the only attorney we would ever recommend, period.",
+    author: "DCH",
+  },
+  {
+    quote:
+      "I was in jail with no bond over a weekend and had to appear in Court on Monday morning. My wife left a message for Mr. Cogdell on Sunday afternoon. He returned her call right away. He had his associate (because Dan was out of town) meet my wife in Court Monday morning and had me out on bond. Because of my past numerous felonies and prison sentences, my current indictment of aggravated theft carried a sentence of 25 years to life. I suffered some health issues during this time period, including 2 strokes. Dan’s concern and compassion for me was sincere. He convinced the Judge to postpone sentencing while I completed medical tests and numerous doctor appointments. He was also able to convince the Judge to allow out-of-county travel to help take care of my disabled parents who live out of town. Due to Dan’s knowledge of the law and legal system, I received 10 years deferred adjudication probation, which was a big win for me. Dan Cogdell definitely lives up to his firm’s motto of “When Results Matter Most.”",
+    author: "Former Client",
+  },
+];
