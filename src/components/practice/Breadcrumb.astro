@@ -1,0 +1,64 @@
+---
+// Breadcrumb trail for nested practice-area pages. Home / Practice Areas / … .
+import type { Crumb } from "../../data/practice-areas";
+
+interface Props {
+  trail: Crumb[];
+}
+
+const { trail } = Astro.props;
+---
+
+<nav class="crumbs" aria-label="Breadcrumb">
+  <div class="container crumbs__inner">
+    <a class="crumbs__link" href="/">Home</a>
+    {
+      trail.map((crumb, i) => (
+        <Fragment>
+          <span class="crumbs__sep" aria-hidden="true">/</span>
+          {i === trail.length - 1 ? (
+            <span class="crumbs__current" aria-current="page">
+              {crumb.title}
+            </span>
+          ) : (
+            <a class="crumbs__link" href={crumb.href}>
+              {crumb.title}
+            </a>
+          )}
+        </Fragment>
+      ))
+    }
+  </div>
+</nav>
+
+<style>
+  .crumbs {
+    background-color: var(--cog-paper);
+    border-bottom: 1px solid var(--cog-line-ink);
+  }
+  .crumbs__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    padding-block: var(--space-4);
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    letter-spacing: 0.04em;
+  }
+  .crumbs__link {
+    color: var(--cog-ink-muted);
+    text-decoration: none;
+    transition: color var(--transition);
+  }
+  .crumbs__link:hover {
+    color: var(--cog-accent);
+  }
+  .crumbs__sep {
+    color: var(--cog-line-ink);
+  }
+  .crumbs__current {
+    color: var(--cog-ink);
+    font-weight: 600;
+  }
+</style>

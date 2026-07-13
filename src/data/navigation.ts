@@ -6,6 +6,8 @@
 // Static-first: this lives in code for now; it can move to Sanity later if the
 // firm wants CMS-managed navigation.
 
+import { practiceAreas } from "./practice-areas";
+
 export type NavItem = {
   label: string;
   href?: string;
@@ -22,13 +24,47 @@ export const pathMatches = (href: string | undefined, current: string) =>
   !!href && normalizePath(href) === current;
 
 /**
+ * True when `current` sits at or beneath a non-root href stem (segment-aware, so
+ * `/practice-areas` matches `/practice-areas/x/y` but never `/practice-areas-x`).
+ * Lets deep pages (e.g. sub-topics not enumerated in the nav) highlight their
+ * ancestor. The root `/` is excluded so Home doesn't match every page.
+ */
+export const isUnder = (href: string | undefined, current: string) => {
+  if (!href) return false;
+  const h = normalizePath(href);
+  return h !== "/" && (current === h || current.startsWith(h + "/"));
+};
+
+/**
  * An item is on the "active trail" if it — or any descendant — is the current
  * page. Highlights the current item and all of its ancestors, even when child
- * URLs don't share the parent's path stem (e.g. /attorney/* → Attorneys).
+ * URLs don't share the parent's path stem (e.g. /attorney/* → Attorneys), and
+ * via `isUnder` for deep pages under a stem (e.g. /practice-areas/*).
  */
 export const isOnTrail = (item: NavItem, current: string): boolean =>
   pathMatches(item.href, current) ||
+  isUnder(item.href, current) ||
   (item.children?.some((child) => isOnTrail(child, current)) ?? false);
+
+// Practice Areas menu is generated from the practice-areas data so the nav and
+// the pages stay in sync — add a sub-topic there and it shows up here too.
+const practiceAreasNav: NavItem = {
+  label: "Practice Areas",
+  href: "/practice-areas",
+  children: practiceAreas.map((area): NavItem => {
+    const item: NavItem = {
+      label: area.title,
+      href: `/practice-areas/${area.slug}`,
+    };
+    if (area.children?.length) {
+      item.children = area.children.map((child) => ({
+        label: child.title,
+        href: `/practice-areas/${area.slug}/${child.slug}`,
+      }));
+    }
+    return item;
+  }),
+};
 
 export const navItems: NavItem[] = [
   { label: "Home", href: "/" },
@@ -80,25 +116,8 @@ export const navItems: NavItem[] = [
       { label: "Videos", href: "/videos" },
     ],
   },
-  {
-    label: "Practice Areas",
-    href: "/practice-areas",
-    children: [
-      {
-        label: "Federal Criminal Cases",
-        href: "/practice-areas/federal-criminal-cases",
-      },
-      {
-        label: "Federal Crimes Investigations",
-        href: "/practice-areas/federal-criminal-cases/federal-crimes-investigations",
-      },
-      {
-        label: "Fraud & White Collar Crimes",
-        href: "/practice-areas/fraud-white-collar-crimes",
-      },
-      { label: "Health Care Fraud Defense", href: "/health-care-fraud-defense" },
-    ],
-  },
+  practiceAreasNav,
+
   { label: "Trial Experience", href: "/trial-experience" },
   { label: "News", href: "/news" },
   { label: "Contact", href: "/contact" },

@@ -1,0 +1,133 @@
+---
+// Renders block-based content: paragraphs (with optional inline links), bullet
+// lists (items may also carry inline links), and blockquotes.
+import type { Block, Inline } from "../../data/practice-areas";
+
+interface Props {
+  blocks: Block[];
+}
+
+const { blocks } = Astro.props;
+
+const isString = (value: unknown): value is string => typeof value === "string";
+---
+
+{
+  blocks.map((block) => {
+    if ("quote" in block) {
+      return <blockquote class="prose__quote">{block.quote}</blockquote>;
+    }
+    if ("ul" in block) {
+      return (
+        <ul class="prose__list">
+          {block.ul.map((item) => (
+            <li>
+              {isString(item)
+                ? item
+                : item.map((seg) =>
+                    isString(seg) ? (
+                      seg
+                    ) : (
+                      <a class="prose__link" href={seg.href}>
+                        {seg.text}
+                      </a>
+                    ),
+                  )}
+            </li>
+          ))}
+        </ul>
+      );
+    }
+    return (
+      <p class="prose__p">
+        {isString(block.p)
+          ? block.p
+          : block.p.map((seg: Inline) =>
+              isString(seg) ? (
+                seg
+              ) : (
+                <a class="prose__link" href={seg.href}>
+                  {seg.text}
+                </a>
+              ),
+            )}
+      </p>
+    );
+  })
+}
+
+<style>
+  .prose__p {
+    margin: 0 0 var(--space-4);
+    font-size: var(--text-base);
+    line-height: 1.75;
+    color: var(--cog-ink-body);
+  }
+  .prose__p:last-child {
+    margin-bottom: 0;
+  }
+  .prose__list {
+    margin: 0 0 var(--space-4);
+    padding: 0;
+    list-style: none;
+  }
+  .prose__list:last-child {
+    margin-bottom: 0;
+  }
+  .prose__list li {
+    position: relative;
+    padding-left: var(--space-6);
+    margin-bottom: var(--space-3);
+    font-size: var(--text-base);
+    line-height: 1.65;
+    color: var(--cog-ink-body);
+  }
+  .prose__list li:last-child {
+    margin-bottom: 0;
+  }
+  .prose__list li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.6em;
+    width: 7px;
+    height: 7px;
+    background-color: var(--cog-accent);
+    transform: rotate(45deg);
+  }
+  .prose__link {
+    color: var(--cog-accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-thickness: 1px;
+    transition: color var(--transition);
+  }
+  .prose__link:hover {
+    color: var(--cog-accent-dark);
+  }
+  .prose__quote {
+    position: relative;
+    margin: var(--space-8) 0;
+    padding: var(--space-6) var(--space-8) var(--space-6) var(--space-12);
+    background-color: var(--cog-paper-card);
+    border-left: 4px solid var(--cog-accent);
+    box-shadow: 0 14px 34px rgba(7, 16, 29, 0.06);
+    font-family: var(--font-heading);
+    font-style: italic;
+    font-weight: 500;
+    font-size: var(--text-xl);
+    line-height: 1.5;
+    color: var(--cog-ink);
+  }
+  /* Decorative opening quotation mark. */
+  .prose__quote::before {
+    content: "\201C";
+    position: absolute;
+    top: 0.28em;
+    left: var(--space-4);
+    font-family: var(--font-heading);
+    font-size: 2.75rem;
+    line-height: 1;
+    color: var(--cog-gold);
+  }
+</style>
