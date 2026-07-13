@@ -10,7 +10,7 @@ interface Props {
   titleLead: string; // italic cream line
   titleStrong: string; // bold white line
   lede?: string;
-  image: ImageMetadata;
+  image?: ImageMetadata; // omit for a plain navy hero (no photo)
   imageAlt?: string;
   imagePosition?: string;
 }
@@ -26,17 +26,21 @@ const {
 } = Astro.props;
 ---
 
-<section class="page-hero">
-  <Image
-    src={image}
-    alt={imageAlt}
-    widths={[900, 1200, 1584]}
-    sizes="100vw"
-    loading="eager"
-    fetchpriority="high"
-    class="page-hero__bg"
-  />
-  <div class="page-hero__overlay" aria-hidden="true"></div>
+<section class:list={["page-hero", !image && "page-hero--plain"]}>
+  {
+    image && (
+      <Image
+        src={image}
+        alt={imageAlt}
+        widths={[900, 1200, 1584]}
+        sizes="100vw"
+        loading="eager"
+        fetchpriority="high"
+        class="page-hero__bg"
+      />
+    )
+  }
+  {image && <div class="page-hero__overlay" aria-hidden="true" />}
 
   <div class="container page-hero__inner">
     <div class="page-hero__content">
@@ -59,6 +63,18 @@ const {
     overflow: hidden;
     background-color: var(--cog-navy-deep);
     color: var(--cog-white);
+  }
+  /* Imageless variant: a subtle navy glow instead of a photo + scrim. */
+  .page-hero--plain {
+    background: radial-gradient(
+      125% 120% at 15% 0%,
+      var(--cog-navy) 0%,
+      var(--cog-navy-deep) 55%
+    );
+  }
+  /* Extra bottom room so an overlapping section (e.g. contact cards) clears the lede. */
+  .page-hero--plain .page-hero__inner {
+    padding-bottom: calc(var(--space-section) + var(--space-12));
   }
 
   .page-hero__bg {

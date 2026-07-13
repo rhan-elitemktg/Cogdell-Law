@@ -9,26 +9,31 @@ import defaultPhoto from "../assets/consult-portrait.jpg";
 interface Props {
   photo?: ImageMetadata;
   photoAlt?: string;
+  eyebrow?: string;
+  headingLead?: string;
+  headingStrong?: string;
+  body?: string;
 }
 
 const {
   photo = defaultPhoto,
   photoAlt = "Dan Cogdell seated in the firm's study",
+  eyebrow = "Confidential",
+  headingLead = "Schedule Your",
+  headingStrong = "Consultation.",
+  body = "Tell us about your case. Dan Cogdell and our team review every inquiry personally — your conversation is privileged and confidential.",
 } = Astro.props;
 ---
 
 <section class="consult" id="contact">
   <div class="container consult__inner">
     <div class="consult__panel">
-      <Eyebrow>Confidential</Eyebrow>
+      <Eyebrow>{eyebrow}</Eyebrow>
       <h2 class="consult__heading">
-        <span class="consult__heading-lead">Schedule Your</span>
-        <span class="consult__heading-strong">Consultation.</span>
+        <span class="consult__heading-lead">{headingLead}</span>
+        <span class="consult__heading-strong">{headingStrong}</span>
       </h2>
-      <p class="consult__body">
-        Tell us about your case. Dan Cogdell and our team review every inquiry
-        personally — your conversation is privileged and confidential.
-      </p>
+      <p class="consult__body">{body}</p>
 
       <form class="consult__form">
         <div class="consult__field">
