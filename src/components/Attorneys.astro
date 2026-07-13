@@ -8,6 +8,13 @@ import aishaPhoto from "../assets/attorneys/aisha-dennis.jpg";
 import anthonyPhoto from "../assets/attorneys/anthony-osso.jpg";
 import brentPhoto from "../assets/attorneys/brent-newton.jpg";
 
+// `background` sets the section ground: "paper" (default) or "card"
+// (near-white --cog-paper-card), used on the standalone /attorneys page.
+interface Props {
+  background?: "paper" | "card";
+}
+const { background = "paper" } = Astro.props;
+
 const attorneys = [
   {
     photo: danPhoto,
@@ -40,7 +47,7 @@ const attorneys = [
 ];
 ---
 
-<section class="attorneys">
+<section class:list={["attorneys", background === "card" && "attorneys--card"]}>
   <div class="container">
     <div class="attorneys__head">
       <div class="attorneys__head-left">
@@ -93,6 +100,9 @@ const attorneys = [
 <style>
   .attorneys {
     background-color: var(--cog-paper);
+  }
+  .attorneys--card {
+    background-color: var(--cog-paper-card);
   }
   .attorneys .container {
     padding-block: var(--space-section);
