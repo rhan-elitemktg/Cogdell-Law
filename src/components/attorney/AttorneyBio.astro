@@ -148,8 +148,11 @@ const { attorney }: Props = Astro.props;
 </section>
 
 <style>
-  body {
-    background-color: var(--cog-paper-card)
+  /* `html body` (specificity 2) so it wins over global.css's `body` rule
+     regardless of production CSS bundle order — a plain `body` selector ties
+     on specificity and loses to global.css when it's bundled to load later. */
+  html body {
+    background-color: var(--cog-paper-card);
   }
   .a-bio {
     background-color: var(--cog-paper-card);
