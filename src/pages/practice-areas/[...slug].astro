@@ -1,0 +1,71 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Breadcrumb from "../../components/practice/Breadcrumb.astro";
+import PageHero from "../../components/PageHero.astro";
+import PracticeBody from "../../components/practice/PracticeBody.astro";
+import PracticeGrid from "../../components/practice/PracticeGrid.astro";
+import PracticeFaqs from "../../components/practice/PracticeFaqs.astro";
+import CtaBar from "../../components/CtaBar.astro";
+import Consult from "../../components/Consult.astro";
+import { getPracticeAreaPaths } from "../../data/practice-areas";
+import type { PracticeArea, Crumb } from "../../data/practice-areas";
+
+export function getStaticPaths() {
+  return getPracticeAreaPaths();
+}
+
+interface Props {
+  node: PracticeArea;
+  trail: Crumb[];
+  path: string;
+}
+
+const { node, trail, path } = Astro.props;
+
+const childItems = (node.children ?? []).map((child) => ({
+  title: child.title,
+  summary: child.cardSummary,
+  href: `/practice-areas/${path}/${child.slug}`,
+  icon: child.icon,
+}));
+
+const description = node.lede ?? `${node.title} — Cogdell Law Firm.`;
+
+// The opening line (former hero lede) now leads the content body.
+const bodyIntro = node.lede
+  ? [{ p: node.lede }, ...(node.intro ?? [])]
+  : node.intro;
+---
+
+<Layout title={node.title} description={description}>
+  <Breadcrumb trail={trail} />
+
+  <PageHero eyebrow="Practice Areas" titleStrong={node.heroTitle}>
+    <a href="#contact" class="btn btn--primary">
+      Schedule a Consultation
+      <svg class="btn__icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+    </a>
+    <a href="tel:7134262244" class="btn btn--outline">
+      Call 713-426-2244
+      <svg class="btn__icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+    </a>
+  </PageHero>
+
+  <PracticeBody intro={bodyIntro} sections={node.sections} />
+
+  {node.faqs && node.faqs.length > 0 && <PracticeFaqs faqs={node.faqs} />}
+
+  {
+    childItems.length > 0 && (
+      <PracticeGrid
+        items={childItems}
+        eyebrow="Explore"
+        headingLead="Topics We"
+        headingStrong="Handle."
+      />
+    )
+  }
+
+  <CtaBar />
+  <Consult />
+</Layout>

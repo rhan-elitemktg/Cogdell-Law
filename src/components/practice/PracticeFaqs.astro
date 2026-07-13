@@ -1,0 +1,152 @@
+---
+// Per-practice-area FAQ accordion. Native <details> (exclusive open via shared
+// name); answers are block content (paragraphs + lists).
+import Eyebrow from "../Eyebrow.astro";
+import Blocks from "./Blocks.astro";
+import type { PracticeFaq } from "../../data/practice-areas";
+
+interface Props {
+  faqs: PracticeFaq[];
+  eyebrow?: string;
+  headingLead?: string;
+  headingStrong?: string;
+}
+
+const {
+  faqs,
+  eyebrow = "Common Questions",
+  headingLead = "Frequently Asked",
+  headingStrong = "Questions.",
+} = Astro.props;
+---
+
+<section class="pfaq">
+  <div class="container pfaq__inner">
+    <div class="pfaq__head">
+      <Eyebrow>{eyebrow}</Eyebrow>
+      <h2 class="pfaq__heading">
+        <span class="pfaq__heading-lead">{headingLead}</span>{" "}
+        <span class="pfaq__heading-strong">{headingStrong}</span>
+      </h2>
+    </div>
+
+    <div class="pfaq__list">
+      {
+        faqs.map((faq) => (
+          <details class="pfaq__item" name="pfaq">
+            <summary class="pfaq__q">
+              <span>{faq.question}</span>
+              <span class="pfaq__icon" aria-hidden="true" />
+            </summary>
+            <div class="pfaq__a">
+              <Blocks blocks={faq.answer} />
+            </div>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .pfaq {
+    background-color: var(--cog-paper-card);
+  }
+  .pfaq__inner {
+    max-width: 900px;
+    padding-block: var(--space-section);
+  }
+  .pfaq__head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin-bottom: var(--space-12);
+  }
+  .pfaq__heading {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: clamp(2rem, 3.4vw, 3rem);
+    line-height: 1.06;
+    letter-spacing: -0.01em;
+  }
+  .pfaq__heading-lead {
+    font-style: italic;
+    font-weight: 500;
+    color: var(--cog-gold);
+  }
+  .pfaq__heading-strong {
+    font-weight: 700;
+    color: var(--cog-ink);
+  }
+
+  .pfaq__item {
+    border-top: 1px solid var(--cog-line-ink);
+  }
+  .pfaq__item:last-child {
+    border-bottom: 1px solid var(--cog-line-ink);
+  }
+  .pfaq__q {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-6);
+    padding: var(--space-6) 0;
+    cursor: pointer;
+    list-style: none;
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: var(--text-xl);
+    color: var(--cog-ink);
+  }
+  .pfaq__q::-webkit-details-marker {
+    display: none;
+  }
+  .pfaq__icon {
+    position: relative;
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+  }
+  .pfaq__icon::before,
+  .pfaq__icon::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    background-color: var(--cog-accent);
+    transform: translate(-50%, -50%);
+    transition: transform var(--transition);
+  }
+  .pfaq__icon::before {
+    width: 100%;
+    height: 2px;
+  }
+  .pfaq__icon::after {
+    width: 2px;
+    height: 100%;
+  }
+  .pfaq__item[open] .pfaq__icon::after {
+    transform: translate(-50%, -50%) scaleY(0);
+  }
+  .pfaq__a {
+    padding-bottom: var(--space-6);
+  }
+
+  /* Animated expand where supported. */
+  @supports (interpolate-size: allow-keywords) {
+    :root {
+      interpolate-size: allow-keywords;
+    }
+    .pfaq__item::details-content {
+      block-size: 0;
+      overflow: hidden;
+      transition:
+        block-size var(--transition),
+        content-visibility var(--transition);
+      transition-behavior: allow-discrete;
+    }
+    .pfaq__item[open]::details-content {
+      block-size: auto;
+    }
+  }
+</style>

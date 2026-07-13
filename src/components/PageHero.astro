@@ -7,7 +7,7 @@ import Eyebrow from "./Eyebrow.astro";
 
 interface Props {
   eyebrow: string;
-  titleLead: string; // italic cream line
+  titleLead?: string; // italic cream line — omit for a single-tone title
   titleStrong: string; // bold white line
   lede?: string;
   image?: ImageMetadata; // omit for a plain navy hero (no photo)
@@ -46,7 +46,7 @@ const {
     <div class="page-hero__content">
       <Eyebrow>{eyebrow}</Eyebrow>
       <h1 class="page-hero__title">
-        <span class="page-hero__title-lead">{titleLead}</span>
+        {titleLead && <span class="page-hero__title-lead">{titleLead}</span>}
         <span class="page-hero__title-strong">{titleStrong}</span>
       </h1>
       {lede && <p class="page-hero__lede">{lede}</p>}
