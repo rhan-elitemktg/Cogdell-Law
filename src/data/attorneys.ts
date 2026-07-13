@@ -1,0 +1,247 @@
+import type { ImageMetadata } from "astro";
+import danCogdell from "../assets/attorneys/dan-cogdell.jpg";
+import anthonyOsso from "../assets/attorneys/anthony-osso.jpg";
+import brentNewton from "../assets/attorneys/brent-newton.jpg";
+
+/** One school + its degrees/honors, for the Education block. */
+export interface EducationEntry {
+  school: string;
+  location?: string;
+  lines: string[];
+}
+
+/**
+ * A single attorney bio. Optional list fields simply omit their section when
+ * empty, so a lighter bio never leaves an empty heading. Every attorney bio
+ * page (`/attorney/[slug]`) is generated from one of these entries.
+ */
+export interface Attorney {
+  slug: string; // matches navigation.ts, e.g. "cogdell-dan-l"
+  name: string;
+  role: string;
+  photo: ImageMetadata;
+  photoAlt: string;
+  phone: string; // display form, e.g. "713-426-2244"
+  email?: string; // when set, "Email" links to mailto; otherwise to the form
+  practiceTags: string[];
+  bio?: string[]; // paragraphs (some attorneys have none)
+  education: EducationEntry[];
+  classesSeminars?: string[];
+  publishedWorks?: string[];
+  barAdmissions: string[];
+  associations?: string[];
+  honors: string[];
+  pastPositions?: string[];
+  representativeCases?: string[];
+}
+
+export const attorneys: Attorney[] = [
+  {
+    slug: "cogdell-dan-l",
+    name: "Dan L. Cogdell",
+    role: "Principal & Founder",
+    photo: danCogdell,
+    photoAlt: "Dan L. Cogdell, Principal & Founder of Cogdell Law Firm",
+    phone: "713-426-2244",
+    practiceTags: [
+      "Health Care Fraud Defense",
+      "White Collar Criminal Defense",
+      "Federal Criminal Defense",
+      "Criminal Appeals",
+      "Grand Jury Investigations",
+      "Fraud Cases",
+    ],
+    bio: [
+      "Dan Cogdell is a Fellow in the American College of Trial Lawyers. His Chambers rating is “Band 1” in White Collar Crime and Government Investigations. Cogdell has been trial counsel in more than 300 jury trials in over sixteen different States. His experience includes verdicts of “Not Guilty” in the Branch Davidian matter, the only acquittal in any Enron related matter, and the successful representation of Texas Attorney General Ken Paxton — both as a member of Paxton’s impeachment trial team and as lead counsel in the successful dismissal of Paxton’s state securities fraud cases. Cogdell also obtained an acquittal in the trial of the alternative cancer treatment physician, Stanislaw Burzynski.",
+      "Cogdell was portrayed by actor Giovanni Ribisi in the five-part Paramount series “Waco, The Aftermath,” which initially aired in early 2024. Dan’s work has been featured in countless documentaries and “true crime” television shows.",
+      "Mr. Cogdell’s success in a multitude of courtrooms across the country has been well documented. His peers have recognized him as one of the “Best Lawyers in America” since 1996. He has been recognized as a “Super Lawyer” for over a decade. The Harris County Criminal Lawyers Association voted him “Lawyer of the Year.”",
+      "Dan is consistently rated as one of the top White Collar Criminal Defense lawyers in the country.",
+    ],
+    education: [
+      {
+        school: "South Texas College of Law Houston",
+        location: "Houston, Texas",
+        lines: ["J.D. — 1982", "Honors: With Highest Honors"],
+      },
+      {
+        school: "University of Texas",
+        location: "Austin, Texas",
+        lines: ["B.B.A. — 1979"],
+      },
+    ],
+    classesSeminars: [
+      "Frequent lecturer and speaker, Houston Bar Association",
+      "Frequent lecturer and speaker, The State Bar of Texas",
+      "Frequent lecturer and speaker, Harvard Law School",
+      "Frequent lecturer and speaker, Texas Criminal Defense Lawyers Association",
+      "Frequent lecturer and speaker, The National Association of Criminal Defense Lawyers",
+      "Frequent lecturer and speaker, Harris County Criminal Lawyers Association",
+      "Frequent lecturer and speaker, Dallas County Bar Association",
+      "Frequent lecturer and speaker, South Texas College of Law",
+      "Frequent lecturer and speaker, University of Houston Law Center",
+      "Frequent lecturer and speaker, University of Texas School of Law",
+      "Frequent lecturer and speaker, Texas Tech School of Law",
+    ],
+    barAdmissions: [
+      "Texas, 1982",
+      "U.S. District Court, Southern District of Texas, 1985",
+      "U.S. District Court, Northern District of Texas, 1987",
+      "U.S. District Court, Eastern District of Texas, 1989",
+      "U.S. Court of Appeals, 5th Circuit, 1989",
+      "U.S. District Court, Western District of Texas",
+      "U.S. Court of Appeals, 4th Circuit",
+      "United States Supreme Court",
+    ],
+    associations: [
+      "State Bar of Texas",
+      "Texas Trial Lawyers Association",
+      "The Association of Trial Lawyers of America",
+      "National Association of Criminal Defense Lawyers",
+      "Texas Criminal Defense Lawyers Association",
+      "Harris County Criminal Lawyers Association",
+      "American College of Trial Lawyers",
+      "American Bar Association",
+      "Houston Bar Association",
+      "Dallas County Bar Association",
+    ],
+    honors: [
+      "Named by his peers to “Best Lawyers in America,” 1996",
+      "Fellow, American College of Trial Lawyers",
+      "Texas Super Lawyers",
+      "Band I Chambers rating in White Collar Crime & Government Investigations",
+      "Harris County Criminal Lawyers Association, Lawyer of the Year",
+      "Impact Alumni of the Year, South Texas College of Law, 2014",
+      "Named “Super Lawyer” by his peers each year since 2003",
+    ],
+    pastPositions: [
+      "Texas Court of Criminal Appeals — Briefing Attorney for Presiding Judge John F. Onion, Jr., 1982–1983",
+      "Past President of the Harris County Criminal Lawyers Association",
+    ],
+    representativeCases: [
+      "USA v. Russo et al., H-93-134",
+      "USA v. Kelly et al., H-94-184",
+      "USA v. Stinger, H-96-175",
+      "USA v. Nesteroff, H-95-21-SS-02",
+      "USA v. Ramming, H-94-181",
+      "USA v. Anzelmo, H-01-391",
+      "USA v. Keraga, H-97-237",
+      "USA v. Burzynski, H-95-290",
+      "USA v. Peavy, H-97-147",
+      "USA v. Ghadially, H-03-147",
+      "USA v. Kahanek, H-03-363",
+    ],
+  },
+  {
+    slug: "osso-anthony",
+    name: "Anthony Osso",
+    role: "Attorney",
+    photo: anthonyOsso,
+    photoAlt: "Anthony Osso, Attorney at Cogdell Law Firm",
+    phone: "713-426-2244",
+    practiceTags: ["Criminal Defense", "Health Care Fraud Defense"],
+    education: [
+      {
+        school: "South Texas College of Law Houston",
+        location: "Houston, Texas",
+        lines: ["J.D. — 2018", "Honors: magna cum laude"],
+      },
+      {
+        school: "University of Mississippi",
+        lines: ["B.B.A. — 2016", "Honors: cum laude"],
+      },
+    ],
+    barAdmissions: [
+      "Texas",
+      "U.S. District Court, Eastern District of Texas",
+      "U.S. District Court, Northern District of Texas",
+      "U.S. District Court, Southern District of Texas",
+      "U.S. District Court, Western District of Texas",
+    ],
+    honors: [
+      "Honorary Order of Barristers",
+      "1st Place, August A. Rendig’s National Product Liability Moot Court Competition",
+    ],
+    pastPositions: [
+      "Harris County District Attorney’s Office, Assistant District Attorney",
+    ],
+  },
+  {
+    slug: "newton-brent-e",
+    name: "Brent E. Newton",
+    role: "Of Counsel",
+    photo: brentNewton,
+    photoAlt: "Brent E. Newton, Of Counsel at Cogdell Law Firm",
+    phone: "713-426-2244",
+    practiceTags: ["Criminal Law", "Health Care Fraud Defense"],
+    education: [
+      {
+        school: "Columbia Law School",
+        location: "New York, New York",
+        lines: [
+          "J.D. — 1992",
+          "Honors: Kent Scholar",
+          "Honors: Stone Scholar",
+          "Columbia Law Review, Senior Editor",
+        ],
+      },
+      {
+        school: "University of North Carolina",
+        location: "Chapel Hill, North Carolina",
+        lines: ["B.A.", "Honors: Phi Beta Kappa", "Honors: With Highest Honors"],
+      },
+    ],
+    classesSeminars: [
+      "“Hot Topics in the Supreme Court’s Fourth Amendment Jurisprudence” — Federal Public Defender’s Office / CLE for CJA Panel Attorneys; Phoenix, AZ; March 2020",
+      "Annual or biannual presentations on legal ethics, immigration offenses, firearms offenses, child pornography offenses, and federal supervised release — U.S. Sentencing Commission’s Annual National Seminars on the Sentencing Guidelines; 2007–2019",
+      "“Sentencing in Securities Fraud Cases” — ABA’s Fifth Annual Institute on Securities Fraud; New Orleans, LA; October 2010",
+      "Annual presentations on federal habeas corpus practice, mental health issues in criminal law, federal pretrial motions practice, and federal sentencing issues — Advanced Criminal Law Course (State Bar of Texas); 1999, 2002, 2005, 2007–2009, 2011",
+      "Regular presentations on firearms offenses, immigration offenses, pretrial motions practice, and Title III wiretaps — “Winning Strategies” Seminars (Defender Services Division, Administrative Office of the U.S. Courts); 2002–2009",
+    ],
+    publishedWorks: [
+      "Trial Advocacy in Action (NITA/LEXIS 2015)",
+      "Practical Criminal Procedure: A Constitutional Manual (4th ed., NITA/LEXIS 2021)",
+      "Criminal Litigation and Legal Issues in Criminal Procedure (5th ed., NITA/Wolters Kluwer 2023)",
+      "Incentivizing Ineffective-Assistance-of-Counsel Claims Raised on Direct Appeal: Why Appellate Courts Should Remand “Colorable” Claims for Evidentiary Hearings, 22 J. App. Prac. & Process 107 (2022)",
+      "A Partial Fix of a Broken Guideline: A Proposed Amendment to Section 2G2.2 of the United States Sentencing Guidelines, 70 Case Western Reserve L. Rev. 53 (2020)",
+      "Recurring Ethical Issues Related to Federal Sentencing, 43 J. of the Legal Prof. 25 (2018)",
+      "The History of the Original United States Sentencing Commission, 1985–87, 45 Hofstra L. Rev. 1167 (2017) (co-authored with Dawinder Sidhu)",
+      "The Supreme Court’s Fourth Amendment Scorecard, 13 Stanford Journal of Civ. Rts. & Civ. Liberties 1 (2017)",
+      "The Real-World Fourth Amendment, 43 Hastings Const. L. Quarterly 759 (2016)",
+      "The Story of Federal Probation, 53 Amer. Crim. L. Rev. 311 (2016)",
+      "Three chapters — Mental Health Issues in Federal Criminal Practice, Pretrial Statements, and Constitutional Issues that Arise During Trial — in Defending a Federal Criminal Case (2010)",
+      "Four entries — Retroactivity, The Eighth Amendment, Substantive Due Process, and Professional Baseball Cases — in The Encyclopedia of the Supreme Court of the United States (Macmillan Reference USA 2008)",
+    ],
+    barAdmissions: [
+      "Texas",
+      "Florida",
+      "Washington",
+      "Maryland",
+      "U.S. District Court, Eastern District of Texas",
+      "U.S. District Court, Northern District of Texas",
+      "U.S. District Court, Southern District of Texas",
+      "U.S. District Court, District of Maryland",
+      "U.S. Court of Appeals, 3rd Circuit",
+      "U.S. Court of Appeals, 4th Circuit",
+      "U.S. Court of Appeals, 5th Circuit",
+      "U.S. Court of Appeals, 9th Circuit",
+      "U.S. Court of Appeals, 10th Circuit",
+      "Supreme Court of the United States",
+    ],
+    honors: [
+      "Elected Member, American Law Institute, 2010",
+      "Martindale-Hubbell “AV Preeminent” Rating",
+      "Student Bar Association’s “Adjunct Professor of the Year,” 2013–2014, Washington College of Law, American University",
+      "Student Bar Association’s “Adjunct Professor of the Year,” 2008–2009, University of Houston Law Center",
+      "Named “Outstanding Assistant Federal Defender, 2006” (one of four nationally) by the National Association of Federal Defenders",
+      "Harry S. Truman Scholar, 1987",
+    ],
+  },
+];
+
+/** Static-path entries for `src/pages/attorney/[slug].astro`. */
+export function getAttorneyPaths() {
+  return attorneys.map((attorney) => ({
+    params: { slug: attorney.slug },
+    props: { attorney },
+  }));
+}

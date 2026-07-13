@@ -1,0 +1,251 @@
+---
+// Attorney bio body: two columns on paper. Left holds the biography prose,
+// education, and speaking history; right holds the credential lists. Optional
+// blocks render only when the attorney has content for them.
+import type { Attorney } from "../../data/attorneys";
+
+interface Props {
+  attorney: Attorney;
+}
+
+const { attorney }: Props = Astro.props;
+---
+
+<section class="a-bio">
+  <div class="container a-bio__grid">
+    <!-- LEFT: biography + education + speaking -->
+    <div class="a-bio__col">
+      {
+        attorney.bio && attorney.bio.length > 0 && (
+          <div class="cred">
+            <h2 class="cred__title">Biography</h2>
+            <div class="cred__prose">
+              {attorney.bio.map((para) => (
+                <p>{para}</p>
+              ))}
+            </div>
+          </div>
+        )
+      }
+
+      {
+        attorney.education.length > 0 && (
+          <div class="cred">
+            <h2 class="cred__title">Education</h2>
+            {attorney.education.map((edu) => (
+              <div class="edu">
+                <p class="edu__school">
+                  {edu.school}
+                  {edu.location && <span>{edu.location}</span>}
+                </p>
+                <ul class="edu__lines">
+                  {edu.lines.map((line) => (
+                    <li>{line}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        )
+      }
+
+      {
+        attorney.classesSeminars && attorney.classesSeminars.length > 0 && (
+          <div class="cred">
+            <h2 class="cred__title">Classes &amp; Seminars</h2>
+            <ul class="cred__list">
+              {attorney.classesSeminars.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+
+      {
+        attorney.publishedWorks && attorney.publishedWorks.length > 0 && (
+          <div class="cred">
+            <h2 class="cred__title">Published Works</h2>
+            <ul class="cred__list">
+              {attorney.publishedWorks.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+    </div>
+
+    <!-- RIGHT: admissions, associations, honors, positions, cases -->
+    <div class="a-bio__col">
+      {
+        attorney.barAdmissions.length > 0 && (
+          <div class="cred">
+            <h2 class="cred__title">Bar Admissions</h2>
+            <ul class="cred__list">
+              {attorney.barAdmissions.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+
+      {
+        attorney.associations && attorney.associations.length > 0 && (
+          <div class="cred">
+            <h2 class="cred__title">Professional Associations</h2>
+            <ul class="cred__list">
+              {attorney.associations.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+
+      {
+        attorney.honors.length > 0 && (
+          <div class="cred">
+            <h2 class="cred__title">Honors</h2>
+            <ul class="cred__list">
+              {attorney.honors.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+
+      {
+        attorney.pastPositions && attorney.pastPositions.length > 0 && (
+          <div class="cred">
+            <h2 class="cred__title">Past Positions</h2>
+            <ul class="cred__list">
+              {attorney.pastPositions.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+
+      {
+        attorney.representativeCases &&
+          attorney.representativeCases.length > 0 && (
+            <div class="cred">
+              <h2 class="cred__title">Representative Cases</h2>
+              <ul class="cred__list">
+                {attorney.representativeCases.map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            </div>
+          )
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  body {
+    background-color: var(--cog-paper-card)
+  }
+  .a-bio {
+    background-color: var(--cog-paper-card);
+    padding-bottom: var(--space-section);
+  }
+  .a-bio__grid {
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap: var(--space-16);
+    align-items: start;
+    max-width: 1280px;
+    margin-inline: auto;
+  }
+
+  .cred + .cred {
+    margin-top: var(--space-12);
+  }
+  .cred__title {
+    margin: 0 0 var(--space-6);
+    padding-bottom: var(--space-3);
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: var(--text-2xl);
+    color: var(--cog-ink);
+    border-bottom: 1px solid var(--cog-line-ink);
+  }
+
+  .cred__prose p {
+    margin: 0 0 var(--space-4);
+    font-size: var(--text-base);
+    line-height: 1.75;
+    color: var(--cog-ink-body);
+  }
+  .cred__prose p:last-child {
+    margin-bottom: 0;
+  }
+
+  .cred__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .cred__list li {
+    position: relative;
+    padding-left: var(--space-6);
+    margin-bottom: var(--space-3);
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    color: var(--cog-ink-body);
+  }
+  .cred__list li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 7px;
+    height: 7px;
+    background-color: var(--cog-accent);
+    transform: rotate(45deg);
+  }
+
+  /* Education entries */
+  .edu + .edu {
+    margin-top: var(--space-6);
+  }
+  .edu__school {
+    margin: 0 0 var(--space-2);
+    font-family: var(--font-heading);
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--cog-ink);
+  }
+  .edu__school span {
+    margin-left: var(--space-2);
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--cog-ink-muted);
+  }
+  .edu__lines {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .edu__lines li {
+    font-size: var(--text-sm);
+    color: var(--cog-ink-body);
+    margin-bottom: 2px;
+  }
+
+  @media (max-width: 860px) {
+    .a-bio__grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-12);
+    }
+  }
+</style>
