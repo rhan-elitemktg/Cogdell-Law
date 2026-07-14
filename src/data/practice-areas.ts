@@ -300,20 +300,38 @@ export const practiceAreas: PracticeArea[] = [
           {
             ul: [
               [
-                { text: "Houston", href: "/houston-healthcare-fraud-defense-law-office" },
+                {
+                  text: "Houston",
+                  href: "/houston/houston-healthcare-fraud-defense-law-office",
+                },
                 ": Our physical office is located in Houston, serving as the central hub for the firm's operations.",
               ],
               [
-                { text: "Dallas", href: "/dallas-health-care-fraud-defense-lawyer" },
+                {
+                  text: "Dallas",
+                  href: "/dallas/dallas-health-care-fraud-defense-lawyer",
+                },
                 " and ",
                 {
                   text: "Fort Worth",
-                  href: "/fort-worth-health-care-fraud-defense-lawyer",
+                  href: "/fort-worth/fort-worth-health-care-fraud-defense-lawyer",
                 },
                 ": Cogdell Law Firm extends its services to clients in the Dallas-Fort Worth metroplex, addressing legal needs in this urban area.",
               ],
-              "Sherman: Our firm offers legal representation in Sherman, catering to clients in this region.",
-              "Beaumont: Clients in Beaumont and surrounding areas can also access our firm's legal services.",
+              [
+                {
+                  text: "Sherman",
+                  href: "/sherman/sherman-federal-criminal-defense-lawyers",
+                },
+                ": Our firm offers legal representation in Sherman, catering to clients in this region.",
+              ],
+              [
+                {
+                  text: "Beaumont",
+                  href: "/beaumont/beaumont-federal-criminal-defense-attorney",
+                },
+                ": Clients in Beaumont and surrounding areas can also access our firm's legal services.",
+              ],
             ],
           },
           {
@@ -2294,7 +2312,7 @@ export const practiceAreas: PracticeArea[] = [
 
 export interface Crumb {
   title: string;
-  href: string;
+  href?: string; // omitted for grouping labels with no page (e.g. a city)
 }
 
 export interface PracticePathEntry {

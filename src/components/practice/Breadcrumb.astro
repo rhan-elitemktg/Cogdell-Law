@@ -20,10 +20,12 @@ const { trail } = Astro.props;
             <span class="crumbs__current" aria-current="page">
               {crumb.title}
             </span>
-          ) : (
+          ) : crumb.href ? (
             <a class="crumbs__link" href={crumb.href}>
               {crumb.title}
             </a>
+          ) : (
+            <span class="crumbs__link">{crumb.title}</span>
           )}
         </Fragment>
       ))
