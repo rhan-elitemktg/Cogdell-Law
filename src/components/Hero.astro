@@ -2,6 +2,12 @@
 import { getImage } from "astro:assets";
 import heroLandscape from "../assets/hero-boardroom.jpg";
 import heroPortrait from "../assets/cogdell-seated-portrait.jpg";
+import { videos } from "../data/videos";
+
+// The hero "Watch The Firm Film" button opens this video in the global lightbox.
+const HERO_VIDEO_ID = "out2hqx46o";
+const heroVideoPoster =
+  videos.find((v) => v.id === HERO_VIDEO_ID)?.poster ?? "";
 
 // Art direction: landscape on desktop, portrait on tablet/mobile.
 const heroDesktop = await getImage({
@@ -70,7 +76,7 @@ const heroTablet = await getImage({
         <span class="hero__role">Founding Attorney</span>
       </figcaption>
 
-      <a href="#" class="hero__watch">
+      <a href="/videos" class="hero__watch" data-video-id={HERO_VIDEO_ID} data-video-poster={heroVideoPoster}>
         <span class="hero__play">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>
         </span>
