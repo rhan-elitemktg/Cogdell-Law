@@ -121,8 +121,29 @@ const socials = [
     </div>
 
     <div class="footer__bottom">
-      <p>© {year} Cogdell Law Firm. All rights reserved.</p>
-      <p>Attorney Advertising. Prior results do not guarantee a similar outcome.</p>
+      <div class="footer__legal">
+        <p>© {year} Cogdell Law Firm. All rights reserved.</p>
+        <nav class="footer__legal-links" aria-label="Legal">
+          <a href="/privacy">Privacy Policy | </a>
+          <a href="/disclaimer">Disclaimer</a>
+        </nav>
+      </div>
+      <a
+        class="footer__credit-link"
+        href="https://www.elitelegalmarketing.com/"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Website by Elite Legal Marketing"
+      >
+        <img
+          class="footer__credit"
+          src="/elite-white.svg"
+          alt="Elite Legal Marketing"
+          width="90"
+          height="35"
+          loading="lazy"
+        />
+      </a>
     </div>
   </div>
 </footer>
@@ -262,16 +283,50 @@ const socials = [
   .footer__bottom {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     justify-content: space-between;
-    gap: var(--space-4);
+    gap: var(--space-6);
     margin-top: var(--space-16);
     padding-block: var(--space-8);
     border-top: 1px solid var(--cog-line);
+  }
+  .footer__legal {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
   }
   .footer__bottom p {
     margin: 0;
     font-size: var(--text-sm);
     color: var(--cog-muted);
+  }
+  .footer__legal-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    font-size: var(--text-sm);
+    transition: color var(--transition);
+  }
+  .footer__legal-links a {
+    text-decoration: none;
+    color: var(--cog-muted);
+  }
+  .footer__legal-links a:hover {
+    color: var(--cog-white);
+  }
+  .footer__credit-link {
+    display: inline-flex;
+    line-height: 0;
+    opacity: 0.85;
+    transition: opacity var(--transition);
+  }
+  .footer__credit-link:hover {
+    opacity: 1;
+  }
+  .footer__credit {
+    height: 45px;
+    width: auto;
   }
 
   /* ---- Responsive ---- */
