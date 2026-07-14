@@ -2,14 +2,16 @@
 import Font from "astro/components/Font.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
+import VideoLightbox from "../components/video/VideoLightbox.astro";
 import "../styles/global.css";
 
 interface Props {
   title: string;
   description?: string;
+  videoEmbed?: boolean; // pages with a Wistia video → warm up the connections
 }
 
-const { title, description } = Astro.props;
+const { title, description, videoEmbed = false } = Astro.props;
 
 const SITE_NAME = "Cogdell Law";
 const fullTitle = title === SITE_NAME ? title : `${title} | ${SITE_NAME}`;
@@ -24,6 +26,18 @@ const fullTitle = title === SITE_NAME ? title : `${title} | ${SITE_NAME}`;
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
+    {
+      videoEmbed && (
+        <Fragment>
+          {/* DNS-only warm-up (cheap; no eager TLS competing with page load).
+              The lightbox loads the Wistia player on click. */}
+          <link rel="dns-prefetch" href="https://fast.wistia.net" />
+          <link rel="dns-prefetch" href="https://embed-ssl.wistia.com" />
+          <link rel="dns-prefetch" href="https://fast.wistia.com" />
+          <link rel="dns-prefetch" href="https://distillery.wistia.com" />
+        </Fragment>
+      )
+    }
     <Font cssVariable="--font-cormorant" preload />
     <Font cssVariable="--font-instrument" preload />
     <title>{fullTitle}</title>
@@ -33,6 +47,7 @@ const fullTitle = title === SITE_NAME ? title : `${title} | ${SITE_NAME}`;
     <Header />
     <slot />
     <Footer />
+    <VideoLightbox />
     <script>
       // Fade each lazy image in once it decodes (covers the already-cached case).
       document

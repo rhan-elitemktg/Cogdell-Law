@@ -1,0 +1,225 @@
+---
+// Poster-thumbnail grid of firm videos. Each card is a button that opens the
+// global VideoLightbox (via data-video-id) — the Wistia player only loads on click.
+import Eyebrow from "../Eyebrow.astro";
+import type { VideoItem } from "../../data/videos";
+
+interface Props {
+  items: VideoItem[];
+  eyebrow?: string;
+  headingLead?: string;
+  headingStrong?: string;
+}
+
+const { items, eyebrow, headingLead, headingStrong } = Astro.props;
+const hasHead = Boolean(eyebrow || headingLead);
+---
+
+<section class="vgrid">
+  <div class="container">
+    {
+      hasHead && (
+        <div class="vgrid__head">
+          {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
+          {headingLead && (
+            <h2 class="vgrid__heading">
+              <span class="vgrid__heading-lead">{headingLead}</span>{" "}
+              <span class="vgrid__heading-strong">{headingStrong}</span>
+            </h2>
+          )}
+        </div>
+      )
+    }
+
+    <div class="vgrid__grid">
+      {
+        items.map((v) => (
+          <button type="button" class="vcard" data-video-id={v.id} data-video-poster={v.poster} aria-label={`Play video: ${v.title}`}>
+            <span class="vcard__thumb">
+              <img
+                class="vcard__img"
+                src={v.poster}
+                alt=""
+                width="1280"
+                height="720"
+                loading="lazy"
+              />
+              <span class="vcard__play" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+              </span>
+              <span class="vcard__duration">{v.duration}</span>
+            </span>
+            <span class="vcard__title">{v.title}</span>
+          </button>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .vgrid {
+    background-color: var(--cog-paper);
+    padding-block: var(--space-section);
+  }
+  .vgrid__head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin-bottom: var(--space-12);
+    max-width: 720px;
+  }
+  .vgrid__heading {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: clamp(2rem, 3.4vw, 3rem);
+    line-height: 1.06;
+    letter-spacing: -0.01em;
+  }
+  .vgrid__heading-lead {
+    font-style: italic;
+    font-weight: 500;
+    color: var(--cog-gold);
+  }
+  .vgrid__heading-strong {
+    font-weight: 700;
+    color: var(--cog-ink);
+  }
+
+  .vgrid__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-8) var(--space-6);
+  }
+
+  .vcard {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: 0;
+    text-align: left;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    color: inherit;
+    font: inherit;
+  }
+  .vcard__thumb {
+    position: relative;
+    display: block;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background-color: var(--cog-navy-deep);
+    border: 1px solid var(--cog-line);
+  }
+  .vcard__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform var(--transition), opacity var(--transition);
+  }
+  .vcard:hover .vcard__img {
+    transform: scale(1.04);
+    opacity: 0.9;
+  }
+  /* Play badge — outlined circle with a radiating pulse (same as the homepage hero). */
+  .vcard__play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    padding-left: 3px;
+    color: var(--cog-accent);
+    border: 1px solid var(--cog-accent);
+    border-radius: 50%;
+    background-color: rgba(7, 16, 29, 0.45);
+    transition: background-color var(--transition), color var(--transition);
+  }
+  .vcard__play svg path {
+    fill: var(--cog-white);
+  }
+  .vcard__play::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1px solid var(--cog-accent);
+    opacity: 0;
+    pointer-events: none;
+    animation: vcard-pulse 2.8s var(--ease) infinite;
+  }
+  @keyframes vcard-pulse {
+    0% {
+      transform: scale(1);
+      opacity: 0.45;
+    }
+    70% {
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1.5);
+      opacity: 0;
+    }
+  }
+  .vcard:hover .vcard__play {
+    background-color: var(--cog-accent);
+    color: var(--cog-white);
+  }
+  .vcard__duration {
+    position: absolute;
+    right: var(--space-3);
+    bottom: var(--space-3);
+    padding: 2px 8px;
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--cog-white);
+    background-color: rgba(7, 16, 29, 0.82);
+  }
+  .vcard__title {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: var(--text-lg);
+    line-height: 1.25;
+    color: var(--cog-ink);
+    transition: color var(--transition);
+  }
+  .vcard:hover .vcard__title {
+    color: var(--cog-accent-dark);
+  }
+  .vcard:focus-visible {
+    outline: 2px solid var(--cog-accent);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .vcard__img,
+    .vcard__play {
+      transition: none;
+    }
+    .vcard__play::after {
+      animation: none;
+    }
+    .vcard:hover .vcard__img {
+      transform: none;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .vgrid__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 560px) {
+    .vgrid__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
