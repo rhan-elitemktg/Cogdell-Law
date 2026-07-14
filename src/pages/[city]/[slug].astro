@@ -1,0 +1,60 @@
+---
+// "Areas We Serve" location pages at /{city}/{slug}. Same page format as the
+// practice-area leaf pages (Breadcrumb → hero → body → optional FAQs → CTA).
+import Layout from "../../layouts/Layout.astro";
+import Breadcrumb from "../../components/practice/Breadcrumb.astro";
+import PageHero from "../../components/PageHero.astro";
+import PracticeBody from "../../components/practice/PracticeBody.astro";
+import PracticeFaqs from "../../components/practice/PracticeFaqs.astro";
+import CtaBar from "../../components/CtaBar.astro";
+import Consult from "../../components/Consult.astro";
+import { getAreaPaths } from "../../data/areas-we-serve";
+import type { LocationPage, ServiceCity } from "../../data/areas-we-serve";
+import type { Crumb } from "../../data/practice-areas";
+
+export function getStaticPaths() {
+  return getAreaPaths();
+}
+
+interface Props {
+  page: LocationPage;
+  city: ServiceCity;
+  trail: Crumb[];
+}
+
+const { page, city, trail } = Astro.props;
+
+const description = page.lede ?? `${page.title} — Cogdell Law Firm.`;
+
+// The opening line (lede) leads the content body, then the overview blocks.
+const bodyIntro = page.lede
+  ? [{ p: page.lede }, ...(page.intro ?? [])]
+  : page.intro;
+---
+
+<Layout title={page.title} description={description}>
+  <Breadcrumb trail={trail} />
+
+  <PageHero
+    eyebrow={`Serving ${city.city}`}
+    titleStrong={page.heroTitle}
+    align="center"
+    contentMaxWidth="700px"
+  >
+    <a href="#contact" class="btn btn--primary">
+      Schedule a Consultation
+      <svg class="btn__icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+    </a>
+    <a href="tel:7134262244" class="btn btn--outline">
+      Call 713-426-2244
+      <svg class="btn__icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+    </a>
+  </PageHero>
+
+  <PracticeBody intro={bodyIntro} sections={page.sections} />
+
+  {page.faqs && page.faqs.length > 0 && <PracticeFaqs faqs={page.faqs} />}
+
+  <CtaBar />
+  <Consult />
+</Layout>

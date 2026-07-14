@@ -7,6 +7,7 @@
 // firm wants CMS-managed navigation.
 
 import { practiceAreas } from "./practice-areas";
+import { areasWeServe } from "./areas-we-serve";
 
 export type NavItem = {
   label: string;
@@ -66,6 +67,19 @@ const practiceAreasNav: NavItem = {
   }),
 };
 
+// Areas We Serve menu is generated from the location data — cities are grouping
+// labels (no href) that open a submenu of their pages.
+const areasWeServeNav: NavItem = {
+  label: "Areas We Serve",
+  children: areasWeServe.map((city): NavItem => ({
+    label: city.city,
+    children: city.pages.map((page) => ({
+      label: page.navLabel,
+      href: `/${city.citySlug}/${page.slug}`,
+    })),
+  })),
+};
+
 export const navItems: NavItem[] = [
   { label: "Home", href: "/" },
   {
@@ -81,37 +95,7 @@ export const navItems: NavItem[] = [
     label: "Our Firm",
     href: "/our-firm",
     children: [
-      {
-        label: "Areas We Serve",
-        children: [
-          {
-            label: "Beaumont Federal Criminal Defense",
-            href: "/beaumont-federal-criminal-defense-attorney",
-          },
-          {
-            label: "Dallas Federal Criminal Defense",
-            href: "/dallas-federal-criminal-defense-lawyers",
-            children: [
-              {
-                label: "Dallas Health Care Fraud Defense",
-                href: "/dallas-health-care-fraud-defense-lawyer",
-              },
-            ],
-          },
-          {
-            label: "Fort Worth Federal Criminal Defense",
-            href: "/fort-worth-health-care-fraud-defense-lawyer",
-          },
-          {
-            label: "Houston Federal Criminal Defense",
-            href: "/houston-healthcare-fraud-defense-law-office",
-          },
-          {
-            label: "Sherman Federal Criminal Defense",
-            href: "/sherman-federal-criminal-defense-lawyers",
-          },
-        ],
-      },
+      areasWeServeNav,
       { label: "Testimonials", href: "/testimonials" },
       { label: "Videos", href: "/videos" },
     ],
