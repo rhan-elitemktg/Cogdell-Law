@@ -5,15 +5,18 @@ import Blocks from "./Blocks.astro";
 import type { Block, PracticeSection } from "../../data/practice-areas";
 
 interface Props {
+  title?: string; // optional page h1 (for pages without a hero, e.g. legal pages)
   intro?: Block[];
   sections?: PracticeSection[];
 }
 
-const { intro, sections } = Astro.props;
+const { title, intro, sections } = Astro.props;
 ---
 
 <section class="pbody">
   <div class="container pbody__inner">
+    {title && <h1 class="pbody__title">{title}</h1>}
+
     {intro && intro.length > 0 && (
       <div class="pbody__lead">
         <Blocks blocks={intro} />
@@ -38,6 +41,15 @@ const { intro, sections } = Astro.props;
   .pbody__inner {
     max-width: 800px;
     padding-block: var(--space-section);
+  }
+  .pbody__title {
+    margin: 0 0 var(--space-8);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: clamp(2.25rem, 4vw, 3.25rem);
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+    color: var(--cog-ink);
   }
   .pbody__lead {
     font-size: var(--text-lg);

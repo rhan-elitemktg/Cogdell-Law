@@ -1,0 +1,52 @@
+---
+// Owned news/post detail page at /news/[slug]. Only builds for items that carry
+// their own `body` and no `externalUrl` (external press mentions link straight
+// out from the index and never reach here). Same format as the practice leaf page.
+import Layout from "../../layouts/Layout.astro";
+import Breadcrumb from "../../components/practice/Breadcrumb.astro";
+import PageHero from "../../components/PageHero.astro";
+import PracticeBody from "../../components/practice/PracticeBody.astro";
+import CtaBar from "../../components/CtaBar.astro";
+import Consult from "../../components/Consult.astro";
+import { getNewsPaths } from "../../data/news";
+import type { NewsItem } from "../../data/news";
+import type { Crumb } from "../../data/practice-areas";
+
+export function getStaticPaths() {
+  return getNewsPaths();
+}
+
+interface Props {
+  item: NewsItem;
+}
+
+const { item } = Astro.props;
+
+const trail: Crumb[] = [
+  { title: "News", href: "/news" },
+  { title: item.title },
+];
+
+const description = item.summary ?? `${item.title} — Cogdell Law Firm.`;
+---
+
+<Layout title={item.title} description={description}>
+  <Breadcrumb trail={trail} />
+
+  <PageHero
+    eyebrow={item.outlet}
+    titleStrong={item.title}
+    align="center"
+    contentMaxWidth="700px"
+  >
+    <a href="#contact" class="btn btn--primary">
+      Schedule a Consultation
+      <svg class="btn__icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+    </a>
+  </PageHero>
+
+  <PracticeBody intro={item.body} />
+
+  <CtaBar />
+  <Consult />
+</Layout>

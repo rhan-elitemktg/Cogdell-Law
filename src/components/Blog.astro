@@ -1,44 +1,62 @@
 ---
-// Homepage "From the Firm" band — featured post + numbered 02/03/04 list, on dark.
+// Homepage "In the News" band — featured press mention + numbered 02/03/04 list,
+// on dark. Reads the latest items from the news data; external items link out.
 import Eyebrow from "./Eyebrow.astro";
-import { posts } from "../data/posts";
+import { latestNews, type NewsMedia } from "../data/news";
 
-const featured = posts[0];
-const rest = posts.slice(1, 4);
+const featured = latestNews[0];
+const rest = latestNews.slice(1, 4);
+
+const MEDIA_LABEL: Record<NewsMedia, string> = {
+  article: "Article",
+  video: "Video",
+  podcast: "Podcast",
+};
+const MEDIA_VERB: Record<NewsMedia, string> = {
+  article: "Read more",
+  video: "Watch",
+  podcast: "Listen",
+};
+
+// Card link target: external press mention (new tab) or an owned /news/[slug].
+const linkAttrs = (n: { externalUrl?: string; slug: string }) =>
+  n.externalUrl
+    ? { href: n.externalUrl, target: "_blank", rel: "noopener noreferrer" }
+    : { href: `/news/${n.slug}` };
 ---
 
 <section class="blog">
   <div class="container blog__inner">
     <div class="blog__head">
       <div class="blog__head-left">
-        <Eyebrow>Blog</Eyebrow>
+        <Eyebrow>Press &amp; Media</Eyebrow>
         <h2 class="blog__heading">
-          <span class="blog__heading-lead">From the</span>
-          <span class="blog__heading-strong"> Firm.</span>
+          <span class="blog__heading-lead">In the</span>
+          <span class="blog__heading-strong"> News.</span>
         </h2>
       </div>
       <p class="blog__lede">
-        Plainspoken guidance from four decades in federal courtrooms — what to
-        do, what to say, and when to bring in counsel. Practical reading on
-        federal investigations, white collar exposure, and protecting your
-        rights long before charges are ever filed.
+        Our attorneys are known throughout Texas and nationally for handling
+        high-profile, high-stakes cases — work that has drawn coverage from
+        local, national, and global media. A selection of recent articles,
+        interviews, and appearances.
       </p>
     </div>
 
     <div class="blog__grid">
       <!-- Featured (01) -->
-      <a class="blog__feature" href={`/news/${featured.slug}`}>
+      <a class="blog__feature" {...linkAttrs(featured)}>
         <span class="blog__feature-num" aria-hidden="true">01</span>
         <span class="blog__tag">Featured</span>
         <div class="blog__meta">
-          <span class="blog__cat">{featured.category}</span>
+          <span class="blog__cat">{featured.outlet}</span>
           <span class="blog__dot" aria-hidden="true"></span>
-          <span class="blog__date">{featured.date}</span>
+          <span class="blog__date">{MEDIA_LABEL[featured.media]}</span>
         </div>
         <h3 class="blog__feature-title">{featured.title}</h3>
-        <p class="blog__feature-excerpt">{featured.excerpt}</p>
+        <p class="blog__feature-excerpt">{featured.summary}</p>
         <span class="blog__more">
-          Read Article
+          {featured.ctaLabel ?? MEDIA_VERB[featured.media]}
           <svg class="blog__more-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
         </span>
       </a>
@@ -47,14 +65,14 @@ const rest = posts.slice(1, 4);
       <div class="blog__list">
         {
           rest.map((post, i) => (
-            <a class="blog__post" href={`/news/${post.slug}`}>
+            <a class="blog__post" {...linkAttrs(post)}>
               <span class="blog__post-num" aria-hidden="true">
                 {String(i + 2).padStart(2, "0")}
               </span>
               <div class="blog__meta">
-                <span class="blog__cat">{post.category}</span>
+                <span class="blog__cat">{post.outlet}</span>
                 <span class="blog__dot" aria-hidden="true" />
-                <span class="blog__date">{post.date}</span>
+                <span class="blog__date">{MEDIA_LABEL[post.media]}</span>
               </div>
               <h3 class="blog__post-title">{post.title}</h3>
             </a>
