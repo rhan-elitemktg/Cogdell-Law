@@ -172,6 +172,7 @@ const arrowIcon = '<path d="M5 12h14M13 6l6 6-6 6"/>';
     background-color: var(--cog-paper-card);
     border: 1px solid var(--cog-line);
     text-decoration: none;
+    cursor: pointer;
   }
   /* Accent top-rule wipe on hover. */
   .ngrid__cell::before {
@@ -265,10 +266,10 @@ const arrowIcon = '<path d="M5 12h14M13 6l6 6-6 6"/>';
   .ngrid__cta-icon {
     flex-shrink: 0;
     transition: transform var(--transition);
+    position: relative;
+    top: -2px;
   }
-  .ngrid__cell:hover .ngrid__cta-icon {
-    transform: translateX(4px);
-  }
+  
   /* Visually hidden helper for screen readers on external links. */
   .ngrid__ext-note {
     position: absolute;

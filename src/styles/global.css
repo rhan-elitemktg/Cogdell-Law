@@ -114,6 +114,9 @@ body {
   background-color: var(--cog-paper);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  /* Clip horizontal overflow (e.g. the off-canvas mobile drawer) without
+     creating a scroll container — keeps vertical scroll and sticky intact. */
+  overflow-x: clip;
 }
 
 img,

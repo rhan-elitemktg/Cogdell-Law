@@ -217,6 +217,12 @@ const {
       min-height: 420px;
     }
   }
+  @media (max-width: 650px) {
+    /* Stack every field full-width on phones (Full Name + Phone no longer split). */
+    .consult__form {
+      grid-template-columns: 1fr;
+    }
+  }
 </style>
 
 <script>

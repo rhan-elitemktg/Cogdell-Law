@@ -158,11 +158,17 @@ buildPanels(navItems, "root", "Menu", null);
     border-left: 3px solid var(--cog-accent);
     box-shadow: -18px 0 50px rgba(0, 0, 0, 0.45);
     transform: translateX(100%);
-    transition: transform var(--transition);
+    /* Hidden when closed so the box-shadow doesn't bleed back into the page.
+       Visibility is transitioned so the slide-out animation still shows. */
+    visibility: hidden;
+    transition:
+      transform var(--transition),
+      visibility var(--transition);
     z-index: 100;
   }
   .mobile-nav.is-open .drawer {
     transform: translateX(0);
+    visibility: visible;
   }
   @media (max-width: 650px) {
     .drawer {
@@ -186,6 +192,7 @@ buildPanels(navItems, "root", "Menu", null);
     font-family: var(--font-heading);
     font-size: var(--text-xl);
     color: var(--cog-white);
+    line-height: 1;
   }
   .drawer__back,
   .drawer__close {
@@ -294,7 +301,6 @@ buildPanels(navItems, "root", "Menu", null);
     padding: var(--space-8) var(--space-6);
     text-align: center;
     background-color: var(--cog-navy-deep);
-    border-top: 1px solid var(--cog-line);
   }
   .drawer__logo {
     line-height: 0;
