@@ -87,6 +87,7 @@ export const navItems: NavItem[] = [
     href: "/attorneys",
     children: [
       { label: "Dan L. Cogdell", href: "/attorney/cogdell-dan-l" },
+      { label: "Aisha J. Dennis", href: "/attorney/dennis-aisha-j" },
       { label: "Anthony Osso", href: "/attorney/osso-anthony" },
       { label: "Brent E. Newton", href: "/attorney/newton-brent-e" },
     ],
