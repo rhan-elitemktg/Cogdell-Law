@@ -1,5 +1,6 @@
 import type { ImageMetadata } from "astro";
 import danCogdell from "../assets/attorneys/dan-cogdell.jpg";
+import aishaDennis from "../assets/attorneys/aisha-dennis.jpg";
 import anthonyOsso from "../assets/attorneys/anthony-osso.jpg";
 import brentNewton from "../assets/attorneys/brent-newton.jpg";
 
@@ -129,6 +130,90 @@ export const attorneys: Attorney[] = [
       "USA v. Peavy, H-97-147",
       "USA v. Ghadially, H-03-147",
       "USA v. Kahanek, H-03-363",
+    ],
+  },
+  {
+    slug: "dennis-aisha-j",
+    name: "Aisha J. Dennis",
+    role: "Attorney",
+    photo: aishaDennis,
+    photoAlt: "Aisha J. Dennis, Attorney at Cogdell Law Firm",
+    phone: "713-426-2244",
+    email: "aisha@cogdell-law.com",
+    practiceTags: [
+      "Federal Criminal Defense",
+      "Constitutional Litigation",
+      "Criminal Appeals",
+      "Government Investigations",
+    ],
+    bio: [
+      "Aisha J. Dennis is a seasoned trial lawyer with more than a decade of experience litigating complex criminal and criminal adjacent matters in federal and state courts. Her practice is grounded in constitutional litigation, motion practice, and trial advocacy, with particular emphasis on cases involving significant liberty interests, government investigations, and emerging legal issues.",
+      "Prior to joining Cogdell Law Firm, Aisha served as an Assistant Federal Public Defender in the Southern District of Texas, where she acted as lead counsel in hundreds of federal criminal cases. In that role, she litigated suppression motions, constitutional challenges, and sentencing issues, and secured dismissals and other favorable outcomes for clients charged with serious offenses. She has extensive experience handling cases involving digital evidence, surveillance, and complex factual records.",
+      "Aisha also served as a Staff Attorney for the National Association of Criminal Defense Lawyers, where she provided nationwide litigation support to defense counsel on Fourth Amendment and privacy issues arising from modern surveillance technologies. Her work included briefing and strategic consultation in cases involving novel constitutional questions and law enforcement practices. In addition, she practiced as a Senior Associate at a boutique litigation firm, representing individuals and institutions in civil matters with criminal, regulatory, and reputational exposure.",
+      "Aisha began her legal career in her hometown of Columbia, South Carolina, clerking for the Honorable J. Michelle Childs of the United States District Court for the District of South Carolina. She later clerked for the Honorable James E. Graves, Jr. of the United States Court of Appeals for the Fifth Circuit. She has handled both state and federal appeals, including oral argument before a state supreme court.",
+      "Aisha earned her Juris Doctor from New York University School of Law, where she was recognized for academic merit, leadership, and public service, and she received her Bachelor of Arts from Harvard University. Before attending law school, she taught high school economics and U.S. history through Teach for America. She is licensed to practice law in Texas and North Carolina.",
+    ],
+    education: [
+      {
+        school: "New York University School of Law",
+        location: "New York, New York",
+        lines: [
+          "J.D. — 2013",
+          "Honors: Root-Tilden-Kern Scholar — full tuition for public service, academic merit, and leadership",
+          "Honors: NAACP LDF Earl Warren Scholar — awarded for civil rights advocacy potential",
+          "Honors: Black, Latino, Asian Pacific American Law Alumni Association Public Service Graduation Award",
+        ],
+      },
+      {
+        school: "Harvard University",
+        location: "Cambridge, Massachusetts",
+        lines: [
+          "B.A. in Government — 2008",
+          "Honors: Senior Woman Leadership and Service Award, presented by the Harvard Black Men’s Forum",
+          "Honors: Harvard Foundation for Intercultural and Race Relations Certificate of Recognition",
+        ],
+      },
+    ],
+    classesSeminars: [
+      "“Challenging the Use of Digital Evidence in Youth Cases” — 21st Annual Juvenile Law Seminar, Collin County, TX; September 2025",
+      "“Challenging the Use of Digital Evidence in Youth Cases” — Texas Bar CLE: Special Education, Child Welfare and the Juvenile Justice System, 21st Annual Course; June 2025",
+      "“Fourth Amendment Update: Trends You Need to Know,” Panel — Federal Bar Association (SDTX Chapter); June 2023",
+      "“Fourth Amendment CLE,” Panel — Judicial Conference for the Federal Fifth Circuit of Appeals; May 2022",
+      "“Search, Seize, and Extract: Challenging Law Enforcement’s Use of Mobile Device Forensic Tools and Technologies in Criminal Cases,” Panel — National Association of Criminal Defense Lawyers “Unlocking the Black Box” Conference, Chicago, Illinois; May 2022",
+      "“Challenging the Use of Digital Evidence” — Federal Public Defenders of New York and their CJA Panel; Federal Public Defenders of the Northern and Southern Districts of Texas and their CJA Panels; 2021–2022",
+      "“Riling Up the Border Search Doctrine: Litigating Searches of Digital Content at Our Ports of Entry” — Federal Defender Services Office Multi-Track Federal Crimes Defense Seminar, Los Angeles, California; August 2018",
+    ],
+    publishedWorks: [
+      "Contributor, Defense of Justice: Transformational Tales from the Trenches, American Bar Association (Aug. 2025)",
+      "Riling Up the Border Search Doctrine: Litigating Searches of Digital Content at Our Ports of Entry, 42-MAR Champion 40 (Mar. 2018)",
+    ],
+    barAdmissions: [
+      "Texas",
+      "North Carolina",
+      "U.S. District Court, Northern District of Texas",
+      "U.S. District Court, Southern District of Texas",
+      "U.S. District Court, Western District of Texas",
+      "U.S. District Court, Western District of North Carolina",
+      "U.S. Court of Appeals, 5th Circuit",
+      "U.S. Court of Appeals, 4th Circuit",
+    ],
+    associations: [
+      "Harris County Public Defender Office Board, Vice-Chair",
+      "National Association of Criminal Defense Lawyers",
+      "Texas Criminal Defense Lawyers Association",
+      "Harris County Criminal Lawyers Association",
+      "Houston Bar Association",
+    ],
+    honors: [
+      "Named to Best Lawyers in America, 2024",
+      "500 Leading Litigators in America, Lawdragon, 2024",
+      "500 X — The Next Generation, Lawdragon, 2024",
+    ],
+    pastPositions: [
+      "United States District Court for the District of South Carolina — Law Clerk to the Honorable J. Michelle Childs",
+      "United States Court of Appeals for the Fifth Circuit — Law Clerk to the Honorable James E. Graves, Jr.",
+      "Federal Public Defender, Southern & Northern District of Texas — Assistant Federal Public Defender",
+      "National Association of Criminal Defense Lawyers — Staff Attorney, Fourth Amendment Center",
     ],
   },
   {
