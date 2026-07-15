@@ -1,27 +1,47 @@
 ---
+import { PortableText } from "astro-portabletext";
 import Eyebrow from "./Eyebrow.astro";
-// Homepage CTA bar — sits directly under the Video Band. Three-up on desktop:
-// eyebrow + heading, supporting copy, and a Schedule Consultation button.
+import CtaBarBody from "./cta/CtaBarBody.astro";
+import { getCtaBar } from "../sanity/lib/ctaBar";
+
+// Site-wide CTA bar — three-up on desktop: eyebrow + heading, supporting copy,
+// and a button. Renders on ~43 pages.
+//
+// Self-fetches rather than taking content props: it's the same everywhere, so
+// nine callers passing identical data would be nine chances to drift. Pages that
+// have their own document pass `pageId` so their optional override can win (D13);
+// dynamic routes have no document and simply get the shared default.
+interface Props {
+  /** Document id of the host page, when it has one — enables its override. */
+  pageId?: string;
+}
+const { pageId } = Astro.props;
+
+const bar = await getCtaBar(pageId);
+
+if (!bar) {
+  throw new Error(
+    "No CTA Bar content found in Sanity.\n" +
+      "Add it in the Studio at /admin → CTA Bar, or seed it with:\n" +
+      "  npx sanity exec scripts/seed-cta-bar.ts --with-user-token",
+  );
+}
 ---
 
 <section class="ctabar">
   <div class="container ctabar__inner">
     <div class="ctabar__lead">
-      <Eyebrow tone="light">When the Stakes Are Highest</Eyebrow>
+      <Eyebrow tone="light">{bar.eyebrow}</Eyebrow>
       <h2 class="ctabar__heading">
-        <span class="ctabar__heading-lead">Call</span> Cogdell Law Firm.
+        <span class="ctabar__heading-lead">{bar.headingLead}</span> {bar.headingRest}
       </h2>
     </div>
 
-    <p class="ctabar__body">
-      Our attorneys have tried the most difficult cases in federal and state
-      courts across the country. If you are facing a serious charge or a
-      high-stakes dispute, call us before you say anything to anyone else.
-    </p>
+    <PortableText value={bar.body} components={{ block: { normal: CtaBarBody } }} />
 
     <div class="ctabar__action">
-      <a href="/contact" class="btn btn--light">
-        Schedule Consultation
+      <a href={bar.cta?.href} class="btn btn--light">
+        {bar.cta?.label}
         <svg class="btn__icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
       </a>
     </div>
@@ -57,7 +77,10 @@ import Eyebrow from "./Eyebrow.astro";
     color: var(--cog-cream);
   }
 
-  .ctabar__body {
+  /* Emitted by CtaBarBody.astro (a Portable Text renderer), so it carries no
+     scoping attribute of its own — see F14. The scoped .ctabar__inner parent
+     bounds the :global. */
+  .ctabar__inner :global(.ctabar__body) {
     max-width: 520px;
     font-size: var(--text-base);
     line-height: 1.7;

@@ -2,10 +2,11 @@
 // Attorney bio body: two columns on paper. Left holds the biography prose,
 // education, and speaking history; right holds the credential lists. Optional
 // blocks render only when the attorney has content for them.
-import type { Attorney } from "../../data/attorneys";
+import { PortableText } from "astro-portabletext";
+import type { AttorneyDoc } from "../../sanity/lib/attorneys";
 
 interface Props {
-  attorney: Attorney;
+  attorney: AttorneyDoc;
 }
 
 const { attorney }: Props = Astro.props;
@@ -20,9 +21,7 @@ const { attorney }: Props = Astro.props;
           <div class="cred">
             <h2 class="cred__title">Biography</h2>
             <div class="cred__prose">
-              {attorney.bio.map((para) => (
-                <p>{para}</p>
-              ))}
+              <PortableText value={attorney.bio} />
             </div>
           </div>
         )
@@ -180,13 +179,13 @@ const { attorney }: Props = Astro.props;
     border-bottom: 1px solid var(--cog-line-ink);
   }
 
-  .cred__prose p {
+  .cred__prose :global(p) {
     margin: 0 0 var(--space-4);
     font-size: var(--text-base);
     line-height: 1.75;
     color: var(--cog-ink-body);
   }
-  .cred__prose p:last-child {
+  .cred__prose :global(p:last-child) {
     margin-bottom: 0;
   }
 

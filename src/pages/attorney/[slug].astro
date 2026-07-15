@@ -3,19 +3,32 @@ import Layout from "../../layouts/Layout.astro";
 import AttorneyHero from "../../components/attorney/AttorneyHero.astro";
 import AttorneyBio from "../../components/attorney/AttorneyBio.astro";
 import Consult from "../../components/Consult.astro";
-import { getAttorneyPaths, type Attorney } from "../../data/attorneys";
+import { getAttorney, getAttorneySlugs } from "../../sanity/lib/attorneys";
 
-export function getStaticPaths() {
-  return getAttorneyPaths();
+// Astro hoists getStaticPaths into its own module scope, so it can't reach
+// module-scope consts in this frontmatter — everything it needs is imported (F7).
+export async function getStaticPaths() {
+  const slugs = await getAttorneySlugs();
+  return slugs.map(({ slug }) => ({ params: { slug } }));
 }
 
-interface Props {
-  attorney: Attorney;
+const { slug } = Astro.params;
+const attorney = await getAttorney(slug!);
+
+if (!attorney) {
+  throw new Error(`No attorney found in Sanity for slug "${slug}".`);
 }
 
-const { attorney } = Astro.props;
+// The meta description opens with the first line of the biography. `bio` is
+// Portable Text now, so pull the plain text out of its first block rather than
+// indexing a string array.
+const firstBioLine = attorney.bio?.[0]?.children
+  ?.map((child) => child.text ?? "")
+  .join("")
+  .trim();
+
 const description = `${attorney.name}, ${attorney.role} at Cogdell Law Firm.${
-  attorney.bio?.[0] ? ` ${attorney.bio[0]}` : ""
+  firstBioLine ? ` ${firstBioLine}` : ""
 }`;
 ---
 

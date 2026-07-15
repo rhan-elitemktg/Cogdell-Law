@@ -236,6 +236,20 @@ export const homePage = defineType({
         }),
       ],
     }),
+    defineField({
+      name: "ctaBar",
+      title: "CTA Bar override",
+      type: "ctaBarContent",
+      description:
+        "Optional. Leave empty to use the site-wide CTA Bar; fill this in only to give this page its own wording.",
+      options: { collapsible: true, collapsed: true },
+    }),
+    defineField({
+      name: "attorneys",
+      title: "Attorneys",
+      type: "attorneysBand",
+      options: { collapsible: true, collapsed: true },
+    }),
   ],
   preview: {
     select: { subtitle: "hero.eyebrow" },

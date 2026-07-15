@@ -20,6 +20,14 @@ export const testimonialsPage = defineType({
       type: "practiceAreasBand",
       options: { collapsible: true, collapsed: true },
     }),
+    defineField({
+      name: "ctaBar",
+      title: "CTA Bar override",
+      type: "ctaBarContent",
+      description:
+        "Optional. Leave empty to use the site-wide CTA Bar; fill this in only to give this page its own wording.",
+      options: { collapsible: true, collapsed: true },
+    }),
   ],
   preview: {
     prepare: () => ({ title: "Testimonials Page" }),

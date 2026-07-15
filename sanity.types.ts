@@ -65,6 +65,30 @@ export type TrialResultList = {
   >;
 };
 
+export type EducationEntry = {
+  _type: "educationEntry";
+  school: string;
+  location?: string;
+  lines: Array<string>;
+};
+
+export type CtaBarContent = {
+  _type: "ctaBarContent";
+  eyebrow: string;
+  headingLead: string;
+  headingRest: string;
+  body: BlockContent;
+  cta: CtaButton;
+};
+
+export type AttorneysBand = {
+  _type: "attorneysBand";
+  eyebrow: string;
+  headingLead: string;
+  headingStrong: string;
+  lede: BlockContent;
+};
+
 export type PracticeAreasBand = {
   _type: "practiceAreasBand";
   eyebrow: string;
@@ -97,6 +121,72 @@ export type CtaButton = {
   href: string;
 };
 
+export type SanityImageAssetReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+};
+
+export type Attorney = {
+  _id: string;
+  _type: "attorney";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  orderRank?: string;
+  name: string;
+  slug: Slug;
+  role: string;
+  credential: string;
+  photo: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+  photoAlt: string;
+  phone: string;
+  email?: string;
+  practiceTags: Array<string>;
+  bio?: BlockContent;
+  education: Array<
+    {
+      _key: string;
+    } & EducationEntry
+  >;
+  barAdmissions: Array<string>;
+  honors: Array<string>;
+  classesSeminars?: Array<string>;
+  publishedWorks?: Array<string>;
+  associations?: Array<string>;
+  pastPositions?: Array<string>;
+  representativeCases?: Array<string>;
+};
+
+export type SanityImageCrop = {
+  _type: "sanity.imageCrop";
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
+};
+
+export type SanityImageHotspot = {
+  _type: "sanity.imageHotspot";
+  x: number;
+  y: number;
+  height: number;
+  width: number;
+};
+
+export type Slug = {
+  _type: "slug";
+  current: string;
+  source?: string;
+};
+
 export type TrialResult = {
   _id: string;
   _type: "trialResult";
@@ -120,6 +210,24 @@ export type TrialResult = {
   };
 };
 
+export type CtaBar = {
+  _id: string;
+  _type: "ctaBar";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  content: CtaBarContent;
+};
+
+export type AttorneysPage = {
+  _id: string;
+  _type: "attorneysPage";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  attorneys?: AttorneysBand;
+};
+
 export type TestimonialsPage = {
   _id: string;
   _type: "testimonialsPage";
@@ -127,6 +235,7 @@ export type TestimonialsPage = {
   _updatedAt: string;
   _rev: string;
   practiceAreas?: PracticeAreasBand;
+  ctaBar?: CtaBarContent;
 };
 
 export type TrialExperiencePage = {
@@ -137,6 +246,7 @@ export type TrialExperiencePage = {
   _rev: string;
   trialResults?: TrialResultList;
   practiceAreas?: PracticeAreasBand;
+  ctaBar?: CtaBarContent;
 };
 
 export type VideoReference = {
@@ -197,6 +307,8 @@ export type HomePage = {
     body: BlockContent;
     cta: CtaButton;
   };
+  ctaBar?: CtaBarContent;
+  attorneys?: AttorneysBand;
 };
 
 export type Video = {
@@ -207,13 +319,6 @@ export type Video = {
   _rev: string;
   title: string;
   wistiaId: string;
-};
-
-export type SanityImageAssetReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
 };
 
 export type FirmDetails = {
@@ -231,22 +336,6 @@ export type FirmDetails = {
     crop?: SanityImageCrop;
     _type: "image";
   };
-};
-
-export type SanityImageCrop = {
-  _type: "sanity.imageCrop";
-  top: number;
-  bottom: number;
-  left: number;
-  right: number;
-};
-
-export type SanityImageHotspot = {
-  _type: "sanity.imageHotspot";
-  x: number;
-  y: number;
-  height: number;
-  width: number;
 };
 
 export type SanityImagePaletteSwatch = {
@@ -346,31 +435,32 @@ export type Geopoint = {
   alt?: number;
 };
 
-export type Slug = {
-  _type: "slug";
-  current: string;
-  source?: string;
-};
-
 export type AllSanitySchemaTypes =
   | AccentText
   | BlockContent
   | TrialResultReference
   | TrialResultList
+  | EducationEntry
+  | CtaBarContent
+  | AttorneysBand
   | PracticeAreasBand
   | PracticeAreaCard
   | SellingPoint
   | CtaButton
+  | SanityImageAssetReference
+  | Attorney
+  | SanityImageCrop
+  | SanityImageHotspot
+  | Slug
   | TrialResult
+  | CtaBar
+  | AttorneysPage
   | TestimonialsPage
   | TrialExperiencePage
   | VideoReference
   | HomePage
   | Video
-  | SanityImageAssetReference
   | FirmDetails
-  | SanityImageCrop
-  | SanityImageHotspot
   | SanityImagePaletteSwatch
   | SanityImagePalette
   | SanityImageDimensions
@@ -378,8 +468,93 @@ export type AllSanitySchemaTypes =
   | SanityFileAsset
   | SanityAssetSourceData
   | SanityImageAsset
-  | Geopoint
-  | Slug;
+  | Geopoint;
+
+// Source: src/sanity/lib/attorneys.ts
+// Variable: ATTORNEY_CARDS_QUERY
+// Query: *[_type == "attorney"] | order(orderRank){  _id,  name,  role,  credential,  photo,  photoAlt,  "slug": slug.current}
+export type ATTORNEY_CARDS_QUERY_RESULT = Array<{
+  _id: string;
+  name: string;
+  role: string;
+  credential: string;
+  photo: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+  photoAlt: string;
+  slug: string;
+}>;
+
+// Source: src/sanity/lib/attorneys.ts
+// Variable: ATTORNEY_SLUGS_QUERY
+// Query: *[_type == "attorney" && defined(slug.current)]{"slug": slug.current}
+export type ATTORNEY_SLUGS_QUERY_RESULT = Array<{
+  slug: string;
+}>;
+
+// Source: src/sanity/lib/attorneys.ts
+// Variable: ATTORNEY_QUERY
+// Query: *[_type == "attorney" && slug.current == $slug][0]{  _id,  name,  role,  credential,  photo,  photoAlt,  phone,  email,  practiceTags,  bio,  education[]{    _key,    school,    location,    lines  },  barAdmissions,  honors,  classesSeminars,  publishedWorks,  associations,  pastPositions,  representativeCases,  "slug": slug.current}
+export type ATTORNEY_QUERY_RESULT = {
+  _id: string;
+  name: string;
+  role: string;
+  credential: string;
+  photo: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+  photoAlt: string;
+  phone: string;
+  email: string | null;
+  practiceTags: Array<string>;
+  bio: BlockContent | null;
+  education: Array<{
+    _key: string;
+    school: string;
+    location: string | null;
+    lines: Array<string>;
+  }>;
+  barAdmissions: Array<string>;
+  honors: Array<string>;
+  classesSeminars: Array<string> | null;
+  publishedWorks: Array<string> | null;
+  associations: Array<string> | null;
+  pastPositions: Array<string> | null;
+  representativeCases: Array<string> | null;
+  slug: string;
+} | null;
+
+// Source: src/sanity/lib/attorneys.ts
+// Variable: ATTORNEYS_BAND_QUERY
+// Query: *[_id == $pageId][0].attorneys{  eyebrow,  headingLead,  headingStrong,  lede}
+export type ATTORNEYS_BAND_QUERY_RESULT = {
+  eyebrow: string;
+  headingLead: string;
+  headingStrong: string;
+  lede: BlockContent;
+} | null;
+
+// Source: src/sanity/lib/ctaBar.ts
+// Variable: CTA_BAR_QUERY
+// Query: coalesce(  *[_id == $pageId][0].ctaBar,  *[_id == "ctaBar"][0].content){  eyebrow,  headingLead,  headingRest,  body,  cta{    label,    href  }}
+export type CTA_BAR_QUERY_RESULT = {
+  eyebrow: string;
+  headingLead: string;
+  headingRest: string;
+  body: BlockContent;
+  cta: {
+    label: string;
+    href: string;
+  };
+} | null;
 
 // Source: src/sanity/lib/firmDetails.ts
 // Variable: FIRM_DETAILS_QUERY
@@ -398,6 +573,11 @@ export type FIRM_DETAILS_QUERY_RESULT =
   | {
       title: string | null;
       phone: null;
+      logo: null;
+    }
+  | {
+      title: null;
+      phone: string;
       logo: null;
     }
   | {
@@ -515,6 +695,11 @@ export type TRIAL_RESULTS_QUERY_RESULT = Array<{
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
+    '*[_type == "attorney"] | order(orderRank){\n  _id,\n  name,\n  role,\n  credential,\n  photo,\n  photoAlt,\n  "slug": slug.current\n}': ATTORNEY_CARDS_QUERY_RESULT;
+    '*[_type == "attorney" && defined(slug.current)]{"slug": slug.current}': ATTORNEY_SLUGS_QUERY_RESULT;
+    '*[_type == "attorney" && slug.current == $slug][0]{\n  _id,\n  name,\n  role,\n  credential,\n  photo,\n  photoAlt,\n  phone,\n  email,\n  practiceTags,\n  bio,\n  education[]{\n    _key,\n    school,\n    location,\n    lines\n  },\n  barAdmissions,\n  honors,\n  classesSeminars,\n  publishedWorks,\n  associations,\n  pastPositions,\n  representativeCases,\n  "slug": slug.current\n}': ATTORNEY_QUERY_RESULT;
+    "*[_id == $pageId][0].attorneys{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  lede\n}": ATTORNEYS_BAND_QUERY_RESULT;
+    'coalesce(\n  *[_id == $pageId][0].ctaBar,\n  *[_id == "ctaBar"][0].content\n){\n  eyebrow,\n  headingLead,\n  headingRest,\n  body,\n  cta{\n    label,\n    href\n  }\n}': CTA_BAR_QUERY_RESULT;
     '*[_id == "firmDetails"][0]{\n  title,\n  phone,\n  logo{\n    ...,\n    "dimensions": asset->metadata.dimensions\n  }\n}': FIRM_DETAILS_QUERY_RESULT;
     '*[_id == "homePage"][0].hero{\n  eyebrow,\n  titleAccent,\n  titleSecond,\n  lead,\n  ctas[]{\n    _key,\n    label,\n    href\n  },\n  caption{\n    name,\n    role,\n    watchLabel,\n    video->{\n      wistiaId\n    }\n  }\n}': HOME_HERO_QUERY_RESULT;
     '*[_id == "homePage"][0].sellingPoints.points[]{\n  _key,\n  value,\n  label\n}': HOME_SELLING_POINTS_QUERY_RESULT;

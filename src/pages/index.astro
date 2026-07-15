@@ -17,16 +17,26 @@ import Blog from "../components/Blog.astro";
 import Consult from "../components/Consult.astro";
 import { getHomeSellingPoints } from "../sanity/lib/homePage";
 import { getPracticeAreasBand } from "../sanity/lib/practiceAreasBand";
+import { getAttorneysBand } from "../sanity/lib/attorneys";
 
 // Both components are shared with other pages, so this page supplies the content.
 const sellingPoints = await getHomeSellingPoints();
 const practiceAreas = await getPracticeAreasBand("homePage");
+const attorneysBand = await getAttorneysBand("homePage");
 
 if (!sellingPoints?.length) {
   throw new Error(
     "No Selling Points found on the Home Page in Sanity.\n" +
       "Add them in the Studio at /admin → Home Page, or seed them with:\n" +
       "  npx sanity exec scripts/seed-selling-points.ts --with-user-token",
+  );
+}
+
+if (!attorneysBand) {
+  throw new Error(
+    "No Attorneys Band found on the Home Page in Sanity.\n" +
+      "Add it in the Studio at /admin → Home Page, or seed it with:\n" +
+      "  npx sanity exec scripts/seed-attorneys-band.ts --with-user-token",
   );
 }
 
@@ -45,8 +55,8 @@ if (!practiceAreas) {
   <PracticeAreas band={practiceAreas} />
   <About />
   <StatementBand />
-  <CtaBar />
-  <Attorneys />
+  <CtaBar pageId="homePage" />
+  <Attorneys band={attorneysBand} />
   <FirmStory />
   <Testimonials />
   <WhyChoose />

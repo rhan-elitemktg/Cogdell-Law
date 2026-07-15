@@ -1,82 +1,76 @@
 ---
 // Homepage "The Firm" attorneys section — header + four attorney cards.
 // Desktop: 4-up grid. Tablet/mobile: horizontal peek carousel (no scrollbar).
-import { Image } from "astro:assets";
 import Eyebrow from "./Eyebrow.astro";
-import danPhoto from "../assets/attorneys/dan-cogdell.jpg";
-import aishaPhoto from "../assets/attorneys/aisha-dennis.jpg";
-import anthonyPhoto from "../assets/attorneys/anthony-osso.jpg";
-import brentPhoto from "../assets/attorneys/brent-newton.jpg";
+import { PortableText } from "astro-portabletext";
+import AttorneysLede from "./attorneys/AttorneysLede.astro";
+import { getAttorneyCards } from "../sanity/lib/attorneys";
+import { urlFor } from "../sanity/lib/image";
 
+// Photos live in Sanity (D6: a new hire shouldn't need a developer), so they're
+// served from Sanity's CDN via urlFor rather than the astro:assets pipeline.
+// These widths and `sizes` match what <Image> emitted before the move.
+const PHOTO_WIDTHS = [300, 460, 600, 790];
+const PHOTO_SIZES = "(max-width: 650px) 80vw, (max-width: 900px) 44vw, 22vw";
+
+const attorneys = await getAttorneyCards();
+
+if (!attorneys.length) {
+  throw new Error(
+    "No Attorneys found in Sanity.\n" +
+      "Add them in the Studio at /admin → Attorney, or seed them with:\n" +
+      "  npx sanity exec scripts/seed-attorneys.ts --with-user-token",
+  );
+}
+
+// `band` is the header copy — supplied by the page, because this component is
+// shared between / and /attorneys and each holds its own copy (D9, D11). The
+// cards are NOT per-page: they're attorney documents, fetched here.
+//
 // `background` sets the section ground: "paper" (default) or "card"
 // (near-white --cog-paper-card), used on the standalone /attorneys page.
 interface Props {
+  band: {
+    eyebrow: string | null;
+    headingLead: string | null;
+    headingStrong: string | null;
+    lede: unknown;
+  };
   background?: "paper" | "card";
 }
-const { background = "paper" } = Astro.props;
+const { band, background = "paper" } = Astro.props;
 
-const attorneys = [
-  {
-    photo: danPhoto,
-    name: "Dan L. Cogdell",
-    role: "Founding Attorney",
-    credential: "40+ years — white collar, civil & federal criminal defense",
-    href: "/attorney/cogdell-dan-l",
-  },
-  {
-    photo: aishaPhoto,
-    name: "Aisha J. Dennis",
-    role: "Attorney",
-    credential: "Federal litigation, white collar defense & complex trials",
-    href: "/attorney/dennis-aisha-j",
-  },
-  {
-    photo: anthonyPhoto,
-    name: "Anthony Osso",
-    role: "Attorney",
-    credential: "Federal criminal cases & complex trials",
-    href: "/attorney/osso-anthony",
-  },
-  {
-    photo: brentPhoto,
-    name: "Brent E. Newton",
-    role: "Attorney",
-    credential: "Federal appeals & post-conviction",
-    href: "/attorney/newton-brent-e",
-  },
-];
 ---
 
 <section class:list={["attorneys", background === "card" && "attorneys--card"]}>
   <div class="container">
     <div class="attorneys__head">
       <div class="attorneys__head-left">
-        <Eyebrow>The Firm</Eyebrow>
+        <Eyebrow>{band.eyebrow}</Eyebrow>
         <h2 class="attorneys__heading">
-          <span class="attorneys__heading-lead">Trial Lawyers</span>
-          <span class="attorneys__heading-strong">Who Fight to Win.</span>
+          <span class="attorneys__heading-lead">{band.headingLead}</span>
+          <span class="attorneys__heading-strong">{band.headingStrong}</span>
         </h2>
       </div>
       <div class="attorneys__head-right">
-        <p class="attorneys__lede">
-          The Cogdell Law Firm team defends individuals, executives, and
-          companies throughout Texas and across the country — federal
-          investigations, white collar matters, complex civil disputes, and the
-          cases other firms turn away.
-        </p>
+        <PortableText value={band.lede} components={{ block: { normal: AttorneysLede } }} />
       </div>
     </div>
 
     <div class="attorneys__grid">
       {
         attorneys.map((a) => (
-          <a class="attorneys__card" href={a.href}>
+          <a class="attorneys__card" href={`/attorney/${a.slug}`}>
             <div class="attorneys__photo">
-              <Image
-                src={a.photo}
+              <img
+                src={urlFor(a.photo).width(790).url()}
+                srcset={PHOTO_WIDTHS.map((w) => `${urlFor(a.photo).width(w).url()} ${w}w`).join(", ")}
                 alt={a.name}
-                widths={[300, 460, 600, 790]}
-                sizes="(max-width: 650px) 80vw, (max-width: 900px) 44vw, 22vw"
+                sizes={PHOTO_SIZES}
+                loading="lazy"
+                decoding="async"
+                width={790}
+                height={790}
                 class="attorneys__photo-img lazy-fade"
               />
               <span class="attorneys__bar" aria-hidden="true" />
@@ -141,7 +135,7 @@ const attorneys = [
     font-weight: 700;
     color: var(--cog-ink);
   }
-  .attorneys__lede {
+  .attorneys__head-right :global(.attorneys__lede) {
     max-width: 660px;
     font-size: var(--text-base);
     line-height: 1.7;

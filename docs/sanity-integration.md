@@ -35,6 +35,7 @@ The schema layer. Everything in section 2 and 3 depends on these.
 | `ctaButton` | `Hero.astro` | object | — | `[x]` | — | `[x]` | ✅ done |
 | `sellingPoint` | `SellingPoints.astro` | object | — | `[x]` | `[x]` | `[x]` | ✅ done |
 | `homePage.statement` | `StatementBand.astro` | object | — | `[x]` | `[x]` | `[x]` | ✅ done |
+| `ctaBar` + `ctaBarContent` | `CtaBar.astro` | singleton + object | 1 | `[x]` | `[x]` | `[x]` | ✅ done — site-wide, ~43 pages (D13) |
 | `practiceAreaCard` | `PracticeAreas.astro` | object | — | `[x]` | `[x]` | `[x]` | ✅ done |
 | `practiceAreasBand` | `PracticeAreas.astro` | object | — | `[x]` | `[x]` | `[x]` | ✅ done — one copy per page (D11) |
 | `trialExperiencePage` | `trial-experience.astro` | singleton | 1 | `[x]` | `[~]` | `[x]` | band only; rest of page pending |
@@ -43,7 +44,10 @@ The schema layer. Everything in section 2 and 3 depends on these.
 | `blockContent` (Portable Text) | `Block[]` in `practice-areas.ts` | object | — | `[x]` | — | `[ ]` | ✅ schema — **standard for all body copy (D12)**; renderer lands with its first consumer |
 | `link` (annotation) | `Inline{text,href}` | object | — | `[x]` | — | `[ ]` | ✅ inside `blockContent`; reference toggle in Phase 5 (D4) |
 | `testimonial` | `data/testimonials.ts` | document | 16 | `[ ]` | `[ ]` | `[ ]` | 1 |
-| `attorney` | `data/attorneys.ts` | document | 4 | `[ ]` | `[ ]` | `[ ]` | 3 |
+| `attorney` | ~~`data/attorneys.ts`~~ | document | 4 | `[x]` | `[x]` | `[x]` | ✅ done — F2 resolved; photos in Sanity |
+| `educationEntry` | `data/attorneys.ts` | object | — | `[x]` | `[x]` | `[x]` | ✅ done |
+| `attorneysBand` | `Attorneys.astro` header | object | — | `[x]` | `[x]` | `[x]` | ✅ done — one copy per page (D11) |
+| `attorneysPage` | `attorneys.astro` | singleton | 1 | `[x]` | `[~]` | `[x]` | band only; rest of page pending |
 | `newsItem` | `data/news.ts` | document | ~10 | `[ ]` | `[ ]` | `[ ]` | 4 |
 | `trialResult` | `TrialResults.astro` + `About.astro` | document | 16 | `[x]` | `[x]` | `[x]` | ✅ done — F2 duplicate resolved |
 | `trialResultList` | `TrialResults.astro` | object | — | `[x]` | `[x]` | `[x]` | ✅ done |
@@ -77,8 +81,8 @@ All 16 routes. "Depends on" is the content type(s) the page needs before it can 
 |---|---|---|---|---|---|---|---|
 | `/testimonials` | `pages/testimonials.astro` | `testimonial` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | 1 |
 | `/videos` | `pages/videos.astro` | `video` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | 2 |
-| `/attorneys` | `pages/attorneys.astro` | `attorney` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | 3 |
-| `/attorney/[slug]` | `pages/attorney/[slug].astro` | `attorney` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | 3 |
+| `/attorneys` | `pages/attorneys.astro` | `attorney` | `[x]` | `[x]` | `[x]` | `[x]` | ✅ done |
+| `/attorney/[slug]` | `pages/attorney/[slug].astro` | `attorney` | `[x]` | `[x]` | `[x]` | `[x]` | ✅ done — 4 pages |
 | `/news` | `pages/news/index.astro` | `newsItem` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | 4 |
 | `/news/[slug]` | `pages/news/[slug].astro` | `newsItem` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | 4 |
 | `/trial-experience` | `pages/trial-experience.astro` | `trialResult` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | 4 |
@@ -111,11 +115,12 @@ All 41 components + the layout. Grouped by how much Sanity work each needs.
 | `Hero.astro` | ~~`data/videos.ts`~~ | `homePage.hero` + `video` | `[x]` | `[x]` | ✅ done |
 | `SellingPoints.astro` | ~~`defaultPoints`~~ | `homePage.sellingPoints` (via `index.astro`) | `[x]` | `[x]` | ✅ done |
 | `StatementBand.astro` *(was `VideoBand`)* | ~~hardcoded copy~~ | `homePage.statement` | `[x]` | `[x]` | ✅ done |
+| `CtaBar.astro` | ~~hardcoded copy~~ | `ctaBar` shared + override (D13) | `[x]` | `[x]` | ✅ done — ~43 pages |
 | `video/VideoGrid.astro` | `data/videos.ts` (type) | `video` | `[ ]` | `[ ]` | 2 |
 | `video/VideoLightbox.astro` | props | `video` | `[ ]` | `[ ]` | 2 |
-| `attorney/AttorneyBio.astro` | `data/attorneys.ts` (type) | `attorney` | `[ ]` | `[ ]` | 3 |
-| `attorney/AttorneyHero.astro` | `data/attorneys.ts` (type) | `attorney` | `[ ]` | `[ ]` | 3 |
-| `Attorneys.astro` ⚠️ | **own array** (4, roles differ) | `attorney` | `[ ]` | `[ ]` | 3 |
+| `attorney/AttorneyBio.astro` | ~~`data/attorneys.ts`~~ | `attorney` | `[x]` | `[x]` | ✅ done |
+| `attorney/AttorneyHero.astro` | ~~`data/attorneys.ts`~~ | `attorney` | `[x]` | `[x]` | ✅ done |
+| `Attorneys.astro` | ~~own array~~ | `attorney` | `[x]` | `[x]` | ✅ done |
 | `about/FoundingAttorney.astro` | hardcoded copy | `attorney` | `[ ]` | `[ ]` | 3 |
 | `news/NewsGrid.astro` | `data/news.ts` (type) | `newsItem` | `[ ]` | `[ ]` | 4 |
 | `Blog.astro` | `data/news.ts` (`latestNews`) | `newsItem` | `[ ]` | `[ ]` | 4 |
@@ -151,7 +156,6 @@ Real content, but design-coupled and rarely changed. Decide per D7 whether it mo
 | `about/QuoteBand.astro` | pull quote | `[ ]` | `[ ]` |
 | `FirmStory.astro` | firm story copy | `[ ]` | `[ ]` |
 | `Consult.astro` | consult copy + phone | `[ ]` | `[ ]` |
-| `CtaBar.astro` | CTA copy + phone | `[ ]` | `[ ]` |
 | `pages/our-firm.astro` | `stats` — 4 stats | `[ ]` | `[ ]` |
 
 ### 3c. Presentational — no Sanity work
@@ -191,7 +195,7 @@ Not near-duplicates — **actually different content**:
 
 | Component | Its content | The data file | Verdict |
 |---|---|---|---|
-| `Attorneys.astro` | 4 attorneys, `"Founding Attorney"` | `attorneys.ts` says `"Principal & Founder"` | Roles drifted |
+| ~~`Attorneys.astro`~~ | 4 attorneys, `"Founding Attorney"` | `attorneys.ts` says `"Principal & Founder"` | ✅ **resolved 2026-07-15** — see F15 |
 | `Testimonials.astro` | 3 quotes, all `"Former Client"` + `tag` | `testimonials.ts` has 16, initials, no tags | **Different quotes entirely** |
 | ~~`PracticeAreas.astro`~~ | Complex Civil Litigation, Personal Injury, Government Investigations… | Health Care Fraud, Federal Criminal Cases, Fraud & White Collar, Appeals | ✅ resolved — see update below |
 | ~~`About.astro`~~ | `results` — Enron, Waco | overlaps `TrialResults.astro`'s cases | ✅ **resolved 2026-07-15** — see F13 |
@@ -245,6 +249,79 @@ with `ReferenceError`, not at build.
 `Block` / `Crumb` / `PracticeSection` are shared across practice, city, news **and**
 legal pages. `Blocks`, `PracticeBody`, `Breadcrumb`, `PracticeFaqs` are shared renderers
 — changing one touches four page types.
+
+### F17 — "Order fixed in code" is a silent bug waiting for the 5th record ⚠️
+
+**Shipped this in the attorney migration.** With no ordering field, I fixed the card order
+with a hardcoded slug list and sorted by `indexOf`:
+
+```ts
+const CARD_ORDER = ["cogdell-dan-l", "dennis-aisha-j", "osso-anthony", "newton-brent-e"];
+cards.sort((a, b) => CARD_ORDER.indexOf(a.slug) - CARD_ORDER.indexOf(b.slug));
+```
+
+Correct for exactly the four people who existed. A fifth attorney isn't in the list, so
+`indexOf` returns **-1** — and they sort to the **front**, above the founder. No error, no
+warning; it only surfaces the day the firm hires someone. The firm asked "what if there
+are more than 4?" before it ever happened.
+
+**Resolved** with D2's plugin (see above). Verified by creating a real 5th attorney with
+**no** `orderRank` at all — worse than reality, since the Studio assigns one on create —
+and confirming they land last, then deleting the probe.
+
+**The general trap:** any code that enumerates today's records — a slug list, a fixed
+count, an index-based lookup — is a bug scheduled for whenever the content grows. The
+layout here was fine (a real `gap`, so a 5th card just wraps); it was the *data* order
+that broke.
+
+### F16 — A band has TWO kinds of content: the records and its own header ⚠️
+
+**Missed this on the first pass and shipped an incomplete migration.**
+
+The attorney band is a header (eyebrow, heading, lede) wrapping a grid of people.
+Migrating the *people* to `attorney` documents felt like "the Attorneys section is done" —
+but the band's own copy was still hardcoded, so **no Attorneys section appeared on the
+Home Page in the Studio**. The firm spotted it, not me.
+
+The two halves belong in different places, and that's the point:
+
+| | Lives in | Why |
+|---|---|---|
+| The cards (name, role, photo, blurb) | `attorney` **documents** | A person is edited once and appears on `/`, `/attorneys`, and their bio page |
+| The header (eyebrow, heading, lede) | `<page>.attorneys` **section** | It's page copy — each page words it its own way (D11) |
+
+**Check for this on every remaining band.** `Testimonials`, `WhyChoose`, `Press`, `Faq`
+and `Blog` all wrap a record list in page copy. Migrating the records is only half of it;
+if no section shows up on the page document, the header was missed.
+
+### F15 — Attorneys: the cards and bio pages disagreed on job titles ✅ resolved
+
+The homepage/`/attorneys` cards and the bio pages stated **different roles for two of
+four attorneys** — the live site contradicted itself:
+
+| | Card said | Bio page said |
+|---|---|---|
+| Dan L. Cogdell | "Founding Attorney" | "Principal & Founder" |
+| Brent E. Newton | **"Attorney"** | **"Of Counsel"** |
+
+"Of Counsel" is a formal designation, not a synonym — the kind of thing a bar association
+cares about. Unlike F13 (where both versions were true and were kept), this was an
+inconsistency to settle, not a variation to preserve.
+
+**Resolved:** one `attorney` document per person; `role` is a **single field** and the bio
+page's wording won. This deliberately changed two visible card labels — the only content
+change in the migration, verified by diffing every attribute of every card. The card's
+one-line blurb lives on as `credential` (it never existed in `data/attorneys.ts` — only in
+the component's array).
+
+`data/attorneys.ts` is **deleted** (332 lines). Photos are in Sanity with hotspot (D6), so
+a new hire needs no developer; they're served via `urlFor` rather than `astro:assets`, and
+the emitted `<img>` matches the old output attribute-for-attribute apart from the URLs.
+`bio` became `blockContent` (D12).
+
+**Watch for:** `.cred__prose p` in `AttorneyBio` was scoped on **both** compounds
+(`.cred__prose[cid] p[cid]`), so the Portable Text `<p>` broke it — fixed with
+`:global(p)`. Exactly the F14 trap, caught by the lint.
 
 ### F14 — Scoped styles break when markup moves to a child component ⚠️
 
@@ -388,12 +465,13 @@ add schema types.
 | # | Decision | Recommendation |
 |---|---|---|
 | **D1** | Practice-area hierarchy | ✅ Flat `practiceArea` docs + self-referencing `parent` ref. Single-segment slug; path built by walking ancestors. Keeps each sub-topic independently editable and preserves the catch-all route. *(Tree is shallower than it looks — only 2 areas have children, never past depth 2.)* |
-| **D2** | Ordering (F3) | ✅ `@sanity/orderable-document-list` + `order(orderRank)` in GROQ. Alt: a plain `order` number field — free, but manual renumbering. |
+| **D2** | Ordering (F3) | ✅ **Landed 2026-07-15 via `@sanity/orderable-document-list`** (attorneys were the first type to need it). Adds `orderRankField` + `orderRankOrdering` to the type, an `orderableDocumentListDeskItem` in `structure.ts`, and `| order(orderRank)` in the query — the Studio list becomes drag-to-reorder and a new document lands last. Ranks are `lexorank` strings (`0\|hzzzzz:`); backfill pre-existing docs with a script using the same lib (see `scripts/backfill-attorney-order.ts`) or their order is arbitrary. <br><br>**Use this for every type with no curating page** — testimonials, news, practice areas. Types ordered by a page's reference array (trial results, D11/F13) don't need it.
 | **D3** | `Block` → Portable Text | ✅ Maps **1:1**. `{p}`→normal, `{ul}`→bullet listItem, `{quote}`→blockquote, `Inline`→link mark. Source is already structured, so it's an in-memory transform — no HTML parsing, no JSDOM. `Blocks.astro` → `<PortableText>` emitting the same `prose__*` classes, so CSS is untouched. |
 | **D4** | Internal links in rich text | ✅ A `link` annotation toggling internal (`reference`) / external (`url`); internal resolves to a path at query time. Kills link rot when slugs change. Alt: keep raw `href` strings. |
 | **D5** | Navigation (F4) | ✅ Keep `navigation.ts` in code but export async `getNavItems()` fetching a slim projection. `Header`/`MobileNav` already await in frontmatter. The pure helpers (`isOnTrail`, `normalizePath`, `isUnder`) don't change. |
 | **D6** | Images | ✅ Attorney photos + press logos → Sanity. Design/decorative assets stay in `src/assets` with `astro:assets`. Wistia posters stay remote. |
 | **D7** | Marketing copy in components (§3b) | ✅ **Leave in code for now.** It's design-coupled, rarely changes, and moving it means a `homePage`/`ourFirmPage` singleton per section. Revisit if the firm asks to edit it. `trialResult` + `faq` are the exception — they're real, growing content. |
+| **D13** | Site-wide content (the CTA bar) | ✅ **One shared record + an optional per-page override.** Chosen 2026-07-15. `CtaBar` renders on **~43 pages** from 9 call sites — including dynamic routes (`practice-areas/[...slug]`, `[city]/[slug]`, `news/[slug]`) that **have no page document at all**, so per-page copies (D11) is not merely wasteful here, it's impossible without putting a `ctaBar` field on all ~20 practice areas and ~15 city pages. <br><br>Shape: `ctaBarContent` object defined once, used by both `ctaBar.content` (the shared default) and `<page>.ctaBar` (the override) — so an override can't drift out of shape. One GROQ `coalesce(override, default)` resolves it; verified against the dataset before building. <br><br>The component **self-fetches** (nine callers passing identical props would be nine chances to drift); pages that have a document pass `pageId` to enable their override. Only `homePage`, `trialExperiencePage` and `testimonialsPage` can override today — the rest have no document. <br><br>**Rule of thumb:** content on a handful of *known* pages → per-page copies (D11). Content on every page, or on dynamic routes → shared + override (D13). |
 | **D12** | Rich text: one standard | ✅ **`blockContent` is the standard for every body-copy field** — practice areas, location pages, news, legal pages, attorney bios. Set 2026-07-15 because the site is handed to an **SEO team** afterwards, who need to add and edit **H1, H2, H3, H4, links and bold** consistently wherever prose appears. **Don't invent per-field rich-text types.** <br><br>Also carries **bulleted + numbered lists** and a **Quote** style — not decoration: `practice-areas.ts` uses `{ul}` and `{quote}`, so D3 cannot migrate without them. <br><br>**One deliberate exception:** `accentText` (the About pull quote) stays minimal — one line, one Accent button — because headings and lists have no styling there. <br><br>**No H1 — headings start at H2.** Every hero already renders the page's `<h1>` (`titleLead` + `titleStrong`), so a body H1 would make a second one. Briefly included at the SEO team's request, then dropped once that was clear. Don't add it back without moving the hero's heading first. <br><br>Links are a `url` annotation accepting relative paths today; **Phase 5 adds the internal/external reference toggle** (D4) once `practiceArea` documents exist to point at. |
 | **D11** | Content shown on several pages | ✅ **Per-page copies, not one shared record.** Decided 2026-07-15 for the practice-areas band (home, /trial-experience, /testimonials): shared *schema* (`practiceAreasBand` object), separate *content* per page document, so pages can be worded differently. **Known trade-off:** the same six cards now live in three places and can drift — the very thing that caused F2. Accepted knowingly for editorial flexibility. Consequence: a component on N pages implies N page documents, so `/trial-experience` and `/testimonials` singletons exist now, holding only this band. |
 | **D10** | Page sections in the Studio | ✅ **Every major section is an `object` field with `options: { collapsible: true, collapsed: true }` and NO `description`.** A page document then opens as a tidy list of closed accordions; the section title carries the meaning, and explanation belongs on the individual fields inside, where it's actually needed. Set by the firm 2026-07-15 — **apply to every new section and page document.** <br><br>**This applies even to list-only sections:** `collapsible` is an `ObjectOptions` flag — `ArrayOptions` has no such option, so a bare array field *cannot* collapse. Wrap it (`sellingPoints: { points: [...] }`). A collapsible `fieldset` also works, but keep one mechanism, not two. |

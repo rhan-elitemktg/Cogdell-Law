@@ -36,7 +36,7 @@ export const TRIAL_CATEGORY_LABELS = [
  */
 export const trialResult = defineType({
   name: "trialResult",
-  title: "Trial Result",
+  title: "Trial Results",
   type: "document",
   icon: icons.case,
   fields: [
