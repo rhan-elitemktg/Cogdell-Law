@@ -34,6 +34,10 @@ The schema layer. Everything in section 2 and 3 depends on these.
 | `homePage` (hero only) | `Hero.astro` | singleton | 1 | `[x]` | `[x]` | `[x]` | ✅ done |
 | `ctaButton` | `Hero.astro` | object | — | `[x]` | — | `[x]` | ✅ done |
 | `sellingPoint` | `SellingPoints.astro` | object | — | `[x]` | `[x]` | `[x]` | ✅ done |
+| `practiceAreaCard` | `PracticeAreas.astro` | object | — | `[x]` | `[x]` | `[x]` | ✅ done |
+| `practiceAreasBand` | `PracticeAreas.astro` | object | — | `[x]` | `[x]` | `[x]` | ✅ done — one copy per page (D11) |
+| `trialExperiencePage` | `trial-experience.astro` | singleton | 1 | `[x]` | `[~]` | `[x]` | band only; rest of page pending |
+| `testimonialsPage` | `testimonials.astro` | singleton | 1 | `[x]` | `[~]` | `[x]` | band only; quotes are Phase 1 |
 | `video` | `data/videos.ts` | document | 5 | `[x]` | `[x]` | `[~]` | ✅ schema+content — title + `wistiaId` only (D8) |
 | `blockContent` (Portable Text) | `Block[]` in `practice-areas.ts` | object | — | `[ ]` | — | `[ ]` | 0 |
 | `link` (annotation) | `Inline{text,href}` | object | — | `[ ]` | — | `[ ]` | 0 |
@@ -118,7 +122,7 @@ All 41 components + the layout. Grouped by how much Sanity work each needs.
 | `practice/PracticeBody.astro` | `practice-areas.ts` (types) | `practiceArea` | `[ ]` | `[ ]` | 5 |
 | `practice/PracticeFaqs.astro` | `practice-areas.ts` (type) | `practiceArea` | `[ ]` | `[ ]` | 5 |
 | `practice/Breadcrumb.astro` | `Crumb` type | `practiceArea` | `[ ]` | `[ ]` | 5 |
-| `PracticeAreas.astro` ⚠️ | **own array — divergent taxonomy** | *decide* | `[ ]` | `[ ]` | 5 |
+| `PracticeAreas.astro` | ~~own array~~ | `practiceAreasBand` ×3 pages | `[x]` | `[x]` | ✅ done |
 | `Header.astro` | `navigation` + `firmDetails` | nav async | `[~]` | `[ ]` | 7 |
 | `MenuList.astro` | `data/navigation.ts` | nav async | `[ ]` | `[ ]` | 7 |
 | `MobileNav.astro` | `data/navigation.ts` | nav async | `[ ]` | `[ ]` | 7 |
@@ -195,6 +199,15 @@ or the tree is incomplete — that's a question for the firm, not something to m
 mechanically. Same for the testimonials: two different curated sets.
 
 **These are content decisions. We should not pick winners on the firm's behalf.**
+
+**Update 2026-07-15 — `PracticeAreas.astro` resolved (for now).** The cards turned out
+**not to be links** (plain `<div>`, no `<a>`), so the band is standalone marketing copy
+and the mismatch breaks nothing. Migrated **verbatim** into `practiceAreasBand`, so the
+site is unchanged and the firm can reconcile the wording in the Studio without a code
+change. The underlying question — is the homepage aspirational, or is the tree
+incomplete? — is still open and still theirs to answer, and it returns in **Phase 5**
+when the real tree moves to Sanity. `Attorneys.astro` and `Testimonials.astro` remain
+unresolved.
 
 ### F3 — Ordering is silent-failure territory
 
@@ -309,7 +322,8 @@ add schema types.
 | **D5** | Navigation (F4) | ✅ Keep `navigation.ts` in code but export async `getNavItems()` fetching a slim projection. `Header`/`MobileNav` already await in frontmatter. The pure helpers (`isOnTrail`, `normalizePath`, `isUnder`) don't change. |
 | **D6** | Images | ✅ Attorney photos + press logos → Sanity. Design/decorative assets stay in `src/assets` with `astro:assets`. Wistia posters stay remote. |
 | **D7** | Marketing copy in components (§3b) | ✅ **Leave in code for now.** It's design-coupled, rarely changes, and moving it means a `homePage`/`ourFirmPage` singleton per section. Revisit if the firm asks to edit it. `trialResult` + `faq` are the exception — they're real, growing content. |
-| **D10** | Page sections in the Studio | ✅ **Every major section is an `object` field with `options: { collapsible: true, collapsed: false }`**, so a page document reads as a list of accordions. Requested 2026-07-15. **This applies even to list-only sections:** `collapsible` is an `ObjectOptions` flag — `ArrayOptions` has no such option, so a bare array field *cannot* collapse. Wrap it (`sellingPoints: { points: [...] }`). A collapsible `fieldset` also works, but keep one mechanism, not two. |
+| **D11** | Content shown on several pages | ✅ **Per-page copies, not one shared record.** Decided 2026-07-15 for the practice-areas band (home, /trial-experience, /testimonials): shared *schema* (`practiceAreasBand` object), separate *content* per page document, so pages can be worded differently. **Known trade-off:** the same six cards now live in three places and can drift — the very thing that caused F2. Accepted knowingly for editorial flexibility. Consequence: a component on N pages implies N page documents, so `/trial-experience` and `/testimonials` singletons exist now, holding only this band. |
+| **D10** | Page sections in the Studio | ✅ **Every major section is an `object` field with `options: { collapsible: true, collapsed: true }` and NO `description`.** A page document then opens as a tidy list of closed accordions; the section title carries the meaning, and explanation belongs on the individual fields inside, where it's actually needed. Set by the firm 2026-07-15 — **apply to every new section and page document.** <br><br>**This applies even to list-only sections:** `collapsible` is an `ObjectOptions` flag — `ArrayOptions` has no such option, so a bare array field *cannot* collapse. Wrap it (`sellingPoints: { points: [...] }`). A collapsible `fieldset` also works, but keep one mechanism, not two. |
 | **D9** | Who fetches: page or component? | ✅ **Shared components take props; page-only components self-fetch.** `Hero` is homepage-only, so it calls `getHomeHero()` itself. `SellingPoints` is shared with `/our-firm` (which passes its own `stats`), so it stays presentational and `index.astro` passes Sanity content in. Established 2026-07-15 with the selling points; applies to every remaining homepage section. Check the caller list before modelling — `Attorneys`, `Testimonials` and `PracticeAreas` are each used on more than one page. |
 | **D8** | Video `duration` + `poster` | ✅ **Decided 2026-07-15: neither is a Studio field.** Wistia owns the runtime and the thumbnail, so hand-typed values can only drift. Both are read from Wistia's oEmbed at build time via `src/lib/wistia.ts` — verified against all 5 videos: every duration matched, and the derived poster is byte-identical to the old hardcoded URL. A `video` document is now just **curated title + `wistiaId`**. Trade-off accepted: the homepage hero now needs Wistia at build time (mitigated with retries — see §9). |
 

@@ -6,6 +6,18 @@ import PracticeAreas from "../components/PracticeAreas.astro";
 import CtaBar from "../components/CtaBar.astro";
 import Consult from "../components/Consult.astro";
 import heroImage from "../assets/firm-steps.jpg";
+import { getPracticeAreasBand } from "../sanity/lib/practiceAreasBand";
+
+// This page holds its own copy of the band, separate from the Home Page.
+const practiceAreas = await getPracticeAreasBand("trialExperiencePage");
+
+if (!practiceAreas) {
+  throw new Error(
+    "No Practice Areas band found on the Trial Experience Page in Sanity.\n" +
+      "Add it in the Studio at /admin → Trial Experience Page, or seed it with:\n" +
+      "  npx sanity exec scripts/seed-practice-areas.ts --with-user-token",
+  );
+}
 ---
 
 <Layout
@@ -32,7 +44,7 @@ import heroImage from "../assets/firm-steps.jpg";
   </PageHero>
 
   <TrialResults />
-  <PracticeAreas background="card" />
+  <PracticeAreas band={practiceAreas} background="card" />
   <CtaBar />
   <Consult />
 </Layout>

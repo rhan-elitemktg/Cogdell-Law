@@ -5,10 +5,13 @@ import { icons } from "@sanity/icons";
  * Home Page singleton. One object field per section of the page, so sections can
  * be added over time without reshaping the document.
  *
- * Every section is an `object` with `collapsible: true`, so the page reads as a
- * list of accordions in the Studio. Keep this uniform — a list-only section still
- * gets the object wrapper (see `sellingPoints`), because `collapsible` is an
- * ObjectOptions flag and plain array fields cannot collapse.
+ * Section convention (D10) — applies to every page document:
+ *   - each section is an `object` with `options: { collapsible: true, collapsed: true }`,
+ *     so the page opens as a tidy list of closed accordions
+ *   - sections carry NO `description` — the title says it; explain inside, on the
+ *     individual fields, where it's actually needed
+ *   - a list-only section still gets the object wrapper (see `sellingPoints`):
+ *     `collapsible` is an ObjectOptions flag, and plain array fields cannot collapse
  *
  * Sections still hardcoded in their components are tracked in
  * docs/sanity-integration.md §3b.
@@ -23,7 +26,7 @@ export const homePage = defineType({
       name: "hero",
       title: "Hero",
       type: "object",
-      options: { collapsible: true, collapsed: false },
+      options: { collapsible: true, collapsed: true },
       fields: [
         defineField({
           name: "eyebrow",
@@ -106,8 +109,7 @@ export const homePage = defineType({
       name: "sellingPoints",
       title: "Selling Points",
       type: "object",
-      description: "The stats bar directly under the hero.",
-      options: { collapsible: true, collapsed: false },
+      options: { collapsible: true, collapsed: true },
       fields: [
         defineField({
           name: "points",
@@ -123,6 +125,12 @@ export const homePage = defineType({
               .error("The stats bar is built for exactly four points."),
         }),
       ],
+    }),
+    defineField({
+      name: "practiceAreas",
+      title: "Practice Areas",
+      type: "practiceAreasBand",
+      options: { collapsible: true, collapsed: true },
     }),
   ],
   preview: {

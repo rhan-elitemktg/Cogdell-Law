@@ -15,6 +15,26 @@
 export declare const internalGroqTypeReferenceTo: unique symbol;
 
 // Source: schema.json
+export type PracticeAreasBand = {
+  _type: "practiceAreasBand";
+  eyebrow: string;
+  headingLead: string;
+  headingStrong: string;
+  description: string;
+  cards: Array<
+    {
+      _key: string;
+    } & PracticeAreaCard
+  >;
+};
+
+export type PracticeAreaCard = {
+  _type: "practiceAreaCard";
+  title: string;
+  desc: string;
+  icon: "briefcase" | "users" | "layers" | "columns" | "search" | "doc";
+};
+
 export type SellingPoint = {
   _type: "sellingPoint";
   value: string;
@@ -25,6 +45,24 @@ export type CtaButton = {
   _type: "ctaButton";
   label: string;
   href: string;
+};
+
+export type TestimonialsPage = {
+  _id: string;
+  _type: "testimonialsPage";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  practiceAreas?: PracticeAreasBand;
+};
+
+export type TrialExperiencePage = {
+  _id: string;
+  _type: "trialExperiencePage";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  practiceAreas?: PracticeAreasBand;
 };
 
 export type VideoReference = {
@@ -64,6 +102,7 @@ export type HomePage = {
       } & SellingPoint
     >;
   };
+  practiceAreas?: PracticeAreasBand;
 };
 
 export type Video = {
@@ -220,8 +259,12 @@ export type Slug = {
 };
 
 export type AllSanitySchemaTypes =
+  | PracticeAreasBand
+  | PracticeAreaCard
   | SellingPoint
   | CtaButton
+  | TestimonialsPage
+  | TrialExperiencePage
   | VideoReference
   | HomePage
   | Video
@@ -275,7 +318,7 @@ export type FIRM_DETAILS_QUERY_RESULT =
 // Source: src/sanity/lib/homePage.ts
 // Variable: HOME_HERO_QUERY
 // Query: *[_id == "homePage"][0].hero{  eyebrow,  titleAccent,  titleSecond,  lead,  ctas[]{    _key,    label,    href  },  caption{    name,    role,    watchLabel,    video->{      wistiaId    }  }}
-export type HOME_HERO_QUERY_RESULT = {
+export type HOME_HERO_QUERY_RESULT = null | {
   eyebrow: string;
   titleAccent: string;
   titleSecond: string;
@@ -293,7 +336,7 @@ export type HOME_HERO_QUERY_RESULT = {
       wistiaId: string;
     };
   } | null;
-} | null;
+};
 
 // Source: src/sanity/lib/homePage.ts
 // Variable: HOME_SELLING_POINTS_QUERY
@@ -304,6 +347,22 @@ export type HOME_SELLING_POINTS_QUERY_RESULT = Array<{
   label: string;
 }> | null;
 
+// Source: src/sanity/lib/practiceAreasBand.ts
+// Variable: PRACTICE_AREAS_BAND_QUERY
+// Query: *[_id == $pageId][0].practiceAreas{  eyebrow,  headingLead,  headingStrong,  description,  cards[]{    _key,    icon,    title,    desc  }}
+export type PRACTICE_AREAS_BAND_QUERY_RESULT = {
+  eyebrow: string;
+  headingLead: string;
+  headingStrong: string;
+  description: string;
+  cards: Array<{
+    _key: string;
+    icon: "briefcase" | "columns" | "doc" | "layers" | "search" | "users";
+    title: string;
+    desc: string;
+  }>;
+} | null;
+
 // Query TypeMap
 import "@sanity/client";
 declare module "@sanity/client" {
@@ -311,5 +370,6 @@ declare module "@sanity/client" {
     '*[_id == "firmDetails"][0]{\n  title,\n  phone,\n  logo{\n    ...,\n    "dimensions": asset->metadata.dimensions\n  }\n}': FIRM_DETAILS_QUERY_RESULT;
     '*[_id == "homePage"][0].hero{\n  eyebrow,\n  titleAccent,\n  titleSecond,\n  lead,\n  ctas[]{\n    _key,\n    label,\n    href\n  },\n  caption{\n    name,\n    role,\n    watchLabel,\n    video->{\n      wistiaId\n    }\n  }\n}': HOME_HERO_QUERY_RESULT;
     '*[_id == "homePage"][0].sellingPoints.points[]{\n  _key,\n  value,\n  label\n}': HOME_SELLING_POINTS_QUERY_RESULT;
+    "*[_id == $pageId][0].practiceAreas{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  description,\n  cards[]{\n    _key,\n    icon,\n    title,\n    desc\n  }\n}": PRACTICE_AREAS_BAND_QUERY_RESULT;
   }
 }

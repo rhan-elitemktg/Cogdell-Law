@@ -15,7 +15,7 @@ import { icons } from "@sanity/icons";
  */
 export const video = defineType({
   name: "video",
-  title: "Video",
+  title: "Videos",
   type: "document",
   icon: icons.play,
   fields: [

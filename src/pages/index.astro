@@ -16,9 +16,11 @@ import Faq from "../components/Faq.astro";
 import Blog from "../components/Blog.astro";
 import Consult from "../components/Consult.astro";
 import { getHomeSellingPoints } from "../sanity/lib/homePage";
+import { getPracticeAreasBand } from "../sanity/lib/practiceAreasBand";
 
-// SellingPoints is shared with /our-firm, so the page supplies the content.
+// Both components are shared with other pages, so this page supplies the content.
 const sellingPoints = await getHomeSellingPoints();
+const practiceAreas = await getPracticeAreasBand("homePage");
 
 if (!sellingPoints?.length) {
   throw new Error(
@@ -27,12 +29,20 @@ if (!sellingPoints?.length) {
       "  npx sanity exec scripts/seed-selling-points.ts --with-user-token",
   );
 }
+
+if (!practiceAreas) {
+  throw new Error(
+    "No Practice Areas band found on the Home Page in Sanity.\n" +
+      "Add it in the Studio at /admin → Home Page, or seed it with:\n" +
+      "  npx sanity exec scripts/seed-practice-areas.ts --with-user-token",
+  );
+}
 ---
 
 <Layout title="Cogdell Law" videoEmbed>
   <Hero />
   <SellingPoints points={sellingPoints} />
-  <PracticeAreas />
+  <PracticeAreas band={practiceAreas} />
   <About />
   <VideoBand />
   <CtaBar />

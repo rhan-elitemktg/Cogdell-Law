@@ -1,17 +1,30 @@
 ---
 import Eyebrow from "./Eyebrow.astro";
 // "Practice Areas" band — light section with a navy card grid. Icon-only cards
-// (no photos). Static for now (can move to Sanity later).
+// (no photos).
+//
+// Presentational: the caller supplies `band`, because each page that renders this
+// (home, /trial-experience, /testimonials) holds its own copy in Sanity.
 //
 // `background` sets the section ground: "paper" (default, warm off-white) or
 // "card" (near-white --cog-paper-card) to break up a page that already runs
 // paper above/below.
+interface Band {
+  eyebrow: string | null;
+  headingLead: string | null;
+  headingStrong: string | null;
+  description: string | null;
+  cards: { _key: string; icon: string | null; title: string | null; desc: string | null }[] | null;
+}
 interface Props {
+  band: Band;
   background?: "paper" | "card";
 }
-const { background = "paper" } = Astro.props;
+const { band, background = "paper" } = Astro.props;
 
 // Lucide-style icon inner-paths (viewBox 0 0 24 24), rendered inline via set:html.
+// Presentation, so it stays in code — Sanity only stores the key. Keep in sync
+// with ICON_CHOICES in src/sanity/schemaTypes/practiceAreaCard.ts.
 const icons: Record<string, string> = {
   briefcase:
     '<rect x="3" y="7" width="18" height="13" rx="1"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 12h18"/>',
@@ -25,64 +38,27 @@ const icons: Record<string, string> = {
   doc: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/>',
 };
 
-const practiceAreas = [
-  {
-    icon: "briefcase",
-    title: "Complex Civil Litigation",
-    desc: "Commercial disputes, business torts, high-value plaintiff and defense work in state and federal courts.",
-  },
-  {
-    icon: "users",
-    title: "Complex Personal Injury",
-    desc: "Serious injury and wrongful death — catastrophic, high-value cases where the stakes demand real trial experience.",
-  },
-  {
-    icon: "layers",
-    title: "White Collar Defense",
-    desc: "Fraud, health care fraud, securities violations, financial crimes — federal and state.",
-  },
-  {
-    icon: "columns",
-    title: "Federal Criminal Defense",
-    desc: "Indictments, federal trials, and appeals before district courts and circuit courts of appeals.",
-  },
-  {
-    icon: "search",
-    title: "Government Investigations",
-    desc: "Grand jury matters, DOJ and FBI inquiries, regulatory enforcement actions, and agency investigations.",
-  },
-  {
-    icon: "doc",
-    title: "State Trials & Appeals",
-    desc: "Felony defense in Texas courts, post-conviction relief, and federal and state appellate work.",
-  },
-];
+const cards = band.cards ?? [];
 ---
 
 <section class:list={["practice", background === "card" && "practice--card"]} id="practice">
   <div class="container">
     <div class="practice__head">
       <div class="practice__head-left">
-        <Eyebrow>Practice Areas</Eyebrow>
+        <Eyebrow>{band.eyebrow}</Eyebrow>
         <h2 class="practice__heading">
-          <span class="practice__heading-lead">What We</span>
-          <span class="practice__heading-strong"> Try.</span>
+          <span class="practice__heading-lead">{band.headingLead}</span>
+          <span class="practice__heading-strong"> {band.headingStrong}</span>
         </h2>
       </div>
       <div class="practice__head-right">
-        <p class="practice__desc">
-          We handle the full range of disputes that demand genuine courtroom
-          ability — complex civil litigation, personal injury, white collar
-          defense, federal criminal matters, and high-stakes state court trials.
-          Our clients come to us when the other side has deep resources, the
-          stakes are real, and the case needs to be tried.
-        </p>
+        <p class="practice__desc">{band.description}</p>
       </div>
     </div>
 
     <div class="practice__grid">
       {
-        practiceAreas.map((area) => (
+        cards.map((area) => (
           <div class="practice__cell">
             <svg
               class="practice__icon"
@@ -95,7 +71,7 @@ const practiceAreas = [
               stroke-linecap="round"
               stroke-linejoin="round"
               aria-hidden="true"
-              set:html={icons[area.icon]}
+              set:html={icons[area.icon ?? ""]}
             />
             <div class="practice__cell-body">
               <h3 class="practice__cell-title">{area.title}</h3>
