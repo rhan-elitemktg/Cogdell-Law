@@ -1,36 +1,40 @@
 ---
 // Homepage "Client Testimonials" section — header + three quote cards.
 import Eyebrow from "./Eyebrow.astro";
+import { getFeaturedTestimonials } from "../sanity/lib/testimonials";
 
-const testimonials = [
-  {
-    quote:
-      "Dan Cogdell and his team gave us our lives back. When we were facing federal charges that carried decades in prison, they fought with a tenacity and strategic brilliance that resulted in a full acquittal. There are no words adequate to express our gratitude.",
-    author: "Former Client",
-    tag: "Federal Criminal Defense",
-  },
-  {
-    quote:
-      "From the first consultation, we knew we were in capable hands. The level of preparation was extraordinary — every motion, every argument was crafted with precision. They anticipated the prosecution at every turn and delivered a result we barely dared to hope for.",
-    author: "Former Client",
-    tag: "White Collar Defense",
-  },
-  {
-    quote:
-      "In a complex civil case with millions at stake, Cogdell Law Firm demonstrated why they are considered among the best trial lawyers in the country. Their courtroom presence is commanding, and their dedication to our case never wavered.",
-    author: "Former Client",
-    tag: "Complex Civil Litigation",
-  },
-];
+// `band` is the header copy — supplied by the page, because this component is
+// shared between / and /attorneys and each holds its own copy (D9, D11). The
+// quotes are NOT per-page: they're the `testimonial` documents toggled
+// `featured`, fetched here.
+interface Props {
+  band: {
+    eyebrow: string | null;
+    headingLead: string | null;
+    headingStrong: string | null;
+  };
+}
+const { band } = Astro.props;
+
+const testimonials = await getFeaturedTestimonials();
+
+if (!testimonials.length) {
+  throw new Error(
+    "No featured testimonials found in Sanity.\n" +
+      'Toggle "Feature on the homepage" on up to three at /admin \u2192 Testimonials, or seed them with:\n' +
+      "  npx sanity exec scripts/seed-testimonials.ts --with-user-token",
+  );
+}
+
 ---
 
 <section class="testimonials">
   <div class="container">
     <div class="testimonials__head">
-      <Eyebrow>Client Testimonials</Eyebrow>
+      <Eyebrow>{band.eyebrow}</Eyebrow>
       <h2 class="testimonials__heading">
-        <span class="testimonials__heading-lead">What Clients Are</span>
-        <span class="testimonials__heading-strong">Saying About Us.</span>
+        <span class="testimonials__heading-lead">{band.headingLead}</span>
+        <span class="testimonials__heading-strong">{band.headingStrong}</span>
       </h2>
     </div>
 
@@ -47,7 +51,7 @@ const testimonials = [
             <p class="testimonials__quote">{t.quote}</p>
             <div class="testimonials__footer">
               <span class="testimonials__author">{t.author}</span>
-              <span class="testimonials__tag">{t.tag}</span>
+              {t.tag && <span class="testimonials__tag">{t.tag}</span>}
             </div>
           </article>
         ))

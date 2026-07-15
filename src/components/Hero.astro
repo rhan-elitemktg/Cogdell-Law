@@ -1,6 +1,7 @@
 ---
 import { getImage } from "astro:assets";
 import { PortableText } from "astro-portabletext";
+import { proseComponents } from "./prose/components";
 import heroLandscape from "../assets/hero-boardroom.jpg";
 import heroPortrait from "../assets/cogdell-seated-portrait.jpg";
 import HeroLead from "./hero/HeroLead.astro";
@@ -68,7 +69,10 @@ const heroTablet = await getImage({
         <span class="hero__title-line">{hero.titleSecond}</span>
       </h1>
 
-      <PortableText value={hero.lead} components={{ block: { normal: HeroLead } }} />
+      <PortableText value={hero.lead} components={{
+          ...proseComponents,
+          block: { ...proseComponents.block, normal: HeroLead },
+        }} />
 
       <div class="hero__actions">
         {

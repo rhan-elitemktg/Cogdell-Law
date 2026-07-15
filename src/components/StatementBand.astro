@@ -6,6 +6,7 @@
 // "VideoBand" (there is no video) or "BoutiqueBand" dates immediately.
 import { Image } from "astro:assets";
 import { PortableText } from "astro-portabletext";
+import { proseComponents } from "./prose/components";
 import Eyebrow from "./Eyebrow.astro";
 import StatementBody from "./statement/StatementBody.astro";
 import teamPhoto from "../assets/team-group.png";
@@ -48,7 +49,10 @@ if (!statement) {
     <div class="statement-band__aside">
       <PortableText
         value={statement.body}
-        components={{ block: { normal: StatementBody } }}
+        components={{
+          ...proseComponents,
+          block: { ...proseComponents.block, normal: StatementBody },
+        }}
       />
       <a href={statement.cta?.href} class="btn btn--outline statement-band__cta">
         {statement.cta?.label}

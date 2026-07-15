@@ -3,6 +3,7 @@
 // education, and speaking history; right holds the credential lists. Optional
 // blocks render only when the attorney has content for them.
 import { PortableText } from "astro-portabletext";
+import { proseComponents } from "../prose/components";
 import type { AttorneyDoc } from "../../sanity/lib/attorneys";
 
 interface Props {
@@ -21,7 +22,7 @@ const { attorney }: Props = Astro.props;
           <div class="cred">
             <h2 class="cred__title">Biography</h2>
             <div class="cred__prose">
-              <PortableText value={attorney.bio} />
+              <PortableText value={attorney.bio} components={proseComponents} />
             </div>
           </div>
         )

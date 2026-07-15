@@ -250,6 +250,70 @@ export const homePage = defineType({
       type: "attorneysBand",
       options: { collapsible: true, collapsed: true },
     }),
+    defineField({
+      name: "firmStory",
+      title: "Firm Story",
+      type: "object",
+      options: { collapsible: true, collapsed: true },
+      fields: [
+        defineField({
+          name: "eyebrow",
+          title: "Eyebrow",
+          type: "string",
+          validation: (rule) => rule.required(),
+        }),
+        defineField({
+          name: "headingLead",
+          title: "Heading — italic",
+          type: "string",
+          description: 'The italic first line — e.g. "The Firm the Opposition".',
+          validation: (rule) => rule.required(),
+        }),
+        defineField({
+          name: "headingStrong",
+          title: "Heading — bold",
+          type: "string",
+          description:
+            'The bold second line, on its own line — e.g. "Doesn\'t Want to Face.".',
+          validation: (rule) => rule.required(),
+        }),
+        defineField({
+          name: "body",
+          title: "Body",
+          type: "blockContent",
+          description:
+            "This band styles paragraphs only — headings and lists have no styling over the photo.",
+          validation: (rule) => rule.required().min(1),
+        }),
+        defineField({
+          name: "cta",
+          title: "Button",
+          type: "ctaButton",
+          description: "Rendered as the solid button.",
+          validation: (rule) => rule.required(),
+        }),
+      ],
+    }),
+    defineField({
+      name: "testimonials",
+      title: "Testimonials",
+      type: "testimonialsBand",
+      options: { collapsible: true, collapsed: true },
+    }),
+    defineField({
+      name: "whyChoose",
+      title: "Why Choose",
+      type: "whyChooseBand",
+      options: { collapsible: true, collapsed: true },
+    }),
+    defineField({
+      name: "consult",
+      title: "Consult override",
+      type: "consultContent",
+      description:
+        "Optional. Leave empty to use the site-wide Consult; fill this in only to give this page its own wording.",
+      options: { collapsible: true, collapsed: true },
+    }),
   ],
   preview: {
     select: { subtitle: "hero.eyebrow" },

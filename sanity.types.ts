@@ -72,6 +72,16 @@ export type EducationEntry = {
   lines: Array<string>;
 };
 
+export type ConsultContent = {
+  _type: "consultContent";
+  eyebrow: string;
+  headingLead: string;
+  headingStrong: string;
+  body: BlockContent;
+  fineprint: string;
+  thankYou: string;
+};
+
 export type CtaBarContent = {
   _type: "ctaBarContent";
   eyebrow: string;
@@ -79,6 +89,40 @@ export type CtaBarContent = {
   headingRest: string;
   body: BlockContent;
   cta: CtaButton;
+};
+
+export type WhyChooseBand = {
+  _type: "whyChooseBand";
+  eyebrow: string;
+  headingLead: string;
+  headingStrong: string;
+  features: Array<
+    {
+      _key: string;
+    } & WhyChooseFeature
+  >;
+};
+
+export type WhyChooseFeature = {
+  _type: "whyChooseFeature";
+  title: string;
+  body: string;
+  icon: "trophy" | "landmark" | "check" | "shield";
+};
+
+export type TestimonialsWallBand = {
+  _type: "testimonialsWallBand";
+  eyebrow: string;
+  headingLead: string;
+  headingStrong: string;
+  lede: BlockContent;
+};
+
+export type TestimonialsBand = {
+  _type: "testimonialsBand";
+  eyebrow: string;
+  headingLead: string;
+  headingStrong: string;
 };
 
 export type AttorneysBand = {
@@ -119,6 +163,19 @@ export type CtaButton = {
   _type: "ctaButton";
   label: string;
   href: string;
+};
+
+export type Testimonial = {
+  _id: string;
+  _type: "testimonial";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  orderRank?: string;
+  quote: string;
+  author: string;
+  tag?: string;
+  featured?: boolean;
 };
 
 export type SanityImageAssetReference = {
@@ -163,6 +220,7 @@ export type Attorney = {
   associations?: Array<string>;
   pastPositions?: Array<string>;
   representativeCases?: Array<string>;
+  consult?: ConsultContent;
 };
 
 export type SanityImageCrop = {
@@ -210,6 +268,15 @@ export type TrialResult = {
   };
 };
 
+export type Consult = {
+  _id: string;
+  _type: "consult";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  content: ConsultContent;
+};
+
 export type CtaBar = {
   _id: string;
   _type: "ctaBar";
@@ -219,6 +286,51 @@ export type CtaBar = {
   content: CtaBarContent;
 };
 
+export type PracticeAreasPage = {
+  _id: string;
+  _type: "practiceAreasPage";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  consult?: ConsultContent;
+};
+
+export type NewsPage = {
+  _id: string;
+  _type: "newsPage";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  consult?: ConsultContent;
+};
+
+export type VideosPage = {
+  _id: string;
+  _type: "videosPage";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  consult?: ConsultContent;
+};
+
+export type OurFirmPage = {
+  _id: string;
+  _type: "ourFirmPage";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  consult?: ConsultContent;
+};
+
+export type ContactPage = {
+  _id: string;
+  _type: "contactPage";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  consult?: ConsultContent;
+};
+
 export type AttorneysPage = {
   _id: string;
   _type: "attorneysPage";
@@ -226,6 +338,9 @@ export type AttorneysPage = {
   _updatedAt: string;
   _rev: string;
   attorneys?: AttorneysBand;
+  testimonials?: TestimonialsBand;
+  whyChoose?: WhyChooseBand;
+  consult?: ConsultContent;
 };
 
 export type TestimonialsPage = {
@@ -234,8 +349,10 @@ export type TestimonialsPage = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  testimonialsWall?: TestimonialsWallBand;
   practiceAreas?: PracticeAreasBand;
   ctaBar?: CtaBarContent;
+  consult?: ConsultContent;
 };
 
 export type TrialExperiencePage = {
@@ -247,6 +364,7 @@ export type TrialExperiencePage = {
   trialResults?: TrialResultList;
   practiceAreas?: PracticeAreasBand;
   ctaBar?: CtaBarContent;
+  consult?: ConsultContent;
 };
 
 export type VideoReference = {
@@ -309,6 +427,16 @@ export type HomePage = {
   };
   ctaBar?: CtaBarContent;
   attorneys?: AttorneysBand;
+  firmStory?: {
+    eyebrow: string;
+    headingLead: string;
+    headingStrong: string;
+    body: BlockContent;
+    cta: CtaButton;
+  };
+  testimonials?: TestimonialsBand;
+  whyChoose?: WhyChooseBand;
+  consult?: ConsultContent;
 };
 
 export type Video = {
@@ -441,19 +569,31 @@ export type AllSanitySchemaTypes =
   | TrialResultReference
   | TrialResultList
   | EducationEntry
+  | ConsultContent
   | CtaBarContent
+  | WhyChooseBand
+  | WhyChooseFeature
+  | TestimonialsWallBand
+  | TestimonialsBand
   | AttorneysBand
   | PracticeAreasBand
   | PracticeAreaCard
   | SellingPoint
   | CtaButton
+  | Testimonial
   | SanityImageAssetReference
   | Attorney
   | SanityImageCrop
   | SanityImageHotspot
   | Slug
   | TrialResult
+  | Consult
   | CtaBar
+  | PracticeAreasPage
+  | NewsPage
+  | VideosPage
+  | OurFirmPage
+  | ContactPage
   | AttorneysPage
   | TestimonialsPage
   | TrialExperiencePage
@@ -542,19 +682,50 @@ export type ATTORNEYS_BAND_QUERY_RESULT = {
   lede: BlockContent;
 } | null;
 
+// Source: src/sanity/lib/consult.ts
+// Variable: CONSULT_QUERY
+// Query: coalesce(  *[_id == $pageId][0].consult,  *[_id == "consult"][0].content){  eyebrow,  headingLead,  headingStrong,  body,  fineprint,  thankYou}
+export type CONSULT_QUERY_RESULT =
+  | {
+      eyebrow: string;
+      headingLead: string;
+      headingStrong: null;
+      body: BlockContent;
+      fineprint: null;
+      thankYou: null;
+    }
+  | {
+      eyebrow: string;
+      headingLead: string;
+      headingStrong: string;
+      body: BlockContent;
+      fineprint: string;
+      thankYou: string;
+    }
+  | null;
+
 // Source: src/sanity/lib/ctaBar.ts
 // Variable: CTA_BAR_QUERY
 // Query: coalesce(  *[_id == $pageId][0].ctaBar,  *[_id == "ctaBar"][0].content){  eyebrow,  headingLead,  headingRest,  body,  cta{    label,    href  }}
-export type CTA_BAR_QUERY_RESULT = {
-  eyebrow: string;
-  headingLead: string;
-  headingRest: string;
-  body: BlockContent;
-  cta: {
-    label: string;
-    href: string;
-  };
-} | null;
+export type CTA_BAR_QUERY_RESULT =
+  | {
+      eyebrow: string;
+      headingLead: string;
+      headingRest: null;
+      body: BlockContent;
+      cta: null;
+    }
+  | {
+      eyebrow: string;
+      headingLead: string;
+      headingRest: string;
+      body: BlockContent;
+      cta: {
+        label: string;
+        href: string;
+      };
+    }
+  | null;
 
 // Source: src/sanity/lib/firmDetails.ts
 // Variable: FIRM_DETAILS_QUERY
@@ -658,6 +829,20 @@ export type HOME_STATEMENT_QUERY_RESULT = null | {
   };
 };
 
+// Source: src/sanity/lib/homePage.ts
+// Variable: HOME_FIRM_STORY_QUERY
+// Query: *[_id == "homePage"][0].firmStory{  eyebrow,  headingLead,  headingStrong,  body,  cta{    label,    href  }}
+export type HOME_FIRM_STORY_QUERY_RESULT = null | {
+  eyebrow: string;
+  headingLead: string;
+  headingStrong: string;
+  body: BlockContent;
+  cta: {
+    label: string;
+    href: string;
+  };
+};
+
 // Source: src/sanity/lib/practiceAreasBand.ts
 // Variable: PRACTICE_AREAS_BAND_QUERY
 // Query: *[_id == $pageId][0].practiceAreas{  eyebrow,  headingLead,  headingStrong,  description,  cards[]{    _key,    icon,    title,    desc  }}
@@ -672,6 +857,44 @@ export type PRACTICE_AREAS_BAND_QUERY_RESULT = {
     title: string;
     desc: string;
   }>;
+} | null;
+
+// Source: src/sanity/lib/testimonials.ts
+// Variable: FEATURED_TESTIMONIALS_QUERY
+// Query: *[  _type == "testimonial" && featured == true] | order(orderRank) [0...3]{  _id,  quote,  author,  tag}
+export type FEATURED_TESTIMONIALS_QUERY_RESULT = Array<{
+  _id: string;
+  quote: string;
+  author: string;
+  tag: string | null;
+}>;
+
+// Source: src/sanity/lib/testimonials.ts
+// Variable: ALL_TESTIMONIALS_QUERY
+// Query: *[_type == "testimonial"] | order(orderRank){  _id,  quote,  author}
+export type ALL_TESTIMONIALS_QUERY_RESULT = Array<{
+  _id: string;
+  quote: string;
+  author: string;
+}>;
+
+// Source: src/sanity/lib/testimonials.ts
+// Variable: TESTIMONIALS_BAND_QUERY
+// Query: *[_id == $pageId][0].testimonials{  eyebrow,  headingLead,  headingStrong}
+export type TESTIMONIALS_BAND_QUERY_RESULT = {
+  eyebrow: string;
+  headingLead: string;
+  headingStrong: string;
+} | null;
+
+// Source: src/sanity/lib/testimonials.ts
+// Variable: TESTIMONIALS_WALL_BAND_QUERY
+// Query: *[_id == "testimonialsPage"][0].testimonialsWall{  eyebrow,  headingLead,  headingStrong,  lede}
+export type TESTIMONIALS_WALL_BAND_QUERY_RESULT = {
+  eyebrow: string;
+  headingLead: string;
+  headingStrong: string;
+  lede: BlockContent;
 } | null;
 
 // Source: src/sanity/lib/trialResults.ts
@@ -691,6 +914,21 @@ export type TRIAL_RESULTS_QUERY_RESULT = Array<{
     | "White Collar";
 }> | null;
 
+// Source: src/sanity/lib/whyChoose.ts
+// Variable: WHY_CHOOSE_BAND_QUERY
+// Query: *[_id == $pageId][0].whyChoose{  eyebrow,  headingLead,  headingStrong,  features[]{    _key,    icon,    title,    body  }}
+export type WHY_CHOOSE_BAND_QUERY_RESULT = {
+  eyebrow: string;
+  headingLead: string;
+  headingStrong: string;
+  features: Array<{
+    _key: string;
+    icon: "check" | "landmark" | "shield" | "trophy";
+    title: string;
+    body: string;
+  }>;
+} | null;
+
 // Query TypeMap
 import "@sanity/client";
 declare module "@sanity/client" {
@@ -699,13 +937,20 @@ declare module "@sanity/client" {
     '*[_type == "attorney" && defined(slug.current)]{"slug": slug.current}': ATTORNEY_SLUGS_QUERY_RESULT;
     '*[_type == "attorney" && slug.current == $slug][0]{\n  _id,\n  name,\n  role,\n  credential,\n  photo,\n  photoAlt,\n  phone,\n  email,\n  practiceTags,\n  bio,\n  education[]{\n    _key,\n    school,\n    location,\n    lines\n  },\n  barAdmissions,\n  honors,\n  classesSeminars,\n  publishedWorks,\n  associations,\n  pastPositions,\n  representativeCases,\n  "slug": slug.current\n}': ATTORNEY_QUERY_RESULT;
     "*[_id == $pageId][0].attorneys{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  lede\n}": ATTORNEYS_BAND_QUERY_RESULT;
+    'coalesce(\n  *[_id == $pageId][0].consult,\n  *[_id == "consult"][0].content\n){\n  eyebrow,\n  headingLead,\n  headingStrong,\n  body,\n  fineprint,\n  thankYou\n}': CONSULT_QUERY_RESULT;
     'coalesce(\n  *[_id == $pageId][0].ctaBar,\n  *[_id == "ctaBar"][0].content\n){\n  eyebrow,\n  headingLead,\n  headingRest,\n  body,\n  cta{\n    label,\n    href\n  }\n}': CTA_BAR_QUERY_RESULT;
     '*[_id == "firmDetails"][0]{\n  title,\n  phone,\n  logo{\n    ...,\n    "dimensions": asset->metadata.dimensions\n  }\n}': FIRM_DETAILS_QUERY_RESULT;
     '*[_id == "homePage"][0].hero{\n  eyebrow,\n  titleAccent,\n  titleSecond,\n  lead,\n  ctas[]{\n    _key,\n    label,\n    href\n  },\n  caption{\n    name,\n    role,\n    watchLabel,\n    video->{\n      wistiaId\n    }\n  }\n}': HOME_HERO_QUERY_RESULT;
     '*[_id == "homePage"][0].sellingPoints.points[]{\n  _key,\n  value,\n  label\n}': HOME_SELLING_POINTS_QUERY_RESULT;
     '*[_id == "homePage"][0].about{\n  eyebrow,\n  titleLead,\n  titleStrong,\n  body,\n  resultsEyebrow,\n  quote,\n  featured[]->{\n    _id,\n    "outcome": coalesce(teaser.outcome, outcome),\n    "caseName": coalesce(teaser.title, name),\n    "note": coalesce(teaser.note, note)\n  }\n}': HOME_ABOUT_QUERY_RESULT;
     '*[_id == "homePage"][0].statement{\n  eyebrow,\n  headingItalic,\n  headingBold,\n  body,\n  cta{\n    label,\n    href\n  }\n}': HOME_STATEMENT_QUERY_RESULT;
+    '*[_id == "homePage"][0].firmStory{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  body,\n  cta{\n    label,\n    href\n  }\n}': HOME_FIRM_STORY_QUERY_RESULT;
     "*[_id == $pageId][0].practiceAreas{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  description,\n  cards[]{\n    _key,\n    icon,\n    title,\n    desc\n  }\n}": PRACTICE_AREAS_BAND_QUERY_RESULT;
+    '*[\n  _type == "testimonial" && featured == true\n] | order(orderRank) [0...3]{\n  _id,\n  quote,\n  author,\n  tag\n}': FEATURED_TESTIMONIALS_QUERY_RESULT;
+    '*[_type == "testimonial"] | order(orderRank){\n  _id,\n  quote,\n  author\n}': ALL_TESTIMONIALS_QUERY_RESULT;
+    "*[_id == $pageId][0].testimonials{\n  eyebrow,\n  headingLead,\n  headingStrong\n}": TESTIMONIALS_BAND_QUERY_RESULT;
+    '*[_id == "testimonialsPage"][0].testimonialsWall{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  lede\n}': TESTIMONIALS_WALL_BAND_QUERY_RESULT;
     '*[_id == "trialExperiencePage"][0].trialResults.cases[]->{\n  _id,\n  name,\n  outcome,\n  note,\n  category,\n  categoryLabel\n}': TRIAL_RESULTS_QUERY_RESULT;
+    "*[_id == $pageId][0].whyChoose{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  features[]{\n    _key,\n    icon,\n    title,\n    body\n  }\n}": WHY_CHOOSE_BAND_QUERY_RESULT;
   }
 }

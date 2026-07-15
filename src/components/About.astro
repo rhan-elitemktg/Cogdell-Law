@@ -6,6 +6,7 @@
 // design, not content, and stay in the repo.
 import { Image } from "astro:assets";
 import { PortableText } from "astro-portabletext";
+import { proseComponents } from "./prose/components";
 import Eyebrow from "./Eyebrow.astro";
 import AboutParagraph from "./about/AboutParagraph.astro";
 import QuoteParagraph from "./about/QuoteParagraph.astro";
@@ -41,7 +42,10 @@ const results = about.featured ?? [];
 
       <PortableText
         value={about.body}
-        components={{ block: { normal: AboutParagraph } }}
+        components={{
+          ...proseComponents,
+          block: { ...proseComponents.block, normal: AboutParagraph },
+        }}
       />
 
       <div class="about__results" id="results">

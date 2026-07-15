@@ -15,6 +15,12 @@ export const testimonialsPage = defineType({
   icon: icons.blockquote,
   fields: [
     defineField({
+      name: "testimonialsWall",
+      title: "Testimonials Wall",
+      type: "testimonialsWallBand",
+      options: { collapsible: true, collapsed: true },
+    }),
+    defineField({
       name: "practiceAreas",
       title: "Practice Areas",
       type: "practiceAreasBand",
@@ -26,6 +32,14 @@ export const testimonialsPage = defineType({
       type: "ctaBarContent",
       description:
         "Optional. Leave empty to use the site-wide CTA Bar; fill this in only to give this page its own wording.",
+      options: { collapsible: true, collapsed: true },
+    }),
+    defineField({
+      name: "consult",
+      title: "Consult override",
+      type: "consultContent",
+      description:
+        "Optional. Leave empty to use the site-wide Consult; fill this in only to give this page its own wording.",
       options: { collapsible: true, collapsed: true },
     }),
   ],

@@ -3,6 +3,7 @@
 // Desktop: 4-up grid. Tablet/mobile: horizontal peek carousel (no scrollbar).
 import Eyebrow from "./Eyebrow.astro";
 import { PortableText } from "astro-portabletext";
+import { proseComponents } from "./prose/components";
 import AttorneysLede from "./attorneys/AttorneysLede.astro";
 import { getAttorneyCards } from "../sanity/lib/attorneys";
 import { urlFor } from "../sanity/lib/image";
@@ -53,7 +54,10 @@ const { band, background = "paper" } = Astro.props;
         </h2>
       </div>
       <div class="attorneys__head-right">
-        <PortableText value={band.lede} components={{ block: { normal: AttorneysLede } }} />
+        <PortableText value={band.lede} components={{
+          ...proseComponents,
+          block: { ...proseComponents.block, normal: AttorneysLede },
+        }} />
       </div>
     </div>
 

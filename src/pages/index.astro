@@ -18,17 +18,35 @@ import Consult from "../components/Consult.astro";
 import { getHomeSellingPoints } from "../sanity/lib/homePage";
 import { getPracticeAreasBand } from "../sanity/lib/practiceAreasBand";
 import { getAttorneysBand } from "../sanity/lib/attorneys";
+import { getTestimonialsBand } from "../sanity/lib/testimonials";
+import { getWhyChooseBand } from "../sanity/lib/whyChoose";
 
 // Both components are shared with other pages, so this page supplies the content.
 const sellingPoints = await getHomeSellingPoints();
 const practiceAreas = await getPracticeAreasBand("homePage");
 const attorneysBand = await getAttorneysBand("homePage");
+const testimonialsBand = await getTestimonialsBand("homePage");
+const whyChooseBand = await getWhyChooseBand("homePage");
 
 if (!sellingPoints?.length) {
   throw new Error(
     "No Selling Points found on the Home Page in Sanity.\n" +
       "Add them in the Studio at /admin → Home Page, or seed them with:\n" +
       "  npx sanity exec scripts/seed-selling-points.ts --with-user-token",
+  );
+}
+
+if (!whyChooseBand) {
+  throw new Error(
+    "No Why Choose band found in Sanity for this page.\n" +
+      "Seed it with: npx sanity exec scripts/seed-why-choose.ts --with-user-token",
+  );
+}
+
+if (!testimonialsBand) {
+  throw new Error(
+    "No Testimonials band found in Sanity for this page.\n" +
+      "Seed it with: npx sanity exec scripts/seed-testimonials.ts --with-user-token",
   );
 }
 
@@ -58,11 +76,11 @@ if (!practiceAreas) {
   <CtaBar pageId="homePage" />
   <Attorneys band={attorneysBand} />
   <FirmStory />
-  <Testimonials />
-  <WhyChoose />
+  <Testimonials band={testimonialsBand} />
+  <WhyChoose band={whyChooseBand} />
   <PracticeReach />
   <Press />
   <Faq />
   <Blog />
-  <Consult />
+  <Consult pageId="homePage" />
 </Layout>

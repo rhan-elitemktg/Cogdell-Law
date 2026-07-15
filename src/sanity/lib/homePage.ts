@@ -80,3 +80,19 @@ const HOME_STATEMENT_QUERY = defineQuery(`*[_id == "homePage"][0].statement{
 export async function getHomeStatement() {
   return await sanityClient.fetch(HOME_STATEMENT_QUERY);
 }
+
+const HOME_FIRM_STORY_QUERY = defineQuery(`*[_id == "homePage"][0].firmStory{
+  eyebrow,
+  headingLead,
+  headingStrong,
+  body,
+  cta{
+    label,
+    href
+  }
+}`);
+
+/** The centred "Why Cogdell" story band over the courthouse photo. */
+export async function getHomeFirmStory() {
+  return await sanityClient.fetch(HOME_FIRM_STORY_QUERY);
+}

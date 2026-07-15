@@ -12,6 +12,12 @@ export const SINGLETONS = [
   "trialExperiencePage",
   "testimonialsPage",
   "attorneysPage",
+  "contactPage",
+  "ourFirmPage",
+  "videosPage",
+  "newsPage",
+  "practiceAreasPage",
+  "consult",
 ];
 
 /** Pinned page singleton: one Studio entry per page document. */
@@ -34,8 +40,14 @@ export const structure: StructureResolver = (S, context) =>
       page(S, "trialExperiencePage", "Trial Experience Page", icons.case),
       page(S, "testimonialsPage", "Testimonials Page", icons.blockquote),
       page(S, "attorneysPage", "Attorneys Page", icons.users),
+      page(S, "ourFirmPage", "Our Firm Page", icons.users),
+      page(S, "practiceAreasPage", "Practice Areas Page", icons.case),
+      page(S, "newsPage", "News Page", icons.documents),
+      page(S, "videosPage", "Videos Page", icons.play),
+      page(S, "contactPage", "Contact Page", icons.envelope),
       S.divider(),
       page(S, "ctaBar", "CTA Bar", icons.bell),
+      page(S, "consult", "Consult", icons.envelope),
       page(S, "firmDetails", "Firm Details", icons.cog),
       S.divider(),
       // Drag-to-reorder list — the card order on / and /attorneys comes from this.

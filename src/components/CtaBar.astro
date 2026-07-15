@@ -1,5 +1,6 @@
 ---
 import { PortableText } from "astro-portabletext";
+import { proseComponents } from "./prose/components";
 import Eyebrow from "./Eyebrow.astro";
 import CtaBarBody from "./cta/CtaBarBody.astro";
 import { getCtaBar } from "../sanity/lib/ctaBar";
@@ -37,7 +38,10 @@ if (!bar) {
       </h2>
     </div>
 
-    <PortableText value={bar.body} components={{ block: { normal: CtaBarBody } }} />
+    <PortableText value={bar.body} components={{
+          ...proseComponents,
+          block: { ...proseComponents.block, normal: CtaBarBody },
+        }} />
 
     <div class="ctabar__action">
       <a href={bar.cta?.href} class="btn btn--light">
