@@ -1,0 +1,80 @@
+{
+  "_createdAt": "2026-07-07T22:16:07Z",
+  "_id": "homePage",
+  "_rev": "O5MYS7X7Id3sNADiEwJvxx",
+  "_system": {
+    "base": {
+      "id": "homePage",
+      "rev": "CSdc3Gq2NphlQbdpKOacoT"
+    }
+  },
+  "_type": "homePage",
+  "_updatedAt": "2026-07-08T14:13:06Z",
+  "hero": {
+    "ctas": [
+      {
+        "_key": "f65893eb6312",
+        "_type": "cta",
+        "href": "#",
+        "label": "Schedule Consultation"
+      },
+      {
+        "_key": "40f53cff258f",
+        "_type": "cta",
+        "href": "#",
+        "label": "Our Results"
+      }
+    ],
+    "eyebrow": "Houston Trial Lawyers",
+    "headlineBold": "Other Lawyers Call",
+    "headlineItalic": "The Trial Lawyers",
+    "image": {
+      "_type": "image",
+      "alt": "Cogdell Trial Lawyers",
+      "asset": {
+        "_ref": "image-3c5544992190d9c36eac48acf26dcb8c69831cde-1800x1138-jpg",
+        "_type": "reference"
+      }
+    },
+    "lede": "Complex civil disputes, personal injury, white collar defense, and high-stakes criminal cases in federal and state courts across the nation.",
+    "nameplate": {
+      "filmEyebrow": "Watch",
+      "filmLabel": "The Firm Film",
+      "filmVideo": {
+        "_type": "file",
+        "asset": {
+          "_ref": "file-defe78f89a8d8706b5180604acfb498336f337c8-mp4",
+          "_type": "reference"
+        }
+      },
+      "name": "Dan Cogdell",
+      "role": "Founding Attorney"
+    }
+  },
+  "sellingPoints": [
+    {
+      "_key": "84b558457808",
+      "_type": "sellingPoint",
+      "label": "Years of Trial Experiance",
+      "value": "40+"
+    },
+    {
+      "_key": "47072436fd53",
+      "_type": "sellingPoint",
+      "label": "Federal & State Courts",
+      "value": "Nationwide"
+    },
+    {
+      "_key": "a74974a84a79",
+      "_type": "sellingPoint",
+      "label": "Top 2% of Trial Lawyers",
+      "value": "Elite"
+    },
+    {
+      "_key": "c302e8885e45",
+      "_type": "sellingPoint",
+      "label": "Free Case Evaluation",
+      "value": "Confidential"
+    }
+  ]
+}

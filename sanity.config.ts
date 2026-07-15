@@ -1,11 +1,25 @@
 import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
 import { schemaTypes } from "./src/sanity/schemaTypes/index";
-import { structure } from "./src/sanity/structure";
+import { structure, SINGLETONS } from "./src/sanity/structure";
+
+// This file is loaded from two very different places:
+//   - the browser Studio, bundled by Astro/Vite → import.meta.env.PUBLIC_* exists
+//   - the Sanity CLI (schema extract / typegen), plain Node → import.meta.env is
+//     absent or empty, but the CLI loads .env into process.env
+// Take the first source that actually carries the value, so one .env stays the
+// single source of truth for both.
+const viteEnv: Record<string, string | undefined> | undefined = import.meta.env;
+const nodeEnv: Record<string, string | undefined> | undefined =
+  typeof process !== "undefined" ? process.env : undefined;
+
+const projectId =
+  viteEnv?.PUBLIC_SANITY_PROJECT_ID ?? nodeEnv?.PUBLIC_SANITY_PROJECT_ID;
+const dataset = viteEnv?.PUBLIC_SANITY_DATASET ?? nodeEnv?.PUBLIC_SANITY_DATASET;
 
 export default defineConfig({
-  projectId: import.meta.env.PUBLIC_SANITY_PROJECT_ID,
-  dataset: import.meta.env.PUBLIC_SANITY_DATASET,
+  projectId,
+  dataset,
   plugins: [structureTool({ structure })],
   schema: {
     types: schemaTypes,
@@ -14,7 +28,7 @@ export default defineConfig({
     // Keep singletons out of the global "＋ Create" menu.
     newDocumentOptions: (prev, { creationContext }) =>
       creationContext.type === "global"
-        ? prev.filter((item) => item.templateId !== "firmDetails")
+        ? prev.filter((item) => !SINGLETONS.includes(item.templateId ?? ""))
         : prev,
   },
 });

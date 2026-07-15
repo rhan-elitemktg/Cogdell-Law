@@ -15,11 +15,23 @@ import Press from "../components/Press.astro";
 import Faq from "../components/Faq.astro";
 import Blog from "../components/Blog.astro";
 import Consult from "../components/Consult.astro";
+import { getHomeSellingPoints } from "../sanity/lib/homePage";
+
+// SellingPoints is shared with /our-firm, so the page supplies the content.
+const sellingPoints = await getHomeSellingPoints();
+
+if (!sellingPoints?.length) {
+  throw new Error(
+    "No Selling Points found on the Home Page in Sanity.\n" +
+      "Add them in the Studio at /admin → Home Page, or seed them with:\n" +
+      "  npx sanity exec scripts/seed-selling-points.ts --with-user-token",
+  );
+}
 ---
 
 <Layout title="Cogdell Law" videoEmbed>
   <Hero />
-  <SellingPoints />
+  <SellingPoints points={sellingPoints} />
   <PracticeAreas />
   <About />
   <VideoBand />
