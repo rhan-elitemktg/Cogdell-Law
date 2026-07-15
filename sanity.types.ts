@@ -15,12 +15,62 @@
 export declare const internalGroqTypeReferenceTo: unique symbol;
 
 // Source: schema.json
+export type AccentText = Array<{
+  children?: Array<{
+    marks?: Array<string>;
+    text?: string;
+    _type: "span";
+    _key: string;
+  }>;
+  style?: "normal";
+  listItem?: never;
+  markDefs?: null;
+  level?: number;
+  _type: "block";
+  _key: string;
+}>;
+
+export type BlockContent = Array<{
+  children?: Array<{
+    marks?: Array<string>;
+    text?: string;
+    _type: "span";
+    _key: string;
+  }>;
+  style?: "normal" | "h2" | "h3" | "h4" | "blockquote";
+  listItem?: "bullet" | "number";
+  markDefs?: Array<{
+    href: string;
+    _type: "link";
+    _key: string;
+  }>;
+  level?: number;
+  _type: "block";
+  _key: string;
+}>;
+
+export type TrialResultReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "trialResult";
+};
+
+export type TrialResultList = {
+  _type: "trialResultList";
+  cases: Array<
+    {
+      _key: string;
+    } & TrialResultReference
+  >;
+};
+
 export type PracticeAreasBand = {
   _type: "practiceAreasBand";
   eyebrow: string;
   headingLead: string;
   headingStrong: string;
-  description: string;
+  description: BlockContent;
   cards: Array<
     {
       _key: string;
@@ -47,6 +97,29 @@ export type CtaButton = {
   href: string;
 };
 
+export type TrialResult = {
+  _id: string;
+  _type: "trialResult";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name: string;
+  outcome: string;
+  note: string;
+  category: "landmark" | "federal" | "fraud";
+  categoryLabel:
+    | "Landmark Case"
+    | "Federal Victory"
+    | "White Collar"
+    | "Health Care Fraud"
+    | "Federal Fraud";
+  teaser?: {
+    title?: string;
+    outcome?: string;
+    note?: string;
+  };
+};
+
 export type TestimonialsPage = {
   _id: string;
   _type: "testimonialsPage";
@@ -62,6 +135,7 @@ export type TrialExperiencePage = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  trialResults?: TrialResultList;
   practiceAreas?: PracticeAreasBand;
 };
 
@@ -82,7 +156,7 @@ export type HomePage = {
     eyebrow: string;
     titleAccent: string;
     titleSecond: string;
-    lead: string;
+    lead: BlockContent;
     ctas?: Array<
       {
         _key: string;
@@ -103,6 +177,26 @@ export type HomePage = {
     >;
   };
   practiceAreas?: PracticeAreasBand;
+  about?: {
+    eyebrow: string;
+    titleLead: string;
+    titleStrong: string;
+    body: BlockContent;
+    resultsEyebrow: string;
+    featured: Array<
+      {
+        _key: string;
+      } & TrialResultReference
+    >;
+    quote: AccentText;
+  };
+  statement?: {
+    eyebrow: string;
+    headingItalic: string;
+    headingBold: string;
+    body: BlockContent;
+    cta: CtaButton;
+  };
 };
 
 export type Video = {
@@ -259,10 +353,15 @@ export type Slug = {
 };
 
 export type AllSanitySchemaTypes =
+  | AccentText
+  | BlockContent
+  | TrialResultReference
+  | TrialResultList
   | PracticeAreasBand
   | PracticeAreaCard
   | SellingPoint
   | CtaButton
+  | TrialResult
   | TestimonialsPage
   | TrialExperiencePage
   | VideoReference
@@ -322,7 +421,7 @@ export type HOME_HERO_QUERY_RESULT = null | {
   eyebrow: string;
   titleAccent: string;
   titleSecond: string;
-  lead: string;
+  lead: BlockContent;
   ctas: Array<{
     _key: string;
     label: string;
@@ -347,6 +446,38 @@ export type HOME_SELLING_POINTS_QUERY_RESULT = Array<{
   label: string;
 }> | null;
 
+// Source: src/sanity/lib/homePage.ts
+// Variable: HOME_ABOUT_QUERY
+// Query: *[_id == "homePage"][0].about{  eyebrow,  titleLead,  titleStrong,  body,  resultsEyebrow,  quote,  featured[]->{    _id,    "outcome": coalesce(teaser.outcome, outcome),    "caseName": coalesce(teaser.title, name),    "note": coalesce(teaser.note, note)  }}
+export type HOME_ABOUT_QUERY_RESULT = null | {
+  eyebrow: string;
+  titleLead: string;
+  titleStrong: string;
+  body: BlockContent;
+  resultsEyebrow: string;
+  quote: AccentText;
+  featured: Array<{
+    _id: string;
+    outcome: string;
+    caseName: string;
+    note: string;
+  }>;
+};
+
+// Source: src/sanity/lib/homePage.ts
+// Variable: HOME_STATEMENT_QUERY
+// Query: *[_id == "homePage"][0].statement{  eyebrow,  headingItalic,  headingBold,  body,  cta{    label,    href  }}
+export type HOME_STATEMENT_QUERY_RESULT = null | {
+  eyebrow: string;
+  headingItalic: string;
+  headingBold: string;
+  body: BlockContent;
+  cta: {
+    label: string;
+    href: string;
+  };
+};
+
 // Source: src/sanity/lib/practiceAreasBand.ts
 // Variable: PRACTICE_AREAS_BAND_QUERY
 // Query: *[_id == $pageId][0].practiceAreas{  eyebrow,  headingLead,  headingStrong,  description,  cards[]{    _key,    icon,    title,    desc  }}
@@ -354,7 +485,7 @@ export type PRACTICE_AREAS_BAND_QUERY_RESULT = {
   eyebrow: string;
   headingLead: string;
   headingStrong: string;
-  description: string;
+  description: BlockContent;
   cards: Array<{
     _key: string;
     icon: "briefcase" | "columns" | "doc" | "layers" | "search" | "users";
@@ -363,6 +494,23 @@ export type PRACTICE_AREAS_BAND_QUERY_RESULT = {
   }>;
 } | null;
 
+// Source: src/sanity/lib/trialResults.ts
+// Variable: TRIAL_RESULTS_QUERY
+// Query: *[_id == "trialExperiencePage"][0].trialResults.cases[]->{  _id,  name,  outcome,  note,  category,  categoryLabel}
+export type TRIAL_RESULTS_QUERY_RESULT = Array<{
+  _id: string;
+  name: string;
+  outcome: string;
+  note: string;
+  category: "federal" | "fraud" | "landmark";
+  categoryLabel:
+    | "Federal Fraud"
+    | "Federal Victory"
+    | "Health Care Fraud"
+    | "Landmark Case"
+    | "White Collar";
+}> | null;
+
 // Query TypeMap
 import "@sanity/client";
 declare module "@sanity/client" {
@@ -370,6 +518,9 @@ declare module "@sanity/client" {
     '*[_id == "firmDetails"][0]{\n  title,\n  phone,\n  logo{\n    ...,\n    "dimensions": asset->metadata.dimensions\n  }\n}': FIRM_DETAILS_QUERY_RESULT;
     '*[_id == "homePage"][0].hero{\n  eyebrow,\n  titleAccent,\n  titleSecond,\n  lead,\n  ctas[]{\n    _key,\n    label,\n    href\n  },\n  caption{\n    name,\n    role,\n    watchLabel,\n    video->{\n      wistiaId\n    }\n  }\n}': HOME_HERO_QUERY_RESULT;
     '*[_id == "homePage"][0].sellingPoints.points[]{\n  _key,\n  value,\n  label\n}': HOME_SELLING_POINTS_QUERY_RESULT;
+    '*[_id == "homePage"][0].about{\n  eyebrow,\n  titleLead,\n  titleStrong,\n  body,\n  resultsEyebrow,\n  quote,\n  featured[]->{\n    _id,\n    "outcome": coalesce(teaser.outcome, outcome),\n    "caseName": coalesce(teaser.title, name),\n    "note": coalesce(teaser.note, note)\n  }\n}': HOME_ABOUT_QUERY_RESULT;
+    '*[_id == "homePage"][0].statement{\n  eyebrow,\n  headingItalic,\n  headingBold,\n  body,\n  cta{\n    label,\n    href\n  }\n}': HOME_STATEMENT_QUERY_RESULT;
     "*[_id == $pageId][0].practiceAreas{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  description,\n  cards[]{\n    _key,\n    icon,\n    title,\n    desc\n  }\n}": PRACTICE_AREAS_BAND_QUERY_RESULT;
+    '*[_id == "trialExperiencePage"][0].trialResults.cases[]->{\n  _id,\n  name,\n  outcome,\n  note,\n  category,\n  categoryLabel\n}': TRIAL_RESULTS_QUERY_RESULT;
   }
 }

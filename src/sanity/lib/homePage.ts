@@ -42,3 +42,41 @@ const HOME_SELLING_POINTS_QUERY = defineQuery(`*[_id == "homePage"][0].sellingPo
 export async function getHomeSellingPoints() {
   return await sanityClient.fetch(HOME_SELLING_POINTS_QUERY);
 }
+
+// `featured` resolves each reference and reads its teaser copy, falling back to
+// the full case wording when a teaser field is blank.
+const HOME_ABOUT_QUERY = defineQuery(`*[_id == "homePage"][0].about{
+  eyebrow,
+  titleLead,
+  titleStrong,
+  body,
+  resultsEyebrow,
+  quote,
+  featured[]->{
+    _id,
+    "outcome": coalesce(teaser.outcome, outcome),
+    "caseName": coalesce(teaser.title, name),
+    "note": coalesce(teaser.note, note)
+  }
+}`);
+
+/** About band content for the homepage, from the Home Page singleton. */
+export async function getHomeAbout() {
+  return await sanityClient.fetch(HOME_ABOUT_QUERY);
+}
+
+const HOME_STATEMENT_QUERY = defineQuery(`*[_id == "homePage"][0].statement{
+  eyebrow,
+  headingItalic,
+  headingBold,
+  body,
+  cta{
+    label,
+    href
+  }
+}`);
+
+/** The full-bleed statement band under the About section. */
+export async function getHomeStatement() {
+  return await sanityClient.fetch(HOME_STATEMENT_QUERY);
+}

@@ -34,17 +34,20 @@ The schema layer. Everything in section 2 and 3 depends on these.
 | `homePage` (hero only) | `Hero.astro` | singleton | 1 | `[x]` | `[x]` | `[x]` | ✅ done |
 | `ctaButton` | `Hero.astro` | object | — | `[x]` | — | `[x]` | ✅ done |
 | `sellingPoint` | `SellingPoints.astro` | object | — | `[x]` | `[x]` | `[x]` | ✅ done |
+| `homePage.statement` | `StatementBand.astro` | object | — | `[x]` | `[x]` | `[x]` | ✅ done |
 | `practiceAreaCard` | `PracticeAreas.astro` | object | — | `[x]` | `[x]` | `[x]` | ✅ done |
 | `practiceAreasBand` | `PracticeAreas.astro` | object | — | `[x]` | `[x]` | `[x]` | ✅ done — one copy per page (D11) |
 | `trialExperiencePage` | `trial-experience.astro` | singleton | 1 | `[x]` | `[~]` | `[x]` | band only; rest of page pending |
 | `testimonialsPage` | `testimonials.astro` | singleton | 1 | `[x]` | `[~]` | `[x]` | band only; quotes are Phase 1 |
 | `video` | `data/videos.ts` | document | 5 | `[x]` | `[x]` | `[~]` | ✅ schema+content — title + `wistiaId` only (D8) |
-| `blockContent` (Portable Text) | `Block[]` in `practice-areas.ts` | object | — | `[ ]` | — | `[ ]` | 0 |
-| `link` (annotation) | `Inline{text,href}` | object | — | `[ ]` | — | `[ ]` | 0 |
+| `blockContent` (Portable Text) | `Block[]` in `practice-areas.ts` | object | — | `[x]` | — | `[ ]` | ✅ schema — **standard for all body copy (D12)**; renderer lands with its first consumer |
+| `link` (annotation) | `Inline{text,href}` | object | — | `[x]` | — | `[ ]` | ✅ inside `blockContent`; reference toggle in Phase 5 (D4) |
 | `testimonial` | `data/testimonials.ts` | document | 16 | `[ ]` | `[ ]` | `[ ]` | 1 |
 | `attorney` | `data/attorneys.ts` | document | 4 | `[ ]` | `[ ]` | `[ ]` | 3 |
 | `newsItem` | `data/news.ts` | document | ~10 | `[ ]` | `[ ]` | `[ ]` | 4 |
-| `trialResult` ⚠️ *new* | `TrialResults.astro` | document | ~12 | `[ ]` | `[ ]` | `[ ]` | 4 |
+| `trialResult` | `TrialResults.astro` + `About.astro` | document | 16 | `[x]` | `[x]` | `[x]` | ✅ done — F2 duplicate resolved |
+| `trialResultList` | `TrialResults.astro` | object | — | `[x]` | `[x]` | `[x]` | ✅ done |
+| `accentText` (Portable Text) | `About.astro` quote | object | — | `[x]` | `[x]` | `[x]` | ✅ done — first PT type |
 | `faq` ⚠️ *new* | `Faq.astro` | document | ~6 | `[ ]` | `[ ]` | `[ ]` | 4 |
 | `practiceArea` | `data/practice-areas.ts` | document | ~20 | `[ ]` | `[ ]` | `[ ]` | 5 |
 | `serviceCity` | `data/areas-we-serve.ts` | document | 6 | `[ ]` | `[ ]` | `[ ]` | 6 |
@@ -107,6 +110,7 @@ All 41 components + the layout. Grouped by how much Sanity work each needs.
 | `Testimonials.astro` ⚠️ | **own array** (3, w/ `tag`) | `testimonial` | `[ ]` | `[ ]` | 1 |
 | `Hero.astro` | ~~`data/videos.ts`~~ | `homePage.hero` + `video` | `[x]` | `[x]` | ✅ done |
 | `SellingPoints.astro` | ~~`defaultPoints`~~ | `homePage.sellingPoints` (via `index.astro`) | `[x]` | `[x]` | ✅ done |
+| `StatementBand.astro` *(was `VideoBand`)* | ~~hardcoded copy~~ | `homePage.statement` | `[x]` | `[x]` | ✅ done |
 | `video/VideoGrid.astro` | `data/videos.ts` (type) | `video` | `[ ]` | `[ ]` | 2 |
 | `video/VideoLightbox.astro` | props | `video` | `[ ]` | `[ ]` | 2 |
 | `attorney/AttorneyBio.astro` | `data/attorneys.ts` (type) | `attorney` | `[ ]` | `[ ]` | 3 |
@@ -115,8 +119,8 @@ All 41 components + the layout. Grouped by how much Sanity work each needs.
 | `about/FoundingAttorney.astro` | hardcoded copy | `attorney` | `[ ]` | `[ ]` | 3 |
 | `news/NewsGrid.astro` | `data/news.ts` (type) | `newsItem` | `[ ]` | `[ ]` | 4 |
 | `Blog.astro` | `data/news.ts` (`latestNews`) | `newsItem` | `[ ]` | `[ ]` | 4 |
-| `TrialResults.astro` ⚠️ | **own array** (~12 cases) | `trialResult` | `[ ]` | `[ ]` | 4 |
-| `About.astro` ⚠️ | **own array** (overlaps above) | `trialResult` | `[ ]` | `[ ]` | 4 |
+| `TrialResults.astro` | ~~own array~~ | `trialResult` ×16 | `[x]` | `[x]` | ✅ done |
+| `About.astro` | ~~own array~~ | `homePage.about` + `trialResult` ×6 | `[x]` | `[x]` | ✅ done |
 | `Faq.astro` ⚠️ | **own array** (~6 Q&A) | `faq` | `[ ]` | `[ ]` | 4 |
 | `practice/Blocks.astro` | `Block`/`Inline` types | → `<PortableText>` | `[ ]` | `[ ]` | 5 |
 | `practice/PracticeBody.astro` | `practice-areas.ts` (types) | `practiceArea` | `[ ]` | `[ ]` | 5 |
@@ -148,7 +152,6 @@ Real content, but design-coupled and rarely changed. Decide per D7 whether it mo
 | `FirmStory.astro` | firm story copy | `[ ]` | `[ ]` |
 | `Consult.astro` | consult copy + phone | `[ ]` | `[ ]` |
 | `CtaBar.astro` | CTA copy + phone | `[ ]` | `[ ]` |
-| `VideoBand.astro` | band copy | `[ ]` | `[ ]` |
 | `pages/our-firm.astro` | `stats` — 4 stats | `[ ]` | `[ ]` |
 
 ### 3c. Presentational — no Sanity work
@@ -190,8 +193,8 @@ Not near-duplicates — **actually different content**:
 |---|---|---|---|
 | `Attorneys.astro` | 4 attorneys, `"Founding Attorney"` | `attorneys.ts` says `"Principal & Founder"` | Roles drifted |
 | `Testimonials.astro` | 3 quotes, all `"Former Client"` + `tag` | `testimonials.ts` has 16, initials, no tags | **Different quotes entirely** |
-| `PracticeAreas.astro` | Complex Civil Litigation, Complex Personal Injury, Government Investigations… | Health Care Fraud, Federal Criminal Cases, Fraud & White Collar, Appeals | **Different taxonomy** |
-| `About.astro` | `results` — Enron, Waco | overlaps `TrialResults.astro`'s cases | Same cases, two places |
+| ~~`PracticeAreas.astro`~~ | Complex Civil Litigation, Personal Injury, Government Investigations… | Health Care Fraud, Federal Criminal Cases, Fraud & White Collar, Appeals | ✅ resolved — see update below |
+| ~~`About.astro`~~ | `results` — Enron, Waco | overlaps `TrialResults.astro`'s cases | ✅ **resolved 2026-07-15** — see F13 |
 
 The homepage practice grid advertises services (civil litigation, personal injury) that
 **don't exist in the practice-areas tree at all**. Either the homepage is aspirational
@@ -242,6 +245,75 @@ with `ReferenceError`, not at build.
 `Block` / `Crumb` / `PracticeSection` are shared across practice, city, news **and**
 legal pages. `Blocks`, `PracticeBody`, `Breadcrumb`, `PracticeFaqs` are shared renderers
 — changing one touches four page types.
+
+### F14 — Scoped styles break when markup moves to a child component ⚠️
+
+**Shipped this bug once — expect it again with every Portable Text renderer.**
+
+Astro scopes a component's `<style>` by stamping `data-astro-cid-XXXX` onto the elements
+in **that component's own template**. Move markup into a child component and the child's
+elements get **no cid at all**, so the parent's scoped rules silently stop matching:
+
+```
+about__quote          cid = oxgmilyn      ← still styled (in About's template)
+about__quote-text     cid = *** NONE ***  ← emitted by QuoteParagraph.astro → unstyled
+about__quote-accent   cid = *** NONE ***  ← emitted by QuoteAccent.astro    → unstyled
+```
+
+The markup is *correct*; only the styling is gone — so it renders as unstyled text and no
+build error fires.
+
+**Fix:** scope the parent, opt the child out — `.about__quote :global(.about__quote-text)`.
+The scoped ancestor keeps `:global` from leaking past the band. (Moving the CSS into the
+child component also works; `:global` was chosen to keep a BEM block's styles in one file.)
+
+**This will recur in Phase 5**, where `Blocks.astro` → `<PortableText>` moves *all*
+practice-area body markup into renderers, and every `prose__*` rule is scoped in a parent.
+
+**A diff that strips `data-astro-cid-*` cannot see this** — that's exactly what let it
+through here; the HTML compared identical. Use the lint instead:
+
+```bash
+npm run build && python3 scripts/check-scoped-styles.py dist/index.html …
+```
+
+It flags any element whose class is targeted by a rule demanding a cid the element lacks
+(skipping classes that also have a global rule). Verified to catch this bug and pass once
+fixed.
+
+**Pass the HTML files you want checked** — Astro inlines small stylesheets into the page
+and emits larger ones to `dist/_astro/*.css`, so the lint reads **both**. An earlier
+version only read the `.css` files and silently skipped every inlined component
+(`PracticeAreas` among them), passing when it shouldn't have.
+
+**Converted so far** (each needed `:global()`): `about.body` → `.about__col`,
+`hero.lead` → `.hero__content`, `practiceAreasBand.description` →
+`.practice__head-right`, plus the About quote's `.about__quote`.
+
+### F13 — About vs TrialResults: same cases, differently badged ✅ resolved
+
+The homepage carousel (6 short teasers) and `/trial-experience` (16 full write-ups)
+described **the same verdicts** in two hardcoded arrays. Three matched by name exactly;
+the other three were the same case renamed ("The Enron Trial" / "The Enron Scandal",
+"Waco / Branch Davidian" / "Waco & the Branch Davidians", "Fraud Acquittal" / "Surgeon
+Fraud Acquittal").
+
+**Two cases carried different verdict badges:** *Physician Victory* and *Psychiatric
+Fraud Victory* were "Acquitted" on the homepage but "Dismissed" on /trial-experience.
+Not a factual error — reading both write-ups, those cases had acquittals **and**
+dismissals, so each page badged a different true aspect. But it's an editorial
+inconsistency the firm may still want to settle.
+
+**Resolved:** one `trialResult` document per verdict (16), holding the full write-up plus
+an optional **Homepage teaser** (`teaser.title` / `teaser.outcome` / `teaser.note`). GROQ
+`coalesce`s teaser over the full copy, so both pages render exactly as before — including
+those two differing badges — while the two versions now sit **in one record**, where drift
+is visible instead of hidden across two files.
+
+Order is per-page: `homePage.about.featured` (6 refs) and
+`trialExperiencePage.trialResults.cases` (16 refs) each carry their own ordered list
+(D11). **This is why no document-ordering plugin was needed** — D2 still applies to
+types without a curating page (testimonials, news, practice areas).
 
 ### F10 — The dataset already had prior work ⚠️
 
@@ -322,6 +394,7 @@ add schema types.
 | **D5** | Navigation (F4) | ✅ Keep `navigation.ts` in code but export async `getNavItems()` fetching a slim projection. `Header`/`MobileNav` already await in frontmatter. The pure helpers (`isOnTrail`, `normalizePath`, `isUnder`) don't change. |
 | **D6** | Images | ✅ Attorney photos + press logos → Sanity. Design/decorative assets stay in `src/assets` with `astro:assets`. Wistia posters stay remote. |
 | **D7** | Marketing copy in components (§3b) | ✅ **Leave in code for now.** It's design-coupled, rarely changes, and moving it means a `homePage`/`ourFirmPage` singleton per section. Revisit if the firm asks to edit it. `trialResult` + `faq` are the exception — they're real, growing content. |
+| **D12** | Rich text: one standard | ✅ **`blockContent` is the standard for every body-copy field** — practice areas, location pages, news, legal pages, attorney bios. Set 2026-07-15 because the site is handed to an **SEO team** afterwards, who need to add and edit **H1, H2, H3, H4, links and bold** consistently wherever prose appears. **Don't invent per-field rich-text types.** <br><br>Also carries **bulleted + numbered lists** and a **Quote** style — not decoration: `practice-areas.ts` uses `{ul}` and `{quote}`, so D3 cannot migrate without them. <br><br>**One deliberate exception:** `accentText` (the About pull quote) stays minimal — one line, one Accent button — because headings and lists have no styling there. <br><br>**No H1 — headings start at H2.** Every hero already renders the page's `<h1>` (`titleLead` + `titleStrong`), so a body H1 would make a second one. Briefly included at the SEO team's request, then dropped once that was clear. Don't add it back without moving the hero's heading first. <br><br>Links are a `url` annotation accepting relative paths today; **Phase 5 adds the internal/external reference toggle** (D4) once `practiceArea` documents exist to point at. |
 | **D11** | Content shown on several pages | ✅ **Per-page copies, not one shared record.** Decided 2026-07-15 for the practice-areas band (home, /trial-experience, /testimonials): shared *schema* (`practiceAreasBand` object), separate *content* per page document, so pages can be worded differently. **Known trade-off:** the same six cards now live in three places and can drift — the very thing that caused F2. Accepted knowingly for editorial flexibility. Consequence: a component on N pages implies N page documents, so `/trial-experience` and `/testimonials` singletons exist now, holding only this band. |
 | **D10** | Page sections in the Studio | ✅ **Every major section is an `object` field with `options: { collapsible: true, collapsed: true }` and NO `description`.** A page document then opens as a tidy list of closed accordions; the section title carries the meaning, and explanation belongs on the individual fields inside, where it's actually needed. Set by the firm 2026-07-15 — **apply to every new section and page document.** <br><br>**This applies even to list-only sections:** `collapsible` is an `ObjectOptions` flag — `ArrayOptions` has no such option, so a bare array field *cannot* collapse. Wrap it (`sellingPoints: { points: [...] }`). A collapsible `fieldset` also works, but keep one mechanism, not two. |
 | **D9** | Who fetches: page or component? | ✅ **Shared components take props; page-only components self-fetch.** `Hero` is homepage-only, so it calls `getHomeHero()` itself. `SellingPoints` is shared with `/our-firm` (which passes its own `stats`), so it stays presentational and `index.astro` passes Sanity content in. Established 2026-07-15 with the selling points; applies to every remaining homepage section. Check the caller list before modelling — `Attorneys`, `Testimonials` and `PracticeAreas` are each used on more than one page. |
@@ -336,9 +409,11 @@ add schema types.
   - [x] `sanity.types.ts` committed; `schema.json` gitignored
   - [x] No API token needed — seed scripts run via `npx sanity exec … --with-user-token`
   - [x] `getFirmDetails()` now typed automatically via TypeGen overloads
-  - [ ] `blockContent` + `link` types (D3/D4)
-  - [ ] `Block[]` → Portable Text converter util
-  - [ ] `@sanity/orderable-document-list` (D2)
+  - [x] `blockContent` + `link` types (D3/D4) — the rich-text standard (D12)
+  - [x] `accentText` + renderers — Portable Text proven end to end on the About quote
+  - [ ] `Block[]` → Portable Text converter util (`{p}`→normal, `{ul}`→bullet, `{quote}`→blockquote, `Inline`→link)
+  - [ ] `blockContent` renderer (`prose__*` classes) — replaces `Blocks.astro`; **needs `:global()`, see F14**
+  - [ ] `@sanity/orderable-document-list` (D2) — only for types with no curating page (see F13)
 - [ ] **Phase 1 — `testimonial`** *(pilot — smallest surface, proves schema → import → GROQ → render → cleanup end to end)*. Resolve F2 testimonials split first.
 - [ ] **Phase 2 — `video`.** Schema + content already done. Remaining: repoint `/videos`,
       `VideoGrid`, `VideoLightbox`; keep `wistiaEmbed()` in code; **implement the Wistia

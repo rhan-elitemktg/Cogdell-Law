@@ -1,5 +1,7 @@
 ---
+import { PortableText } from "astro-portabletext";
 import Eyebrow from "./Eyebrow.astro";
+import PracticeDescription from "./practice/PracticeDescription.astro";
 // "Practice Areas" band — light section with a navy card grid. Icon-only cards
 // (no photos).
 //
@@ -52,7 +54,10 @@ const cards = band.cards ?? [];
         </h2>
       </div>
       <div class="practice__head-right">
-        <p class="practice__desc">{band.description}</p>
+        <PortableText
+          value={band.description}
+          components={{ block: { normal: PracticeDescription } }}
+        />
       </div>
     </div>
 
@@ -126,7 +131,10 @@ const cards = band.cards ?? [];
     display: flex;
   }
 
-  .practice__desc {
+  /* Emitted by PracticeDescription.astro (a Portable Text renderer), so it
+     carries no scoping attribute of its own — see F14. The scoped
+     .practice__head-right parent bounds the :global. */
+  .practice__head-right :global(.practice__desc) {
     margin: 0;
     max-width: 750px;
     font-family: var(--font-body);

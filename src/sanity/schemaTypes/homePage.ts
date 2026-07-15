@@ -53,9 +53,10 @@ export const homePage = defineType({
         defineField({
           name: "lead",
           title: "Lead paragraph",
-          type: "text",
-          rows: 3,
-          validation: (rule) => rule.required(),
+          type: "blockContent",
+          description:
+            "The hero styles paragraphs only — headings and lists have no styling over the photo.",
+          validation: (rule) => rule.required().min(1),
         }),
         defineField({
           name: "ctas",
@@ -131,6 +132,109 @@ export const homePage = defineType({
       title: "Practice Areas",
       type: "practiceAreasBand",
       options: { collapsible: true, collapsed: true },
+    }),
+    defineField({
+      name: "about",
+      title: "About",
+      type: "object",
+      options: { collapsible: true, collapsed: true },
+      fields: [
+        defineField({
+          name: "eyebrow",
+          title: "Eyebrow",
+          type: "string",
+          validation: (rule) => rule.required(),
+        }),
+        defineField({
+          name: "titleLead",
+          title: "Heading — lead",
+          type: "string",
+          description: 'Lighter first line — e.g. "Four Decades of".',
+          validation: (rule) => rule.required(),
+        }),
+        defineField({
+          name: "titleStrong",
+          title: "Heading — emphasis",
+          type: "string",
+          description: 'Bold second line — e.g. "High-Profile Victories".',
+          validation: (rule) => rule.required(),
+        }),
+        defineField({
+          name: "body",
+          title: "Body",
+          type: "blockContent",
+          description:
+            "This band styles paragraphs only — headings and links fall back to the site's base styles, and lists aren't styled here.",
+          validation: (rule) => rule.required().min(1),
+        }),
+        defineField({
+          name: "resultsEyebrow",
+          title: "Results eyebrow",
+          type: "string",
+          description: 'Label above the results carousel — e.g. "Notable Results".',
+          validation: (rule) => rule.required(),
+        }),
+        defineField({
+          name: "featured",
+          title: "Featured results",
+          type: "array",
+          of: [defineArrayMember({ type: "reference", to: [{ type: "trialResult" }] })],
+          description:
+            "The cases in the carousel, in this order. Each shows its Homepage teaser copy — fill that in on the Trial Result itself.",
+          validation: (rule) => rule.required().min(1).unique(),
+        }),
+        defineField({
+          name: "quote",
+          title: "Pull quote",
+          type: "accentText",
+          description:
+            "Sits under the photo. Select a phrase and hit Accent to highlight it.",
+          validation: (rule) => rule.required(),
+        }),
+      ],
+    }),
+    defineField({
+      name: "statement",
+      title: "Statement Band",
+      type: "object",
+      options: { collapsible: true, collapsed: true },
+      fields: [
+        defineField({
+          name: "eyebrow",
+          title: "Eyebrow",
+          type: "string",
+          validation: (rule) => rule.required(),
+        }),
+        defineField({
+          name: "headingItalic",
+          title: "Heading — italic",
+          type: "string",
+          description: 'The italic first line — e.g. "Built for the Highest Stakes —".',
+          validation: (rule) => rule.required(),
+        }),
+        defineField({
+          name: "headingBold",
+          title: "Heading — bold",
+          type: "string",
+          description: 'The bold second line — e.g. "Civil and Criminal.".',
+          validation: (rule) => rule.required(),
+        }),
+        defineField({
+          name: "body",
+          title: "Body",
+          type: "blockContent",
+          description:
+            "This band styles paragraphs only — headings and lists aren't styled over the photo.",
+          validation: (rule) => rule.required().min(1),
+        }),
+        defineField({
+          name: "cta",
+          title: "Button",
+          type: "ctaButton",
+          description: "Rendered as the outlined button on the photo.",
+          validation: (rule) => rule.required(),
+        }),
+      ],
     }),
   ],
   preview: {

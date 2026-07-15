@@ -1,7 +1,9 @@
 ---
 import { getImage } from "astro:assets";
+import { PortableText } from "astro-portabletext";
 import heroLandscape from "../assets/hero-boardroom.jpg";
 import heroPortrait from "../assets/cogdell-seated-portrait.jpg";
+import HeroLead from "./hero/HeroLead.astro";
 import { getHomeHero } from "../sanity/lib/homePage";
 import { getWistiaMeta } from "../lib/wistia";
 
@@ -66,7 +68,7 @@ const heroTablet = await getImage({
         <span class="hero__title-line">{hero.titleSecond}</span>
       </h1>
 
-      <p class="hero__lead">{hero.lead}</p>
+      <PortableText value={hero.lead} components={{ block: { normal: HeroLead } }} />
 
       <div class="hero__actions">
         {
@@ -187,7 +189,10 @@ const heroTablet = await getImage({
     color: var(--cog-cream);
   }
 
-  .hero__lead {
+  /* Emitted by HeroLead.astro (a Portable Text renderer), so it carries no
+     scoping attribute of its own — see F14. The scoped .hero__content parent
+     bounds the :global. */
+  .hero__content :global(.hero__lead) {
     max-width: 34rem;
     font-size: var(--text-lg);
     color: var(--cog-body);

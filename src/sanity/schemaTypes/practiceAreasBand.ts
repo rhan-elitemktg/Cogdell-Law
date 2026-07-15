@@ -36,10 +36,10 @@ export const practiceAreasBand = defineType({
     defineField({
       name: "description",
       title: "Description",
-      type: "text",
-      rows: 4,
-      description: "The paragraph beside the heading.",
-      validation: (rule) => rule.required(),
+      type: "blockContent",
+      description:
+        "The copy beside the heading. This band styles paragraphs only — headings and lists aren't styled here.",
+      validation: (rule) => rule.required().min(1),
     }),
     defineField({
       name: "cards",
