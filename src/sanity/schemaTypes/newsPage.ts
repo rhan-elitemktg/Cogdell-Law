@@ -14,6 +14,12 @@ export const newsPage = defineType({
   icon: icons.documents,
   fields: [
     defineField({
+      name: "hero",
+      title: "Hero",
+      type: "pageHero",
+      options: { collapsible: true, collapsed: true },
+    }),
+    defineField({
       name: "grid",
       title: "News Grid",
       type: "object",

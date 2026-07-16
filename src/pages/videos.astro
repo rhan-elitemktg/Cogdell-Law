@@ -1,4 +1,5 @@
 ---
+import { getPageHero } from "../sanity/lib/pageHero";
 import Layout from "../layouts/Layout.astro";
 import PageHero from "../components/PageHero.astro";
 import VideoGrid from "../components/video/VideoGrid.astro";
@@ -17,6 +18,11 @@ if (!videos.length || !gridHeader) {
       "           npx sanity exec scripts/seed-videos-page.ts --with-user-token",
   );
 }
+
+const hero = await getPageHero("videosPage");
+if (!hero) {
+  throw new Error("No hero found for videosPage. Seed: npx sanity exec scripts/seed-page-heroes.ts --with-user-token");
+}
 ---
 
 <Layout
@@ -25,11 +31,11 @@ if (!videos.length || !gridHeader) {
   videoEmbed
 >
   <PageHero
-    eyebrow="Videos"
-    titleLead="The Firm,"
-    titleStrong="On the Record."
+    eyebrow={hero.eyebrow}
+    titleLead={hero.titleLead}
+    titleStrong={hero.titleStrong}
     image={heroImage}
-    lede="A closer look at Dan Cogdell and the firm — the work, the landmark cases, and four decades of courtroom experience, in their own words."
+    lede={hero.lede ?? ""}
   >
     <a href="#contact" class="btn btn--primary">
       Schedule a Consultation

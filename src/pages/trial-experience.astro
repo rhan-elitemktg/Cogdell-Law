@@ -1,4 +1,5 @@
 ---
+import { getPageHero } from "../sanity/lib/pageHero";
 import Layout from "../layouts/Layout.astro";
 import PageHero from "../components/PageHero.astro";
 import TrialResults from "../components/TrialResults.astro";
@@ -18,6 +19,11 @@ if (!practiceAreas) {
       "  npx sanity exec scripts/seed-practice-areas.ts --with-user-token",
   );
 }
+
+const hero = await getPageHero("trialExperiencePage");
+if (!hero) {
+  throw new Error("No hero found for trialExperiencePage. Seed: npx sanity exec scripts/seed-page-heroes.ts --with-user-token");
+}
 ---
 
 <Layout
@@ -25,10 +31,10 @@ if (!practiceAreas) {
   description="From Enron to the Branch Davidian trial to the Texas Attorney General, Dan Cogdell has defended and won the cases the nation was watching. Not settlements. Verdicts."
 >
   <PageHero
-    eyebrow="Trial Experience"
-    titleLead="A Legacy of"
-    titleStrong="Legal Victories."
-    lede="From Enron to the Branch Davidian trial to the Texas Attorney General, Dan Cogdell has defended and won the cases the nation was watching. Not settlements. Verdicts."
+    eyebrow={hero.eyebrow}
+    titleLead={hero.titleLead}
+    titleStrong={hero.titleStrong}
+    lede={hero.lede ?? ""}
     image={heroImage}
     imageAlt="The attorneys of Cogdell Law Firm ascending the courthouse steps"
     imagePosition="center 35%"

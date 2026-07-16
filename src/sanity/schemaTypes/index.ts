@@ -32,6 +32,7 @@ import { whyChooseFeature } from "./whyChooseFeature";
 import { whyChooseBand } from "./whyChooseBand";
 import { practiceReachStat } from "./practiceReachStat";
 import { pressLogo } from "./pressLogo";
+import { pageHero } from "./pageHero";
 import { faqBand } from "./faqBand";
 import { newsBand } from "./newsBand";
 import { ctaBarContent } from "./ctaBarContent";
@@ -78,6 +79,7 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   whyChooseBand,
   practiceReachStat,
   pressLogo,
+  pageHero,
   faqBand,
   newsBand,
   ctaBarContent,

@@ -127,6 +127,14 @@ export type FaqBand = {
   >;
 };
 
+export type PageHero = {
+  _type: "pageHero";
+  eyebrow: string;
+  titleLead?: string;
+  titleStrong: string;
+  lede?: string;
+};
+
 export type SanityImageAssetReference = {
   _ref: string;
   _type: "reference";
@@ -480,6 +488,7 @@ export type PracticeAreasPage = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  hero?: PageHero;
   consult?: ConsultContent;
 };
 
@@ -489,6 +498,7 @@ export type NewsPage = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  hero?: PageHero;
   grid?: {
     eyebrow: string;
     headingLead: string;
@@ -503,6 +513,7 @@ export type VideosPage = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  hero?: PageHero;
   grid?: {
     eyebrow: string;
     headingLead: string;
@@ -581,6 +592,7 @@ export type ContactPage = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  hero?: PageHero;
   consult?: ConsultContent;
 };
 
@@ -590,6 +602,7 @@ export type AttorneysPage = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  hero?: PageHero;
   attorneys?: AttorneysBand;
   testimonials?: TestimonialsBand;
   whyChoose?: WhyChooseBand;
@@ -602,6 +615,7 @@ export type TestimonialsPage = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  hero?: PageHero;
   testimonialsWall?: TestimonialsWallBand;
   practiceAreas?: PracticeAreasBand;
   ctaBar?: CtaBarContent;
@@ -614,6 +628,7 @@ export type TrialExperiencePage = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  hero?: PageHero;
   trialResults?: TrialResultList;
   practiceAreas?: PracticeAreasBand;
   ctaBar?: CtaBarContent;
@@ -868,6 +883,7 @@ export type AllSanitySchemaTypes =
   | NewsBand
   | FaqReference
   | FaqBand
+  | PageHero
   | SanityImageAssetReference
   | PressLogo
   | PracticeReachStat
@@ -1164,7 +1180,6 @@ export type FIRM_DETAILS_QUERY_RESULT =
 // Variable: HOME_HERO_QUERY
 // Query: *[_id == "homePage"][0].hero{  eyebrow,  titleAccent,  titleSecond,  lead,  ctas[]{    _key,    label,    href  },  caption{    name,    role,    watchLabel,    video->{      wistiaId    }  }}
 export type HOME_HERO_QUERY_RESULT =
-  | null
   | {
       eyebrow: string;
       titleAccent: null;
@@ -1173,6 +1188,7 @@ export type HOME_HERO_QUERY_RESULT =
       ctas: null;
       caption: null;
     }
+  | null
   | {
       eyebrow: string;
       titleAccent: string;
@@ -1423,6 +1439,15 @@ export type OUR_FIRM_QUERY_RESULT =
       values: null;
     }
   | {
+      hero: PageHero | null;
+      intro: null;
+      stats: null;
+      quote: null;
+      foundingAttorney: null;
+      originStory: null;
+      values: null;
+    }
+  | {
       hero: {
         eyebrow: string;
         titleAccent: string;
@@ -1503,6 +1528,30 @@ export type OUR_FIRM_QUERY_RESULT =
       } | null;
     }
   | null;
+
+// Source: src/sanity/lib/pageHero.ts
+// Variable: PAGE_HERO_QUERY
+// Query: *[_id == $pageId][0].hero{  eyebrow,  titleLead,  titleStrong,  lede}
+export type PAGE_HERO_QUERY_RESULT =
+  | {
+      eyebrow: string;
+      titleLead: string | null;
+      titleStrong: string;
+      lede: string | null;
+    }
+  | null
+  | {
+      eyebrow: string;
+      titleLead: null;
+      titleStrong: null;
+      lede: null;
+    }
+  | {
+      eyebrow: string;
+      titleLead: string;
+      titleStrong: string;
+      lede: string;
+    };
 
 // Source: src/sanity/lib/practiceAreas.ts
 // Variable: ALL_QUERY
@@ -1661,6 +1710,7 @@ declare module "@sanity/client" {
     '*[_type == "newsItem" && linkType == "article" && defined(slug.current)]{"slug": slug.current}': OWNED_NEWS_SLUGS_QUERY_RESULT;
     '*[_id == "newsPage"][0].grid{\n  eyebrow,\n  headingLead,\n  headingStrong\n}': NEWS_GRID_HEADER_QUERY_RESULT;
     '*[_id == "ourFirmPage"][0]{\n  hero,\n  intro{ eyebrow, headingLead, headingStrong, body },\n  stats{ items[]{ _key, value, label } },\n  quote{ lead, accent, attribution },\n  foundingAttorney{ eyebrow, headingLead, headingStrong, body },\n  originStory{ eyebrow, headingLead, headingStrong, body, milestones[]{ _key, key, title, desc } },\n  values{ eyebrow, headingLead, headingStrong, items[]{ _key, icon, title, body } }\n}': OUR_FIRM_QUERY_RESULT;
+    "*[_id == $pageId][0].hero{\n  eyebrow,\n  titleLead,\n  titleStrong,\n  lede\n}": PAGE_HERO_QUERY_RESULT;
     '*[_type == "practiceArea"] | order(orderRank){\n  _id,\n  title,\n  heroTitle,\n  lede,\n  cardSummary,\n  icon,\n  intro,\n  sections[]{ _key, heading, body },\n  faqs[]{ _key, question, answer },\n  "slug": slug.current,\n  "parentId": parent._ref\n}': ALL_QUERY_RESULT;
     "*[_id == $pageId][0].practiceAreas{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  description,\n  cards[]{\n    _key,\n    icon,\n    title,\n    desc\n  }\n}": PRACTICE_AREAS_BAND_QUERY_RESULT;
     '*[\n  _type == "testimonial" && featured == true\n] | order(orderRank) [0...3]{\n  _id,\n  quote,\n  author,\n  tag\n}': FEATURED_TESTIMONIALS_QUERY_RESULT;

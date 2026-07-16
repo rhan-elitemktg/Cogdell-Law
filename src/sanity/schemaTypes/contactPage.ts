@@ -15,6 +15,12 @@ export const contactPage = defineType({
   icon: icons.envelope,
   fields: [
     defineField({
+      name: "hero",
+      title: "Hero",
+      type: "pageHero",
+      options: { collapsible: true, collapsed: true },
+    }),
+    defineField({
       name: "consult",
       title: "Consult override",
       type: "consultContent",

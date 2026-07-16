@@ -15,6 +15,12 @@ export const testimonialsPage = defineType({
   icon: icons.blockquote,
   fields: [
     defineField({
+      name: "hero",
+      title: "Hero",
+      type: "pageHero",
+      options: { collapsible: true, collapsed: true },
+    }),
+    defineField({
       name: "testimonialsWall",
       title: "Testimonials Wall",
       type: "testimonialsWallBand",

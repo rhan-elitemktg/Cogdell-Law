@@ -16,6 +16,12 @@ export const attorneysPage = defineType({
   icon: icons.users,
   fields: [
     defineField({
+      name: "hero",
+      title: "Hero",
+      type: "pageHero",
+      options: { collapsible: true, collapsed: true },
+    }),
+    defineField({
       name: "attorneys",
       title: "Attorneys",
       type: "attorneysBand",

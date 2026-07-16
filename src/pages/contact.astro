@@ -1,10 +1,16 @@
 ---
+import { getPageHero } from "../sanity/lib/pageHero";
 import Layout from "../layouts/Layout.astro";
 import PageHero from "../components/PageHero.astro";
 import ContactMethods from "../components/ContactMethods.astro";
 import Consult from "../components/Consult.astro";
 import boardroom from "../assets/whychoose-bg.jpg";
 import heroImage from "../assets/firm-steps.jpg";
+
+const hero = await getPageHero("contactPage");
+if (!hero) {
+  throw new Error("No hero found for contactPage. Seed: npx sanity exec scripts/seed-page-heroes.ts --with-user-token");
+}
 ---
 
 <Layout
@@ -12,11 +18,11 @@ import heroImage from "../assets/firm-steps.jpg";
   description="Facing federal charges, a government investigation, or a complex civil dispute? Reach Cogdell Law Firm in Houston — the first step is a confidential conversation."
 >
   <PageHero
-    eyebrow="Get in Touch"
-    titleLead="Connect"
-    titleStrong="With Us."
+    eyebrow={hero.eyebrow}
+    titleLead={hero.titleLead}
+    titleStrong={hero.titleStrong}
     image={heroImage}
-    lede="Whether you're facing federal charges, a government investigation, or a complex civil dispute — the first step is a confidential conversation."
+    lede={hero.lede ?? ""}
   />
 
   <ContactMethods />

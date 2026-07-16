@@ -14,6 +14,12 @@ export const videosPage = defineType({
   icon: icons.play,
   fields: [
     defineField({
+      name: "hero",
+      title: "Hero",
+      type: "pageHero",
+      options: { collapsible: true, collapsed: true },
+    }),
+    defineField({
       name: "grid",
       title: "Video Grid",
       type: "object",

@@ -1,4 +1,5 @@
 ---
+import { getPageHero } from "../sanity/lib/pageHero";
 import Layout from "../layouts/Layout.astro";
 import PageHero from "../components/PageHero.astro";
 import Attorneys from "../components/Attorneys.astro";
@@ -36,6 +37,11 @@ if (!attorneysBand) {
       "  npx sanity exec scripts/seed-attorneys-band.ts --with-user-token",
   );
 }
+
+const hero = await getPageHero("attorneysPage");
+if (!hero) {
+  throw new Error("No hero found for attorneysPage. Seed: npx sanity exec scripts/seed-page-heroes.ts --with-user-token");
+}
 ---
 
 <Layout
@@ -43,10 +49,10 @@ if (!attorneysBand) {
   description="Since 1988, Cogdell Law Firm's trial lawyers have brought 40+ years of experience to federal criminal charges and serious allegations across Houston, East Texas, North Texas, and the state."
 >
   <PageHero
-    eyebrow="Our Attorneys"
-    titleLead="Tenacious Advocacy"
-    titleStrong="Backed by Proven Experience."
-    lede="Facing federal criminal charges or other serious allegations? Since 1988, Cogdell Law Firm has provided strong, unyielding advocacy for Texans statewide. Our Houston-based lawyers bring over 40 years of experience to your defense."
+    eyebrow={hero.eyebrow}
+    titleLead={hero.titleLead}
+    titleStrong={hero.titleStrong}
+    lede={hero.lede ?? ""}
     image={heroImage}
     imageAlt="The attorneys of Cogdell Law Firm outside the courthouse"
   >

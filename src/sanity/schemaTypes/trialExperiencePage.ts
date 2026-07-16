@@ -15,6 +15,12 @@ export const trialExperiencePage = defineType({
   icon: icons.case,
   fields: [
     defineField({
+      name: "hero",
+      title: "Hero",
+      type: "pageHero",
+      options: { collapsible: true, collapsed: true },
+    }),
+    defineField({
       name: "trialResults",
       title: "Trial Results",
       type: "trialResultList",

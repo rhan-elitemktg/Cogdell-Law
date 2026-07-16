@@ -1,4 +1,5 @@
 ---
+import { getPageHero } from "../../sanity/lib/pageHero";
 import Layout from "../../layouts/Layout.astro";
 import PageHero from "../../components/PageHero.astro";
 import NewsGrid from "../../components/news/NewsGrid.astro";
@@ -16,6 +17,11 @@ if (!news.length || !gridHeader) {
       "Seed them with: npx sanity exec scripts/seed-news.ts --with-user-token",
   );
 }
+
+const hero = await getPageHero("newsPage");
+if (!hero) {
+  throw new Error("No hero found for newsPage. Seed: npx sanity exec scripts/seed-page-heroes.ts --with-user-token");
+}
 ---
 
 <Layout
@@ -23,11 +29,11 @@ if (!news.length || !gridHeader) {
   description="Cogdell Law Firm in the news — press coverage, interviews, and podcast appearances from high-profile, high-stakes cases across Texas and nationally."
 >
   <PageHero
-    eyebrow="News"
-    titleLead="Cogdell Law Firm"
-    titleStrong="In the News."
+    eyebrow={hero.eyebrow}
+    titleLead={hero.titleLead}
+    titleStrong={hero.titleStrong}
     image={heroImage}
-    lede="Our attorneys are known throughout Texas and nationally for handling high-profile, high-stakes cases — work that has been covered by local, national, and global media."
+    lede={hero.lede ?? ""}
   >
     <a href="#contact" class="btn btn--primary">
       Schedule a Consultation

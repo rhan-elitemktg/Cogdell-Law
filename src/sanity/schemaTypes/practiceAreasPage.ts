@@ -14,6 +14,12 @@ export const practiceAreasPage = defineType({
   icon: icons.case,
   fields: [
     defineField({
+      name: "hero",
+      title: "Hero",
+      type: "pageHero",
+      options: { collapsible: true, collapsed: true },
+    }),
+    defineField({
       name: "consult",
       title: "Consult override",
       type: "consultContent",
