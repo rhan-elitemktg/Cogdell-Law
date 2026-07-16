@@ -1,0 +1,76 @@
+---
+// Long-form content body: an optional title + lead intro, then h2 sections.
+// The blockContent equivalent of practice/PracticeBody.astro (which renders the
+// legacy Block[] model and is retired once practice areas migrate).
+//
+// Same .pbody markup/styles, so migrated pages render identically.
+import { PortableText } from "astro-portabletext";
+import { proseBodyComponents } from "./bodyComponents";
+
+interface Props {
+  title?: string;
+  intro?: unknown; // blockContent
+  sections?: { _key?: string; heading: string; body: unknown }[];
+}
+const { title, intro, sections } = Astro.props;
+const hasIntro = Array.isArray(intro) && intro.length > 0;
+---
+
+<section class="pbody">
+  <div class="container pbody__inner">
+    {title && <h1 class="pbody__title">{title}</h1>}
+
+    {hasIntro && (
+      <div class="pbody__lead">
+        <PortableText value={intro} components={proseBodyComponents} />
+      </div>
+    )}
+
+    {
+      sections?.map((section) => (
+        <div class="pbody__section">
+          <h2 class="pbody__heading">{section.heading}</h2>
+          <PortableText value={section.body} components={proseBodyComponents} />
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .pbody {
+    background-color: var(--cog-paper);
+  }
+  .pbody__inner {
+    max-width: 800px;
+    padding-block: var(--space-section);
+  }
+  .pbody__title {
+    margin: 0 0 var(--space-8);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: clamp(2.25rem, 4vw, 3.25rem);
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+    color: var(--cog-ink);
+  }
+  .pbody__lead {
+    font-size: var(--text-lg);
+  }
+  .pbody__lead :global(.prose__p) {
+    font-size: var(--text-lg);
+    line-height: 1.7;
+    color: var(--cog-ink);
+  }
+  .pbody__section {
+    margin-top: var(--space-14);
+  }
+  .pbody__heading {
+    margin: 0 0 var(--space-6);
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: clamp(1.625rem, 2.4vw, 2.25rem);
+    line-height: 1.15;
+    color: var(--cog-ink);
+  }
+</style>

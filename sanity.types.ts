@@ -226,6 +226,22 @@ export type CtaButton = {
   href: string;
 };
 
+export type LegalPage = {
+  _id: string;
+  _type: "legalPage";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title: string;
+  intro: BlockContent;
+  sections?: Array<{
+    heading: string;
+    body: BlockContent;
+    _type: "section";
+    _key: string;
+  }>;
+};
+
 export type NewsItem = {
   _id: string;
   _type: "newsItem";
@@ -727,6 +743,7 @@ export type AllSanitySchemaTypes =
   | PracticeAreaCard
   | SellingPoint
   | CtaButton
+  | LegalPage
   | NewsItem
   | SanityImageCrop
   | SanityImageHotspot
@@ -1085,6 +1102,36 @@ export type HOME_PRESS_QUERY_RESULT = Array<{
   dimensions: SanityImageDimensions | null;
 }> | null;
 
+// Source: src/sanity/lib/legalPages.ts
+// Variable: LEGAL_PAGE_QUERY
+// Query: *[_id == $id][0]{  title,  intro,  sections[]{    _key,    heading,    body  }}
+export type LEGAL_PAGE_QUERY_RESULT =
+  | {
+      title: string;
+      intro: BlockContent;
+      sections: Array<{
+        _key: string;
+        heading: string;
+        body: BlockContent;
+      }> | null;
+    }
+  | {
+      title: null;
+      intro: null;
+      sections: null;
+    }
+  | {
+      title: string;
+      intro: null;
+      sections: null;
+    }
+  | {
+      title: string | null;
+      intro: null;
+      sections: null;
+    }
+  | null;
+
 // Source: src/sanity/lib/news.ts
 // Variable: ALL_NEWS_QUERY
 // Query: *[_type == "newsItem"] | order(coalesce(publishedAt, _createdAt) desc){  _id,  title,  outlet,  media,  summary,  ctaLabel,  linkType,  externalUrl,  "slug": slug.current,  "date": coalesce(publishedAt, _createdAt),  outletLogo}
@@ -1290,6 +1337,7 @@ declare module "@sanity/client" {
     '*[_id == "homePage"][0].firmStory{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  body,\n  cta{\n    label,\n    href\n  }\n}': HOME_FIRM_STORY_QUERY_RESULT;
     '*[_id == "homePage"][0].practiceReach{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  lede,\n  stats[]{\n    _key,\n    label,\n    value\n  }\n}': HOME_PRACTICE_REACH_QUERY_RESULT;
     '*[_id == "homePage"][0].press.logos[]{\n  _key,\n  alt,\n  image,\n  "dimensions": image.asset->metadata.dimensions\n}': HOME_PRESS_QUERY_RESULT;
+    "*[_id == $id][0]{\n  title,\n  intro,\n  sections[]{\n    _key,\n    heading,\n    body\n  }\n}": LEGAL_PAGE_QUERY_RESULT;
     '*[_type == "newsItem"] | order(coalesce(publishedAt, _createdAt) desc){\n  _id,\n  title,\n  outlet,\n  media,\n  summary,\n  ctaLabel,\n  linkType,\n  externalUrl,\n  "slug": slug.current,\n  "date": coalesce(publishedAt, _createdAt),\n  outletLogo\n}': ALL_NEWS_QUERY_RESULT;
     '*[_id == "homePage"][0].news{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  lede,\n  "featured": featured->{\n  _id,\n  title,\n  outlet,\n  media,\n  summary,\n  ctaLabel,\n  linkType,\n  externalUrl,\n  "slug": slug.current,\n  "date": coalesce(publishedAt, _createdAt),\n  outletLogo\n},\n  "featuredId": featured._ref\n}': NEWS_BAND_QUERY_RESULT;
     '*[_type == "newsItem" && slug.current == $slug][0]{\n  _id,\n  title,\n  outlet,\n  summary,\n  body,\n  "slug": slug.current\n}': NEWS_ITEM_QUERY_RESULT;
