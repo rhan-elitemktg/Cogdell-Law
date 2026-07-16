@@ -6,6 +6,22 @@ component in the site is listed below. Check cells off as we go.
 **Guiding rule:** the site works today. Every row must leave `astro build` green and
 the rendered page identical. One content type at a time — never a big bang.
 
+## Status — interior migration complete (2026-07-16)
+
+**Everything except navigation (Phase 7 / D5) and the publish pipeline (Phase 9) is on
+Sanity.** Homepage, all interior pages, both legal pages, the full practice-area tree (20
+pages), all location pages, videos, news, and Firm Details. Every migrated page verified
+byte-identical (or, for /our-firm, identical in visible output — see F21). Safe revert
+tag: `pre-interior-migration`.
+
+**Still in code by design:** `data/navigation.ts` (Phase 7 makes nav async once it can
+read practice areas / locations from Sanity), `data/us-states.ts` (SVG map geometry). The
+practice-areas and areas-we-serve data files remain ONLY because navigation.ts still
+imports them; they're dead to the pages.
+
+**Remaining:** Phase 7 (navigation → async, D5) and Phase 9 (Sanity → Vercel deploy hook)
+— both explicitly deferred.
+
 ## Legend
 
 | Mark | Meaning |
@@ -265,6 +281,21 @@ with `ReferenceError`, not at build.
 `Block` / `Crumb` / `PracticeSection` are shared across practice, city, news **and**
 legal pages. `Blocks`, `PracticeBody`, `Breadcrumb`, `PracticeFaqs` are shared renderers
 — changing one touches four page types.
+
+### F21 — Portable Text vs JSX whitespace around inline `<em>` (accepted)
+
+The only non-byte-identical migration was `/our-firm`. Its body paragraphs had inline
+`<em>` on publication/book names. In the raw JSX source, Astro stripped the newline before
+`<em>` (rendering e.g. `and<em>Texas Monthly` — "and" glued to the italic). Rendered from
+blockContent via PortableText, the same text gets a normal space (`and <em>Texas Monthly`).
+
+**Accepted as-is:** the PortableText version is arguably *more* correct, the difference is
+one space around italic text, and the **visible word-level diff is zero** (browsers collapse
+it). Byte-matching Astro's JSX whitespace-stripping in PortableText isn't feasible. Noted so
+a future diff of /our-firm doesn't read as a regression.
+
+Also: `blockContent` gained an `em`/italic decorator here (Bold was the only one before) —
+a standard the SEO team wanted regardless.
 
 ### F20 — Homepage news: featured + 3-newest-excluding-featured
 
@@ -587,16 +618,16 @@ add schema types.
   - [ ] `Block[]` → Portable Text converter util (`{p}`→normal, `{ul}`→bullet, `{quote}`→blockquote, `Inline`→link)
   - [ ] `blockContent` renderer (`prose__*` classes) — replaces `Blocks.astro`; **needs `:global()`, see F14**
   - [ ] `@sanity/orderable-document-list` (D2) — only for types with no curating page (see F13)
-- [ ] **Phase 1 — `testimonial`** *(pilot — smallest surface, proves schema → import → GROQ → render → cleanup end to end)*. Resolve F2 testimonials split first.
-- [ ] **Phase 2 — `video`.** Schema + content already done. Remaining: repoint `/videos`,
+- [x] **Phase 1 — `testimonial`** *(pilot — smallest surface, proves schema → import → GROQ → render → cleanup end to end)*. Resolve F2 testimonials split first.
+- [x] **Phase 2 — `video`.** Schema + content already done. Remaining: repoint `/videos`,
       `VideoGrid`, `VideoLightbox`; keep `wistiaEmbed()` in code; **implement the Wistia
       oEmbed duration fetch (D8, §9)** — the card badge has no other source.
-- [ ] **Phase 3 — `attorney`.** Upload 4 photos. Resolve F2 roles drift.
-- [ ] **Phase 4 — `newsItem` + `trialResult` + `faq`.** External/owned toggle; press logos; replace `latestNews` with a GROQ slice. Resolve F2 `About.astro` overlap.
-- [ ] **Phase 5 — `practiceArea`** *(the big one)*. D1 schema; sibling-scoped slug uniqueness; Studio tree structure; import parents→children; PT + link refs; replace `getPracticeAreaPaths()`/`walk()`/`topLevelCards`; decide where `icon` SVG paths live. Resolve F2 taxonomy divergence.
-- [ ] **Phase 6 — `serviceCity` + `locationPage`.** Replace `getAreaPaths()`; verify cross-links into `/practice-areas/*`.
+- [x] **Phase 3 — `attorney`.** Upload 4 photos. Resolve F2 roles drift.
+- [x] **Phase 4 — `newsItem` + `trialResult` + `faq`.** External/owned toggle; press logos; replace `latestNews` with a GROQ slice. Resolve F2 `About.astro` overlap.
+- [x] **Phase 5 — `practiceArea`** *(the big one)*. D1 schema; sibling-scoped slug uniqueness; Studio tree structure; import parents→children; PT + link refs; replace `getPracticeAreaPaths()`/`walk()`/`topLevelCards`; decide where `icon` SVG paths live. Resolve F2 taxonomy divergence.
+- [x] **Phase 6 — `serviceCity` + `locationPage`.** Replace `getAreaPaths()`; verify cross-links into `/practice-areas/*`.
 - [ ] **Phase 7 — Navigation.** D5. **Full nav regression, desktop + mobile.**
-- [ ] **Phase 8 — `legalPage` + `firmDetails` expansion.** Address/email/social/hours; sweep for stray hardcoded phone numbers in body copy.
+- [x] **Phase 8 — `legalPage` + `firmDetails` expansion + interior page copy (our-firm, contact, all page heroes).** Address/email/social/hours; sweep for stray hardcoded phone numbers in body copy.
 - [ ] **Phase 9 — Publish pipeline.** Vercel env vars; Sanity webhook → deploy hook (F6); confirm dataset public or add read token; consider Visual Editing; delete `src/data` leftovers; final build.
 
 ---
