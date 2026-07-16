@@ -8,16 +8,17 @@ import FoundingAttorney from "../components/about/FoundingAttorney.astro";
 import OriginStory from "../components/about/OriginStory.astro";
 import Values from "../components/about/Values.astro";
 import Consult from "../components/Consult.astro";
-// Same courthouse shot as the homepage About section (the live site's /about hero).
 import heroImage from "../assets/about-courthouse.jpg";
 import consultBoardroom from "../assets/whychoose-bg.jpg";
+import { getOurFirm } from "../sanity/lib/ourFirm";
 
-const stats = [
-  { value: "40+", label: "Years of Trial Experience" },
-  { value: "500+", label: "Jury Trials" },
-  { value: "Top 2%", label: "Fellow, American College of Trial Lawyers" },
-  { value: "Nationwide", label: "Federal & State Courts" },
-];
+const page = await getOurFirm();
+if (!page?.hero) {
+  throw new Error(
+    "No Our Firm page content found in Sanity.\n" +
+      "Seed it with: npx sanity exec scripts/seed-our-firm.ts --with-user-token",
+  );
+}
 ---
 
 <Layout
@@ -25,10 +26,10 @@ const stats = [
   description="For more than four decades, Cogdell Law Firm has defended the cases others call unwinnable. Learn about founding attorney Dan Cogdell and our trial team."
 >
   <PageHero
-    eyebrow="About Cogdell Law Firm"
-    titleLead="The Firm the Opposition"
-    titleStrong="Doesn't Want to Face."
-    lede="When the courtroom doors swing open, there's one name that makes the opposition think twice. For more than four decades, Cogdell Law Firm has defended the cases others call unwinnable — and won."
+    eyebrow={page.hero.eyebrow}
+    titleLead={page.hero.titleLead}
+    titleStrong={page.hero.titleStrong}
+    lede={page.hero.lede}
     image={heroImage}
     imageAlt="Dan Cogdell outside the courthouse"
   >
@@ -42,11 +43,32 @@ const stats = [
     </a>
   </PageHero>
 
-  <AboutIntro />
-  <SellingPoints points={stats} />
-  <QuoteBand />
-  <FoundingAttorney />
-  <OriginStory />
-  <Values />
+  <AboutIntro
+    eyebrow={page.intro.eyebrow}
+    headingLead={page.intro.headingLead}
+    headingStrong={page.intro.headingStrong}
+    body={page.intro.body}
+  />
+  <SellingPoints points={page.stats.items} />
+  <QuoteBand lead={page.quote.lead} accent={page.quote.accent} attribution={page.quote.attribution} />
+  <FoundingAttorney
+    eyebrow={page.foundingAttorney.eyebrow}
+    headingLead={page.foundingAttorney.headingLead}
+    headingStrong={page.foundingAttorney.headingStrong}
+    body={page.foundingAttorney.body}
+  />
+  <OriginStory
+    eyebrow={page.originStory.eyebrow}
+    headingLead={page.originStory.headingLead}
+    headingStrong={page.originStory.headingStrong}
+    body={page.originStory.body}
+    milestones={page.originStory.milestones}
+  />
+  <Values
+    eyebrow={page.values.eyebrow}
+    headingLead={page.values.headingLead}
+    headingStrong={page.values.headingStrong}
+    items={page.values.items}
+  />
   <Consult pageId="ourFirmPage" photo={consultBoardroom} photoAlt="The Cogdell Law Firm team in the boardroom" />
 </Layout>

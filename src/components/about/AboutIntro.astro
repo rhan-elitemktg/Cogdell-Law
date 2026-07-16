@@ -1,31 +1,25 @@
 ---
 // Our Firm "Who We Are" intro — heading left, copy + CTA right, on paper.
+import { PortableText } from "astro-portabletext";
 import Eyebrow from "../Eyebrow.astro";
+import BareParagraph from "../prose/BareParagraph.astro";
+
+interface Props { eyebrow: string; headingLead: string; headingStrong: string; body: unknown }
+const { eyebrow, headingLead, headingStrong, body } = Astro.props;
 ---
 
 <section class="about-intro">
   <div class="container about-intro__inner">
     <div class="about-intro__head">
-      <Eyebrow>Who We Are</Eyebrow>
+      <Eyebrow>{eyebrow}</Eyebrow>
       <h2 class="about-intro__heading">
-        <span class="about-intro__heading-lead">Not just a law firm —</span>
-        <span class="about-intro__heading-strong">the law firm of choice.</span>
+        <span class="about-intro__heading-lead">{headingLead}</span>
+        <span class="about-intro__heading-strong">{headingStrong}</span>
       </h2>
     </div>
 
     <div class="about-intro__body">
-      <p>
-        Cogdell Law Firm is the firm of choice for people facing charges for
-        federal white collar and criminal offenses, state felony charges, grand
-        jury investigations, medical kickback, securities fraud, and criminal
-        appeals. We are trial lawyers, brought in when the stakes are highest
-        and the case must be won in the courtroom.
-      </p>
-      <p>
-        Dan Cogdell is one of the elite 2% of attorneys admitted as a Fellow of
-        the American College of Trial Lawyers. His reputation for strategy and
-        skill isn't just respected — it's revered.
-      </p>
+      <PortableText value={body} components={{ block: { normal: BareParagraph } }} />
       <div class="about-intro__actions">
         <a href="/#practice" class="btn btn--primary">
           Our Practice Areas
@@ -74,7 +68,7 @@ import Eyebrow from "../Eyebrow.astro";
     color: var(--cog-ink);
   }
 
-  .about-intro__body p {
+  .about-intro__body :global(p) {
     max-width: 660px;
     margin-bottom: var(--space-4);
     font-size: var(--text-base);

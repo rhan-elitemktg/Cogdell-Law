@@ -1,7 +1,12 @@
 ---
 // Our Firm "Founding Attorney" — study portrait left, career story right.
 import { Image } from "astro:assets";
+import { PortableText } from "astro-portabletext";
 import Eyebrow from "../Eyebrow.astro";
+import BareParagraph from "../prose/BareParagraph.astro";
+
+interface Props { eyebrow: string; headingLead: string; headingStrong: string; body: unknown }
+const { eyebrow, headingLead, headingStrong, body } = Astro.props;
 import portrait from "../../assets/consult-portrait.jpg";
 ---
 
@@ -18,30 +23,12 @@ import portrait from "../../assets/consult-portrait.jpg";
     </div>
 
     <div class="founding__body">
-      <Eyebrow>Founding Attorney</Eyebrow>
+      <Eyebrow>{eyebrow}</Eyebrow>
       <h2 class="founding__heading">
-        <span class="founding__heading-lead">A Career Built on</span>
-        <span class="founding__heading-strong">Winning the Unwinnable.</span>
+        <span class="founding__heading-lead">{headingLead}</span>
+        <span class="founding__heading-strong">{headingStrong}</span>
       </h2>
-      <p>
-        Mr. Cogdell knows the play before the opposition has even decided on the
-        game. He has spent his career collecting acquittals in cases written off
-        by others — including the sole acquittal in any Enron-related trial and
-        the defense of Clive Doyle following the siege of the Branch Davidian
-        compound in Waco.
-      </p>
-      <p>
-        He doesn't take cases he thinks he can win; he takes those he knows he
-        will. His work has drawn features in <em>The Texas Tribune</em> and
-        <em>Texas Monthly</em>, and coverage in national publications from CNN
-        to <em>The New York Times</em>.
-      </p>
-      <p>
-        The firm's attorneys, paralegals, and support staff live and breathe
-        victory. Choosing Cogdell Law Firm means choosing success — not just
-        navigating legal complexities, but partnering with a legal giant who
-        stands shoulder to shoulder with you.
-      </p>
+      <PortableText value={body} components={{ block: { normal: BareParagraph } }} />
       <div class="founding__actions">
         <a href="/#results" class="btn btn--primary">
           View Trial Experience
@@ -99,7 +86,7 @@ import portrait from "../../assets/consult-portrait.jpg";
     color: var(--cog-ink);
   }
 
-  .founding__body p {
+  .founding__body :global(p) {
     max-width: 660px;
     margin-bottom: var(--space-4);
     font-size: var(--text-base);

@@ -41,7 +41,10 @@ export const blockContent = defineType({
       ],
       marks: {
         // Toggles — no data of their own.
-        decorators: [{ title: "Bold", value: "strong" }],
+        decorators: [
+          { title: "Bold", value: "strong" },
+          { title: "Italic", value: "em" },
+        ],
         // Marks that carry data.
         annotations: [
           defineArrayMember({

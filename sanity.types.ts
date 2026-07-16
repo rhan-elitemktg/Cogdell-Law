@@ -517,6 +517,61 @@ export type OurFirmPage = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  hero?: {
+    eyebrow: string;
+    titleLead: string;
+    titleStrong: string;
+    lede: string;
+  };
+  intro?: {
+    eyebrow: string;
+    headingLead: string;
+    headingStrong: string;
+    body: BlockContent;
+  };
+  stats?: {
+    items: Array<
+      {
+        _key: string;
+      } & SellingPoint
+    >;
+  };
+  quote?: {
+    lead: string;
+    accent: string;
+    attribution: string;
+  };
+  foundingAttorney?: {
+    eyebrow: string;
+    headingLead: string;
+    headingStrong: string;
+    body: BlockContent;
+  };
+  originStory?: {
+    eyebrow: string;
+    headingLead: string;
+    headingStrong: string;
+    body: BlockContent;
+    milestones: Array<{
+      key: string;
+      title: string;
+      desc: string;
+      _type: "milestone";
+      _key: string;
+    }>;
+  };
+  values?: {
+    eyebrow: string;
+    headingLead: string;
+    headingStrong: string;
+    items: Array<{
+      icon: "sparkles" | "gavel" | "users";
+      title: string;
+      body: string;
+      _type: "value";
+      _key: string;
+    }>;
+  };
   consult?: ConsultContent;
 };
 
@@ -1108,25 +1163,35 @@ export type FIRM_DETAILS_QUERY_RESULT =
 // Source: src/sanity/lib/homePage.ts
 // Variable: HOME_HERO_QUERY
 // Query: *[_id == "homePage"][0].hero{  eyebrow,  titleAccent,  titleSecond,  lead,  ctas[]{    _key,    label,    href  },  caption{    name,    role,    watchLabel,    video->{      wistiaId    }  }}
-export type HOME_HERO_QUERY_RESULT = null | {
-  eyebrow: string;
-  titleAccent: string;
-  titleSecond: string;
-  lead: BlockContent;
-  ctas: Array<{
-    _key: string;
-    label: string;
-    href: string;
-  }> | null;
-  caption: {
-    name: string;
-    role: string;
-    watchLabel: string;
-    video: {
-      wistiaId: string;
+export type HOME_HERO_QUERY_RESULT =
+  | null
+  | {
+      eyebrow: string;
+      titleAccent: null;
+      titleSecond: null;
+      lead: null;
+      ctas: null;
+      caption: null;
+    }
+  | {
+      eyebrow: string;
+      titleAccent: string;
+      titleSecond: string;
+      lead: BlockContent;
+      ctas: Array<{
+        _key: string;
+        label: string;
+        href: string;
+      }> | null;
+      caption: {
+        name: string;
+        role: string;
+        watchLabel: string;
+        video: {
+          wistiaId: string;
+        };
+      } | null;
     };
-  } | null;
-};
 
 // Source: src/sanity/lib/homePage.ts
 // Variable: HOME_SELLING_POINTS_QUERY
@@ -1251,6 +1316,16 @@ export type LEGAL_PAGE_QUERY_RESULT =
         body: BlockContent;
       }> | null;
     }
+  | {
+      title: null;
+      intro: {
+        eyebrow: string;
+        headingLead: string;
+        headingStrong: string;
+        body: BlockContent;
+      } | null;
+      sections: null;
+    }
   | null;
 
 // Source: src/sanity/lib/news.ts
@@ -1333,6 +1408,101 @@ export type NEWS_GRID_HEADER_QUERY_RESULT = null | {
   headingLead: string;
   headingStrong: string;
 };
+
+// Source: src/sanity/lib/ourFirm.ts
+// Variable: OUR_FIRM_QUERY
+// Query: *[_id == "ourFirmPage"][0]{  hero,  intro{ eyebrow, headingLead, headingStrong, body },  stats{ items[]{ _key, value, label } },  quote{ lead, accent, attribution },  foundingAttorney{ eyebrow, headingLead, headingStrong, body },  originStory{ eyebrow, headingLead, headingStrong, body, milestones[]{ _key, key, title, desc } },  values{ eyebrow, headingLead, headingStrong, items[]{ _key, icon, title, body } }}
+export type OUR_FIRM_QUERY_RESULT =
+  | {
+      hero: null;
+      intro: null;
+      stats: null;
+      quote: null;
+      foundingAttorney: null;
+      originStory: null;
+      values: null;
+    }
+  | {
+      hero: {
+        eyebrow: string;
+        titleAccent: string;
+        titleSecond: string;
+        lead: BlockContent;
+        ctas?: Array<
+          {
+            _key: string;
+          } & CtaButton
+        >;
+        caption?: {
+          name: string;
+          role: string;
+          watchLabel: string;
+          video: VideoReference;
+        };
+      } | null;
+      intro: null;
+      stats: null;
+      quote: null;
+      foundingAttorney: null;
+      originStory: null;
+      values: null;
+    }
+  | {
+      hero: {
+        eyebrow: string;
+        titleLead: string;
+        titleStrong: string;
+        lede: string;
+      } | null;
+      intro: {
+        eyebrow: string;
+        headingLead: string;
+        headingStrong: string;
+        body: BlockContent;
+      } | null;
+      stats: {
+        items: Array<{
+          _key: string;
+          value: string;
+          label: string;
+        }>;
+      } | null;
+      quote: {
+        lead: string;
+        accent: string;
+        attribution: string;
+      } | null;
+      foundingAttorney: {
+        eyebrow: string;
+        headingLead: string;
+        headingStrong: string;
+        body: BlockContent;
+      } | null;
+      originStory: {
+        eyebrow: string;
+        headingLead: string;
+        headingStrong: string;
+        body: BlockContent;
+        milestones: Array<{
+          _key: string;
+          key: string;
+          title: string;
+          desc: string;
+        }>;
+      } | null;
+      values: {
+        eyebrow: string;
+        headingLead: string;
+        headingStrong: string;
+        items: Array<{
+          _key: string;
+          icon: "gavel" | "sparkles" | "users";
+          title: string;
+          body: string;
+        }>;
+      } | null;
+    }
+  | null;
 
 // Source: src/sanity/lib/practiceAreas.ts
 // Variable: ALL_QUERY
@@ -1490,6 +1660,7 @@ declare module "@sanity/client" {
     '*[_type == "newsItem" && slug.current == $slug][0]{\n  _id,\n  title,\n  outlet,\n  summary,\n  body,\n  "slug": slug.current\n}': NEWS_ITEM_QUERY_RESULT;
     '*[_type == "newsItem" && linkType == "article" && defined(slug.current)]{"slug": slug.current}': OWNED_NEWS_SLUGS_QUERY_RESULT;
     '*[_id == "newsPage"][0].grid{\n  eyebrow,\n  headingLead,\n  headingStrong\n}': NEWS_GRID_HEADER_QUERY_RESULT;
+    '*[_id == "ourFirmPage"][0]{\n  hero,\n  intro{ eyebrow, headingLead, headingStrong, body },\n  stats{ items[]{ _key, value, label } },\n  quote{ lead, accent, attribution },\n  foundingAttorney{ eyebrow, headingLead, headingStrong, body },\n  originStory{ eyebrow, headingLead, headingStrong, body, milestones[]{ _key, key, title, desc } },\n  values{ eyebrow, headingLead, headingStrong, items[]{ _key, icon, title, body } }\n}': OUR_FIRM_QUERY_RESULT;
     '*[_type == "practiceArea"] | order(orderRank){\n  _id,\n  title,\n  heroTitle,\n  lede,\n  cardSummary,\n  icon,\n  intro,\n  sections[]{ _key, heading, body },\n  faqs[]{ _key, question, answer },\n  "slug": slug.current,\n  "parentId": parent._ref\n}': ALL_QUERY_RESULT;
     "*[_id == $pageId][0].practiceAreas{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  description,\n  cards[]{\n    _key,\n    icon,\n    title,\n    desc\n  }\n}": PRACTICE_AREAS_BAND_QUERY_RESULT;
     '*[\n  _type == "testimonial" && featured == true\n] | order(orderRank) [0...3]{\n  _id,\n  quote,\n  author,\n  tag\n}': FEATURED_TESTIMONIALS_QUERY_RESULT;
