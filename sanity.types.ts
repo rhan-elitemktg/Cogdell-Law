@@ -405,6 +405,11 @@ export type VideosPage = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  grid?: {
+    eyebrow: string;
+    headingLead: string;
+    headingStrong: string;
+  };
   consult?: ConsultContent;
 };
 
@@ -560,6 +565,7 @@ export type Video = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  orderRank?: string;
   title: string;
   wistiaId: string;
 };
@@ -1231,6 +1237,24 @@ export type TRIAL_RESULTS_QUERY_RESULT = Array<{
     | "White Collar";
 }> | null;
 
+// Source: src/sanity/lib/videos.ts
+// Variable: VIDEOS_QUERY
+// Query: *[_type == "video"] | order(orderRank){  _id,  title,  wistiaId}
+export type VIDEOS_QUERY_RESULT = Array<{
+  _id: string;
+  title: string;
+  wistiaId: string;
+}>;
+
+// Source: src/sanity/lib/videos.ts
+// Variable: VIDEO_GRID_HEADER_QUERY
+// Query: *[_id == "videosPage"][0].grid{  eyebrow,  headingLead,  headingStrong}
+export type VIDEO_GRID_HEADER_QUERY_RESULT = null | {
+  eyebrow: string;
+  headingLead: string;
+  headingStrong: string;
+};
+
 // Source: src/sanity/lib/whyChoose.ts
 // Variable: WHY_CHOOSE_BAND_QUERY
 // Query: *[_id == $pageId][0].whyChoose{  eyebrow,  headingLead,  headingStrong,  features[]{    _key,    icon,    title,    body  }}
@@ -1277,6 +1301,8 @@ declare module "@sanity/client" {
     "*[_id == $pageId][0].testimonials{\n  eyebrow,\n  headingLead,\n  headingStrong\n}": TESTIMONIALS_BAND_QUERY_RESULT;
     '*[_id == "testimonialsPage"][0].testimonialsWall{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  lede\n}': TESTIMONIALS_WALL_BAND_QUERY_RESULT;
     '*[_id == "trialExperiencePage"][0].trialResults.cases[]->{\n  _id,\n  name,\n  outcome,\n  note,\n  category,\n  categoryLabel\n}': TRIAL_RESULTS_QUERY_RESULT;
+    '*[_type == "video"] | order(orderRank){\n  _id,\n  title,\n  wistiaId\n}': VIDEOS_QUERY_RESULT;
+    '*[_id == "videosPage"][0].grid{\n  eyebrow,\n  headingLead,\n  headingStrong\n}': VIDEO_GRID_HEADER_QUERY_RESULT;
     "*[_id == $pageId][0].whyChoose{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  features[]{\n    _key,\n    icon,\n    title,\n    body\n  }\n}": WHY_CHOOSE_BAND_QUERY_RESULT;
   }
 }

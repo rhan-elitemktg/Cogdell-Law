@@ -14,6 +14,17 @@ export const videosPage = defineType({
   icon: icons.play,
   fields: [
     defineField({
+      name: "grid",
+      title: "Video Grid",
+      type: "object",
+      options: { collapsible: true, collapsed: true },
+      fields: [
+        defineField({ name: "eyebrow", title: "Eyebrow", type: "string", validation: (rule) => rule.required() }),
+        defineField({ name: "headingLead", title: "Heading — italic", type: "string", validation: (rule) => rule.required() }),
+        defineField({ name: "headingStrong", title: "Heading — bold", type: "string", validation: (rule) => rule.required() }),
+      ],
+    }),
+    defineField({
       name: "consult",
       title: "Consult override",
       type: "consultContent",

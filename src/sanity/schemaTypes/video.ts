@@ -1,5 +1,6 @@
 import { defineType, defineField } from "sanity";
 import { icons } from "@sanity/icons";
+import { orderRankField, orderRankOrdering } from "@sanity/orderable-document-list";
 
 /**
  * A firm video hosted on Wistia. Playback happens in a lightbox that only loads
@@ -18,7 +19,10 @@ export const video = defineType({
   title: "Videos",
   type: "document",
   icon: icons.play,
+  // Drag-to-reorder in the Studio (D2) — sets the order on /videos.
+  orderings: [orderRankOrdering],
   fields: [
+    orderRankField({ type: "video" }),
     defineField({
       name: "title",
       title: "Title",
