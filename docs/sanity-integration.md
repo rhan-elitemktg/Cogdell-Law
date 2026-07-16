@@ -52,20 +52,24 @@ The schema layer. Everything in section 2 and 3 depends on these.
 | `testimonialsBand` | `Testimonials.astro` header | object | — | `[x]` | `[x]` | `[x]` | ✅ done — one copy per page (D11) |
 | `testimonialsWallBand` | `TestimonialsWall.astro` header | object | — | `[x]` | `[x]` | `[x]` | ✅ done |
 | `whyChooseBand` + `whyChooseFeature` | `WhyChoose.astro` | object | — | `[x]` | `[x]` | `[x]` | ✅ done — one copy per page (D11) |
+| `homePage.practiceReach` + `practiceReachStat` | `PracticeReach.astro` | object | — | `[x]` | `[x]` | `[x]` | ✅ done — copy only; US map stays in code |
+| `homePage.press` + `pressLogo` | `Press.astro` | object | — | `[x]` | `[x]` | `[x]` | ✅ done — logos in Sanity (D6) |
 | `attorney` | ~~`data/attorneys.ts`~~ | document | 4 | `[x]` | `[x]` | `[x]` | ✅ done — F2 resolved; photos in Sanity |
 | `educationEntry` | `data/attorneys.ts` | object | — | `[x]` | `[x]` | `[x]` | ✅ done |
 | `attorneysBand` | `Attorneys.astro` header | object | — | `[x]` | `[x]` | `[x]` | ✅ done — one copy per page (D11) |
 | `attorneysPage` | `attorneys.astro` | singleton | 1 | `[x]` | `[~]` | `[x]` | band only; rest of page pending |
-| `newsItem` | `data/news.ts` | document | ~10 | `[ ]` | `[ ]` | `[ ]` | 4 |
+| `newsItem` | ~~`data/news.ts`~~ | document | 12 | `[x]` | `[x]` | `[x]` | ✅ done — hybrid external/owned; publishedAt override |
+| `newsBand` | `News.astro` (was Blog) | object | — | `[x]` | `[x]` | `[x]` | ✅ done — featured ref + 3-newest (F20) |
 | `trialResult` | `TrialResults.astro` + `About.astro` | document | 16 | `[x]` | `[x]` | `[x]` | ✅ done — F2 duplicate resolved |
 | `trialResultList` | `TrialResults.astro` | object | — | `[x]` | `[x]` | `[x]` | ✅ done |
 | `accentText` (Portable Text) | `About.astro` quote | object | — | `[x]` | `[x]` | `[x]` | ✅ done — first PT type |
-| `faq` ⚠️ *new* | `Faq.astro` | document | ~6 | `[ ]` | `[ ]` | `[ ]` | 4 |
+| `faq` | `Faq.astro` | document | 6 | `[x]` | `[x]` | `[x]` | ✅ done — F1; `blockContent` answers, orderRank |
+| `faqBand` | `Faq.astro` header | object | — | `[x]` | `[x]` | `[x]` | ✅ done |
 | `practiceArea` | `data/practice-areas.ts` | document | ~20 | `[ ]` | `[ ]` | `[ ]` | 5 |
 | `serviceCity` | `data/areas-we-serve.ts` | document | 6 | `[ ]` | `[ ]` | `[ ]` | 6 |
 | `locationPage` | `data/areas-we-serve.ts` | document | ~15 | `[ ]` | `[ ]` | `[ ]` | 6 |
 | `legalPage` | `privacy.astro`, `disclaimer.astro` | document | 2 | `[ ]` | `[ ]` | `[ ]` | 8 |
-| `firmDetails` *(expand)* | scattered hardcoded | singleton | 1 | `[ ]` | `[ ]` | `[ ]` | 8 |
+| `firmDetails` *(expanded)* | `Footer.astro` | singleton | 1 | `[x]` | `[x]` | `[x]` | ✅ tagline/email/address/socials + copyright/legal links; footer wired |
 
 ⚠️ `trialResult` and `faq` were **not** in the original plan — they're real content
 currently buried inside components. See section 4, finding F1.
@@ -91,8 +95,8 @@ All 16 routes. "Depends on" is the content type(s) the page needs before it can 
 | `/videos` | `pages/videos.astro` | `video` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | 2 |
 | `/attorneys` | `pages/attorneys.astro` | `attorney` | `[x]` | `[x]` | `[x]` | `[x]` | ✅ done |
 | `/attorney/[slug]` | `pages/attorney/[slug].astro` | `attorney` | `[x]` | `[x]` | `[x]` | `[x]` | ✅ done — 4 pages |
-| `/news` | `pages/news/index.astro` | `newsItem` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | 4 |
-| `/news/[slug]` | `pages/news/[slug].astro` | `newsItem` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | 4 |
+| `/news` | `pages/news/index.astro` | `newsItem` | `[x]` | `[x]` | `[x]` | `[x]` | ✅ done |
+| `/news/[slug]` | `pages/news/[slug].astro` | `newsItem` | `[x]` | `[x]` | `[~]` | `[x]` | wired; 0 owned articles yet |
 | `/trial-experience` | `pages/trial-experience.astro` | `trialResult` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | 4 |
 | `/practice-areas` | `pages/practice-areas/index.astro` | `practiceArea` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | 5 |
 | `/practice-areas/[...slug]` | `pages/practice-areas/[...slug].astro` | `practiceArea` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | 5 |
@@ -126,6 +130,9 @@ All 41 components + the layout. Grouped by how much Sanity work each needs.
 | `CtaBar.astro` | ~~hardcoded copy~~ | `ctaBar` shared + override (D13) | `[x]` | `[x]` | ✅ done — ~43 pages |
 | `FirmStory.astro` | ~~hardcoded copy~~ | `homePage.firmStory` | `[x]` | `[x]` | ✅ done |
 | `WhyChoose.astro` | ~~own array~~ | `whyChooseBand` ×2 pages | `[x]` | `[x]` | ✅ done |
+| `PracticeReach.astro` | ~~hardcoded copy + `us-states.ts`~~ | `homePage.practiceReach` (map stays) | `[x]` | `[x]` | ✅ done |
+| `Press.astro` | ~~10 logo imports~~ | `homePage.press` (logos in Sanity) | `[x]` | `[x]` | ✅ done |
+| `Faq.astro` | ~~own array~~ | `faq` docs + `homePage.faq` header | `[x]` | `[x]` | ✅ done |
 | `Consult.astro` | ~~hardcoded defaults~~ | `consult` shared + override (D13) | `[x]` | `[x]` | ✅ done — 13 callers |
 | `video/VideoGrid.astro` | `data/videos.ts` (type) | `video` | `[ ]` | `[ ]` | 2 |
 | `video/VideoLightbox.astro` | props | `video` | `[ ]` | `[ ]` | 2 |
@@ -133,11 +140,11 @@ All 41 components + the layout. Grouped by how much Sanity work each needs.
 | `attorney/AttorneyHero.astro` | ~~`data/attorneys.ts`~~ | `attorney` | `[x]` | `[x]` | ✅ done |
 | `Attorneys.astro` | ~~own array~~ | `attorney` | `[x]` | `[x]` | ✅ done |
 | `about/FoundingAttorney.astro` | hardcoded copy | `attorney` | `[ ]` | `[ ]` | 3 |
-| `news/NewsGrid.astro` | `data/news.ts` (type) | `newsItem` | `[ ]` | `[ ]` | 4 |
-| `Blog.astro` | `data/news.ts` (`latestNews`) | `newsItem` | `[ ]` | `[ ]` | 4 |
+| `news/NewsGrid.astro` | ~~`data/news.ts`~~ | `newsItem` | `[x]` | `[x]` | ✅ done |
+| `News.astro` *(was `Blog`)* | ~~`data/news.ts`~~ | `homePage.news` + `newsItem` | `[x]` | `[x]` | ✅ done |
 | `TrialResults.astro` | ~~own array~~ | `trialResult` ×16 | `[x]` | `[x]` | ✅ done |
 | `About.astro` | ~~own array~~ | `homePage.about` + `trialResult` ×6 | `[x]` | `[x]` | ✅ done |
-| `Faq.astro` ⚠️ | **own array** (~6 Q&A) | `faq` | `[ ]` | `[ ]` | 4 |
+| `Faq.astro` | ~~own array~~ | `faq` docs + `homePage.faq` header | `[x]` | `[x]` | ✅ done |
 | `practice/Blocks.astro` | `Block`/`Inline` types | → `<PortableText>` | `[ ]` | `[ ]` | 5 |
 | `practice/PracticeBody.astro` | `practice-areas.ts` (types) | `practiceArea` | `[ ]` | `[ ]` | 5 |
 | `practice/PracticeFaqs.astro` | `practice-areas.ts` (type) | `practiceArea` | `[ ]` | `[ ]` | 5 |
@@ -148,7 +155,8 @@ All 41 components + the layout. Grouped by how much Sanity work each needs.
 | `MobileNav.astro` | `data/navigation.ts` | nav async | `[ ]` | `[ ]` | 7 |
 | `Footer.astro` | `firmDetails` + hardcoded links | `firmDetails` | `[~]` | `[ ]` | 7–8 |
 | `ContactMethods.astro` | hardcoded phone/email | `firmDetails` | `[ ]` | `[ ]` | 8 |
-| `Press.astro` | 10 logo imports | *decide* | `[ ]` | `[ ]` | 4 |
+| `Press.astro` | ~~10 logo imports~~ | `homePage.press` (logos in Sanity) | `[x]` | `[x]` | ✅ done |
+| `Faq.astro` | ~~own array~~ | `faq` docs + `homePage.faq` header | `[x]` | `[x]` | ✅ done |
 
 `Header` / `Footer` are `[~]` — already partly on Sanity (logo, phone) but still hold
 hardcoded nav links and socials.
@@ -175,7 +183,7 @@ Props-driven or pure layout. Listed for coverage; nothing to do.
 | `Eyebrow.astro` | Pure presentation |
 | `PageHero.astro` | Props-driven |
 | `practice/PracticeGrid.astro` | Props-driven |
-| `PracticeReach.astro` | Uses `us-states.ts` — stays static |
+| ~~`PracticeReach.astro`~~ | ✅ **copy migrated** (`homePage.practiceReach`); only the US map geometry (`us-states.ts`) stays static |
 | `layouts/Layout.astro` | Shell |
 | `pages/404.astro` | `quickLinks` are nav, not content |
 
@@ -257,6 +265,24 @@ with `ReferenceError`, not at build.
 `Block` / `Crumb` / `PracticeSection` are shared across practice, city, news **and**
 legal pages. `Blocks`, `PracticeBody`, `Breadcrumb`, `PracticeFaqs` are shared renderers
 — changing one touches four page types.
+
+### F20 — Homepage news: featured + 3-newest-excluding-featured
+
+The homepage shows ONE chosen featured article (left) and the 3 newest OTHER items
+(right); the featured must never appear in the right column. Mechanism: `homePage.news.featured`
+is a reference to a `newsItem`; the right column is `order(coalesce(publishedAt, _createdAt)
+desc)` filtered to exclude the featured `_id`, sliced to 3. Verified by re-featuring a
+right-column item: it left the right column and the next-newest backfilled the slot.
+
+**Dates:** the firm wanted "date added, overridable." Modelled as an optional `publishedAt`
+that overrides the document's `_createdAt`; effective date = `coalesce(publishedAt,
+_createdAt)`. The 12 seeded items got `publishedAt` descending in the file's curation order
+so "newest" reproduced the old array order; editors set real dates in the Studio.
+
+**Hybrid model kept:** a `newsItem` either links to external coverage (`linkType: "external"`,
+`externalUrl`) or is a full article (`linkType: "article"`, `body` → /news/[slug]). All 12
+today are external, so **no detail pages build yet** — the route is wired and waiting.
+`data/news.ts` deleted (174 lines).
 
 ### F19 — Testimonials: two sets, zero overlap ✅ resolved
 

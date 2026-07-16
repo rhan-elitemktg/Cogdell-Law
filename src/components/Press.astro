@@ -1,29 +1,26 @@
 ---
 // Homepage "As seen in" press strip — an infinite, slow marquee of outlet logos.
-import { Image } from "astro:assets";
-import cnn from "../assets/press/cnn.png";
-import cbs from "../assets/press/cbs.png";
-import foxNews from "../assets/press/fox-news.png";
-import washingtonPost from "../assets/press/washington-post.png";
-import houstonChronicle from "../assets/press/houston-chronicle.png";
-import dallasMorningNews from "../assets/press/dallas-morning-news.png";
-import laTimes from "../assets/press/la-times.png";
-import texasTribune from "../assets/press/texas-tribune.png";
-import chicagoTribune from "../assets/press/chicago-tribune.png";
-import austinStatesman from "../assets/press/austin-american-statesman.png";
+//
+// Homepage-only, so it fetches its own content (D9). Logos live in Sanity (D6:
+// "as seen in" is a marketing claim the firm updates) and are served from
+// Sanity's CDN via urlFor rather than the astro:assets pipeline. Each logo is
+// shown at a fixed height with object-fit: contain, so width/height only prevent
+// layout shift.
+import { urlFor } from "../sanity/lib/image";
+import { getHomePress } from "../sanity/lib/homePage";
 
-const logos = [
-  { src: cnn, alt: "CNN" },
-  { src: cbs, alt: "CBS" },
-  { src: foxNews, alt: "Fox News" },
-  { src: washingtonPost, alt: "The Washington Post" },
-  { src: houstonChronicle, alt: "Houston Chronicle" },
-  { src: dallasMorningNews, alt: "The Dallas Morning News" },
-  { src: laTimes, alt: "Los Angeles Times" },
-  { src: texasTribune, alt: "The Texas Tribune" },
-  { src: chicagoTribune, alt: "Chicago Tribune" },
-  { src: austinStatesman, alt: "Austin American-Statesman" },
-];
+const logos = await getHomePress();
+
+if (!logos?.length) {
+  throw new Error(
+    "No press logos found on the Home Page in Sanity.\n" +
+      "Add them in the Studio at /admin → Home Page → Press, or seed them with:\n" +
+      "  npx sanity exec scripts/seed-press.ts --with-user-token",
+  );
+}
+
+// Displayed at 42px tall; serve 2× for retina crispness.
+const LOGO_RENDER_HEIGHT = 84;
 ---
 
 <section class="press" aria-label="Featured in the press">
@@ -32,7 +29,15 @@ const logos = [
       {
         logos.map((logo) => (
           <li class="press__item">
-            <Image src={logo.src} alt={logo.alt} class="press__logo" />
+            <img
+              src={urlFor(logo.image).height(LOGO_RENDER_HEIGHT).url()}
+              alt={logo.alt}
+              width={logo.dimensions?.width}
+              height={logo.dimensions?.height}
+              loading="lazy"
+              decoding="async"
+              class="press__logo"
+            />
           </li>
         ))
       }
@@ -40,7 +45,15 @@ const logos = [
       {
         logos.map((logo) => (
           <li class="press__item" aria-hidden="true">
-            <Image src={logo.src} alt="" class="press__logo" />
+            <img
+              src={urlFor(logo.image).height(LOGO_RENDER_HEIGHT).url()}
+              alt=""
+              width={logo.dimensions?.width}
+              height={logo.dimensions?.height}
+              loading="lazy"
+              decoding="async"
+              class="press__logo"
+            />
           </li>
         ))
       }

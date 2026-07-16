@@ -96,3 +96,32 @@ const HOME_FIRM_STORY_QUERY = defineQuery(`*[_id == "homePage"][0].firmStory{
 export async function getHomeFirmStory() {
   return await sanityClient.fetch(HOME_FIRM_STORY_QUERY);
 }
+
+const HOME_PRACTICE_REACH_QUERY = defineQuery(`*[_id == "homePage"][0].practiceReach{
+  eyebrow,
+  headingLead,
+  headingStrong,
+  lede,
+  stats[]{
+    _key,
+    label,
+    value
+  }
+}`);
+
+/** The "Where We Practice" band (map beside it is fixed art, not queried). */
+export async function getHomePracticeReach() {
+  return await sanityClient.fetch(HOME_PRACTICE_REACH_QUERY);
+}
+
+const HOME_PRESS_QUERY = defineQuery(`*[_id == "homePage"][0].press.logos[]{
+  _key,
+  alt,
+  image,
+  "dimensions": image.asset->metadata.dimensions
+}`);
+
+/** The "As seen in" logo strip. `dimensions` fills width/height to avoid layout shift. */
+export async function getHomePress() {
+  return await sanityClient.fetch(HOME_PRESS_QUERY);
+}

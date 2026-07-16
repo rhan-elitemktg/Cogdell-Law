@@ -2,12 +2,25 @@
 // Grid of press mentions / news. Paper-card cells with an accent top-rule wipe on
 // hover (same recipe as PracticeGrid, tuned for paper). External items link out in
 // a new tab with a ↗ affordance; owned posts link to /news/[slug] with an arrow.
-import { Image } from "astro:assets";
 import Eyebrow from "../Eyebrow.astro";
-import type { NewsItem, NewsMedia } from "../../data/news";
+import { urlFor } from "../../sanity/lib/image";
+
+type NewsMedia = "article" | "video" | "podcast";
+interface NewsCard {
+  _id: string;
+  title: string;
+  outlet: string;
+  media: NewsMedia;
+  summary: string;
+  ctaLabel?: string | null;
+  linkType?: string | null;
+  externalUrl?: string | null;
+  slug?: string | null;
+  outletLogo?: unknown;
+}
 
 interface Props {
-  items: NewsItem[];
+  items: NewsCard[];
   eyebrow?: string;
   headingLead?: string;
   headingStrong?: string;
@@ -59,8 +72,8 @@ const arrowIcon = '<path d="M5 12h14M13 6l6 6-6 6"/>';
     <div class="ngrid__grid">
       {
         items.map((item) => {
-          const external = Boolean(item.externalUrl);
-          const href = item.externalUrl ?? `/news/${item.slug}`;
+          const external = item.linkType === "external";
+          const href = external ? item.externalUrl! : `/news/${item.slug}`;
           const media = MEDIA[item.media];
           const cta = item.ctaLabel ?? media.verb;
           return (
@@ -73,9 +86,9 @@ const arrowIcon = '<path d="M5 12h14M13 6l6 6-6 6"/>';
               <div class="ngrid__top">
                 <span class="ngrid__outlet">
                   {item.outletLogo ? (
-                    <Image
+                    <img
                       class="ngrid__outlet-logo"
-                      src={item.outletLogo}
+                      src={urlFor(item.outletLogo).height(44).url()}
                       alt={item.outlet}
                       height={22}
                     />

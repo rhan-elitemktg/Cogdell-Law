@@ -1,48 +1,47 @@
 ---
 // Homepage "Common Questions" section — intro on the left, accordion on the right.
 // Native <details> with a shared name = exclusive accordion, no JS.
+//
+// Homepage-only, so it fetches its own content (D9). Questions are `faq`
+// documents (F1); the header is page copy (F16).
+import { PortableText } from "astro-portabletext";
 import Eyebrow from "./Eyebrow.astro";
+import FaqLede from "./faq/FaqLede.astro";
+import FaqAnswer from "./faq/FaqAnswer.astro";
+import { proseComponents } from "./prose/components";
+import { getFaqBand } from "../sanity/lib/faqs";
 
-const faqs = [
-  {
-    q: "How long do I have before charges are filed?",
-    a: "Federal investigations frequently run for months — sometimes years — before any indictment is handed down, and many people never realize they are a target until late in the process. That quiet window is precisely when an experienced defense lawyer can do the most good. By engaging counsel early, we can open a dialogue with prosecutors, present favorable evidence, challenge the government's assumptions, and in some cases persuade them not to bring charges at all. Once an indictment is filed, the options narrow and the stakes climb sharply. The single most valuable thing you can do is involve a lawyer the moment you suspect you are under scrutiny — not after the charges arrive at your door.",
-  },
-  {
-    q: "Should I speak with federal investigators?",
-    a: "Not before you speak with a lawyer. Federal agents are trained, experienced interviewers, and a friendly, casual conversation is rarely as harmless as it feels — anything you say can and will be used to build a case against you, including an offhand remark or an honest mistake about a date or a dollar figure. You are under no obligation to answer questions on the spot, and politely declining until you have counsel is not an admission of guilt; it is simply prudent. Once we represent you, we handle every communication with investigators directly, so you never have to navigate those conversations alone or risk saying something that is later twisted out of context.",
-  },
-  {
-    q: "What is the federal criminal process?",
-    a: "A federal case typically moves through several distinct stages: an investigation, a possible grand-jury indictment, an arraignment where the charges are formally read, a pretrial phase of motions and discovery, and — if the matter is not resolved — a trial, followed by sentencing or appeal. Each stage carries its own deadlines, risks, and opportunities, and the decisions made early often determine how the later ones unfold. We build a strategy from day one: scrutinizing how the evidence was gathered, filing motions to suppress anything obtained improperly, and preparing every case as though it will be tried in front of a jury. That readiness is frequently what brings the government to the table.",
-  },
-  {
-    q: "What does white collar defense cover?",
-    a: "White collar defense covers the broad category of financial and business-related offenses — wire and mail fraud, securities and bank fraud, health care fraud, money laundering, tax matters, embezzlement, and the conspiracy charges that often accompany them. These cases are document-heavy and complex, usually built over years by teams of agents, auditors, and forensic accountants long before the accused is ever contacted. Defending them well demands a lawyer who can master financial records, cross-examine expert witnesses, and tell a clear, persuasive story to a jury. We represent professionals, executives, and business owners at both the investigation and trial stages, working to dismantle the government's theory piece by piece.",
-  },
-  {
-    q: "Do you handle cases outside Houston?",
-    a: "Yes. While our office sits in downtown Houston, our practice reaches across Texas and into federal courtrooms nationwide. We regularly defend clients in Dallas, Fort Worth, Beaumont, Sherman, and beyond, and our reputation for trying — and winning — high-stakes cases travels with us. Federal criminal law is national in scope, and we are admitted and prepared to appear wherever a client needs us. Distance is rarely an obstacle: we coordinate closely with clients and local resources, manage the logistics, and bring the same relentless, trial-ready approach to every jurisdiction. If you are facing charges anywhere in the state, it is worth a conversation.",
-  },
-  {
-    q: "How much does a defense cost?",
-    a: "Every case is different, and so is its cost — the answer depends on the charges, the complexity of the evidence, the stage the matter has reached, and whether it ultimately goes to trial. What we promise is transparency: during your confidential consultation we discuss the likely scope of work and our fee structure openly, so you can make an informed decision without surprises. We treat a defense as an investment in your freedom, your reputation, and your future, and we are candid about what that requires of both of us. The consultation itself is privileged, and you are under no obligation afterward — call us and we will tell you plainly where you stand.",
-  },
-];
+const band = await getFaqBand();
+
+// The homepage curates which FAQs it shows via a reference array on the band, so
+// editors add/remove them right in the Home Page document (F1 / the about.featured
+// pattern). The master FAQ list lives as `faq` documents.
+const faqs = band?.questions ?? [];
+
+if (!band || !faqs.length) {
+  throw new Error(
+    "No FAQ band or questions found in Sanity.\n" +
+      "Add questions to the Home Page → FAQ section, or seed them with:\n" +
+      "  npx sanity exec scripts/seed-faqs.ts --with-user-token",
+  );
+}
 ---
 
 <section class="faq">
   <div class="container faq__inner">
     <div class="faq__intro">
-      <Eyebrow>Common Questions</Eyebrow>
+      <Eyebrow>{band.eyebrow}</Eyebrow>
       <h2 class="faq__heading">
-        <span class="faq__heading-lead">Answers to the Questions</span>
-        <span class="faq__heading-strong">That Matter Most.</span>
+        <span class="faq__heading-lead">{band.headingLead}</span>
+        <span class="faq__heading-strong">{band.headingStrong}</span>
       </h2>
-      <p class="faq__lede">
-        We understand that facing a serious legal matter raises urgent questions.
-        Here are answers to some of the most common inquiries we receive.
-      </p>
+      <PortableText
+        value={band.lede}
+        components={{
+          ...proseComponents,
+          block: { ...proseComponents.block, normal: FaqLede },
+        }}
+      />
     </div>
 
     <div class="faq__accordion">
@@ -50,11 +49,17 @@ const faqs = [
         faqs.map((item, i) => (
           <details class="faq__item" name="faq" open={i === 0}>
             <summary class="faq__summary">
-              <span class="faq__q">{item.q}</span>
+              <span class="faq__q">{item.question}</span>
               <svg class="faq__icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
             </summary>
             <div class="faq__answer">
-              <p>{item.a}</p>
+              <PortableText
+                value={item.answer}
+                components={{
+                  ...proseComponents,
+                  block: { ...proseComponents.block, normal: FaqAnswer },
+                }}
+              />
             </div>
           </details>
         ))
@@ -100,7 +105,7 @@ const faqs = [
     font-weight: 700;
     color: var(--cog-ink);
   }
-  .faq__lede {
+  .faq__intro :global(.faq__lede) {
     max-width: 380px;
     margin-top: var(--space-6);
     font-size: var(--text-base);
@@ -183,7 +188,7 @@ const faqs = [
   .faq__answer {
     padding: 0 var(--space-6) var(--space-6);
   }
-  .faq__answer p {
+  .faq__answer :global(p) {
     max-width: 72ch;
     font-size: var(--text-sm);
     line-height: 1.7;

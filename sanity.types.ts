@@ -91,6 +91,67 @@ export type CtaBarContent = {
   cta: CtaButton;
 };
 
+export type NewsItemReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "newsItem";
+};
+
+export type NewsBand = {
+  _type: "newsBand";
+  eyebrow: string;
+  headingLead: string;
+  headingStrong: string;
+  lede: BlockContent;
+  featured: NewsItemReference;
+};
+
+export type FaqReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "faq";
+};
+
+export type FaqBand = {
+  _type: "faqBand";
+  eyebrow: string;
+  headingLead: string;
+  headingStrong: string;
+  lede: BlockContent;
+  questions: Array<
+    {
+      _key: string;
+    } & FaqReference
+  >;
+};
+
+export type SanityImageAssetReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+};
+
+export type PressLogo = {
+  _type: "pressLogo";
+  image: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+  alt: string;
+};
+
+export type PracticeReachStat = {
+  _type: "practiceReachStat";
+  label: string;
+  value: string;
+};
+
 export type WhyChooseBand = {
   _type: "whyChooseBand";
   eyebrow: string;
@@ -165,6 +226,64 @@ export type CtaButton = {
   href: string;
 };
 
+export type NewsItem = {
+  _id: string;
+  _type: "newsItem";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title: string;
+  slug: Slug;
+  outlet: string;
+  outletLogo?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+  media: "article" | "video" | "podcast";
+  summary: string;
+  publishedAt?: string;
+  linkType: "external" | "article";
+  externalUrl?: string;
+  ctaLabel?: string;
+  body?: BlockContent;
+};
+
+export type SanityImageCrop = {
+  _type: "sanity.imageCrop";
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
+};
+
+export type SanityImageHotspot = {
+  _type: "sanity.imageHotspot";
+  x: number;
+  y: number;
+  height: number;
+  width: number;
+};
+
+export type Slug = {
+  _type: "slug";
+  current: string;
+  source?: string;
+};
+
+export type Faq = {
+  _id: string;
+  _type: "faq";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  orderRank?: string;
+  question: string;
+  answer: BlockContent;
+};
+
 export type Testimonial = {
   _id: string;
   _type: "testimonial";
@@ -176,13 +295,6 @@ export type Testimonial = {
   author: string;
   tag?: string;
   featured?: boolean;
-};
-
-export type SanityImageAssetReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
 };
 
 export type Attorney = {
@@ -221,28 +333,6 @@ export type Attorney = {
   pastPositions?: Array<string>;
   representativeCases?: Array<string>;
   consult?: ConsultContent;
-};
-
-export type SanityImageCrop = {
-  _type: "sanity.imageCrop";
-  top: number;
-  bottom: number;
-  left: number;
-  right: number;
-};
-
-export type SanityImageHotspot = {
-  _type: "sanity.imageHotspot";
-  x: number;
-  y: number;
-  height: number;
-  width: number;
-};
-
-export type Slug = {
-  _type: "slug";
-  current: string;
-  source?: string;
 };
 
 export type TrialResult = {
@@ -301,6 +391,11 @@ export type NewsPage = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  grid?: {
+    eyebrow: string;
+    headingLead: string;
+    headingStrong: string;
+  };
   consult?: ConsultContent;
 };
 
@@ -436,6 +531,26 @@ export type HomePage = {
   };
   testimonials?: TestimonialsBand;
   whyChoose?: WhyChooseBand;
+  practiceReach?: {
+    eyebrow: string;
+    headingLead: string;
+    headingStrong: string;
+    lede: BlockContent;
+    stats: Array<
+      {
+        _key: string;
+      } & PracticeReachStat
+    >;
+  };
+  press?: {
+    logos: Array<
+      {
+        _key: string;
+      } & PressLogo
+    >;
+  };
+  faq?: FaqBand;
+  news?: NewsBand;
   consult?: ConsultContent;
 };
 
@@ -456,7 +571,19 @@ export type FirmDetails = {
   _updatedAt: string;
   _rev: string;
   title: string;
+  tagline: string;
   phone: string;
+  email: string;
+  address?: {
+    street: string;
+    cityStateZip: string;
+  };
+  socials?: Array<{
+    platform: "facebook" | "x" | "linkedin" | "instagram" | "youtube";
+    url: string;
+    _type: "social";
+    _key: string;
+  }>;
   logo?: {
     asset?: SanityImageAssetReference;
     media?: unknown;
@@ -464,6 +591,13 @@ export type FirmDetails = {
     crop?: SanityImageCrop;
     _type: "image";
   };
+  copyrightNotice: string;
+  legalLinks?: Array<{
+    label: string;
+    href: string;
+    _type: "legalLink";
+    _key: string;
+  }>;
 };
 
 export type SanityImagePaletteSwatch = {
@@ -571,6 +705,13 @@ export type AllSanitySchemaTypes =
   | EducationEntry
   | ConsultContent
   | CtaBarContent
+  | NewsItemReference
+  | NewsBand
+  | FaqReference
+  | FaqBand
+  | SanityImageAssetReference
+  | PressLogo
+  | PracticeReachStat
   | WhyChooseBand
   | WhyChooseFeature
   | TestimonialsWallBand
@@ -580,12 +721,13 @@ export type AllSanitySchemaTypes =
   | PracticeAreaCard
   | SellingPoint
   | CtaButton
-  | Testimonial
-  | SanityImageAssetReference
-  | Attorney
+  | NewsItem
   | SanityImageCrop
   | SanityImageHotspot
   | Slug
+  | Faq
+  | Testimonial
+  | Attorney
   | TrialResult
   | Consult
   | CtaBar
@@ -727,33 +869,96 @@ export type CTA_BAR_QUERY_RESULT =
     }
   | null;
 
+// Source: src/sanity/lib/faqs.ts
+// Variable: FAQS_QUERY
+// Query: *[_type == "faq"] | order(orderRank){  _id,  question,  answer}
+export type FAQS_QUERY_RESULT = Array<{
+  _id: string;
+  question: string;
+  answer: BlockContent;
+}>;
+
+// Source: src/sanity/lib/faqs.ts
+// Variable: FAQ_BAND_QUERY
+// Query: *[_id == "homePage"][0].faq{  eyebrow,  headingLead,  headingStrong,  lede,  questions[]->{    _id,    question,    answer  }}
+export type FAQ_BAND_QUERY_RESULT = {
+  eyebrow: string;
+  headingLead: string;
+  headingStrong: string;
+  lede: BlockContent;
+  questions: Array<{
+    _id: string;
+    question: string;
+    answer: BlockContent;
+  }>;
+} | null;
+
 // Source: src/sanity/lib/firmDetails.ts
 // Variable: FIRM_DETAILS_QUERY
-// Query: *[_id == "firmDetails"][0]{  title,  phone,  logo{    ...,    "dimensions": asset->metadata.dimensions  }}
+// Query: *[_id == "firmDetails"][0]{  title,  tagline,  phone,  email,  address,  socials[]{    platform,    url  },  copyrightNotice,  legalLinks[]{    label,    href  },  logo{    ...,    "dimensions": asset->metadata.dimensions  }}
 export type FIRM_DETAILS_QUERY_RESULT =
   | {
       title: null;
+      tagline: null;
       phone: null;
+      email: null;
+      address: null;
+      socials: null;
+      copyrightNotice: null;
+      legalLinks: null;
       logo: null;
     }
   | {
       title: string;
+      tagline: null;
       phone: null;
+      email: null;
+      address: null;
+      socials: null;
+      copyrightNotice: null;
+      legalLinks: null;
       logo: null;
     }
   | {
       title: string | null;
+      tagline: null;
       phone: null;
+      email: null;
+      address: null;
+      socials: null;
+      copyrightNotice: null;
+      legalLinks: null;
       logo: null;
     }
   | {
       title: null;
+      tagline: null;
       phone: string;
+      email: string | null;
+      address: null;
+      socials: null;
+      copyrightNotice: null;
+      legalLinks: null;
       logo: null;
     }
   | {
       title: string;
+      tagline: string;
       phone: string;
+      email: string;
+      address: {
+        street: string;
+        cityStateZip: string;
+      } | null;
+      socials: Array<{
+        platform: "facebook" | "instagram" | "linkedin" | "x" | "youtube";
+        url: string;
+      }> | null;
+      copyrightNotice: string;
+      legalLinks: Array<{
+        label: string;
+        href: string;
+      }> | null;
       logo: {
         asset?: SanityImageAssetReference;
         media?: unknown;
@@ -841,6 +1046,118 @@ export type HOME_FIRM_STORY_QUERY_RESULT = null | {
     label: string;
     href: string;
   };
+};
+
+// Source: src/sanity/lib/homePage.ts
+// Variable: HOME_PRACTICE_REACH_QUERY
+// Query: *[_id == "homePage"][0].practiceReach{  eyebrow,  headingLead,  headingStrong,  lede,  stats[]{    _key,    label,    value  }}
+export type HOME_PRACTICE_REACH_QUERY_RESULT = null | {
+  eyebrow: string;
+  headingLead: string;
+  headingStrong: string;
+  lede: BlockContent;
+  stats: Array<{
+    _key: string;
+    label: string;
+    value: string;
+  }>;
+};
+
+// Source: src/sanity/lib/homePage.ts
+// Variable: HOME_PRESS_QUERY
+// Query: *[_id == "homePage"][0].press.logos[]{  _key,  alt,  image,  "dimensions": image.asset->metadata.dimensions}
+export type HOME_PRESS_QUERY_RESULT = Array<{
+  _key: string;
+  alt: string;
+  image: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+  dimensions: SanityImageDimensions | null;
+}> | null;
+
+// Source: src/sanity/lib/news.ts
+// Variable: ALL_NEWS_QUERY
+// Query: *[_type == "newsItem"] | order(coalesce(publishedAt, _createdAt) desc){  _id,  title,  outlet,  media,  summary,  ctaLabel,  linkType,  externalUrl,  "slug": slug.current,  "date": coalesce(publishedAt, _createdAt),  outletLogo}
+export type ALL_NEWS_QUERY_RESULT = Array<{
+  _id: string;
+  title: string;
+  outlet: string;
+  media: "article" | "podcast" | "video";
+  summary: string;
+  ctaLabel: string | null;
+  linkType: "article" | "external";
+  externalUrl: string | null;
+  slug: string;
+  date: string;
+  outletLogo: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  } | null;
+}>;
+
+// Source: src/sanity/lib/news.ts
+// Variable: NEWS_BAND_QUERY
+// Query: *[_id == "homePage"][0].news{  eyebrow,  headingLead,  headingStrong,  lede,  "featured": featured->{  _id,  title,  outlet,  media,  summary,  ctaLabel,  linkType,  externalUrl,  "slug": slug.current,  "date": coalesce(publishedAt, _createdAt),  outletLogo},  "featuredId": featured._ref}
+export type NEWS_BAND_QUERY_RESULT = {
+  eyebrow: string;
+  headingLead: string;
+  headingStrong: string;
+  lede: BlockContent;
+  featured: {
+    _id: string;
+    title: string;
+    outlet: string;
+    media: "article" | "podcast" | "video";
+    summary: string;
+    ctaLabel: string | null;
+    linkType: "article" | "external";
+    externalUrl: string | null;
+    slug: string;
+    date: string;
+    outletLogo: {
+      asset?: SanityImageAssetReference;
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      _type: "image";
+    } | null;
+  };
+  featuredId: string;
+} | null;
+
+// Source: src/sanity/lib/news.ts
+// Variable: NEWS_ITEM_QUERY
+// Query: *[_type == "newsItem" && slug.current == $slug][0]{  _id,  title,  outlet,  summary,  body,  "slug": slug.current}
+export type NEWS_ITEM_QUERY_RESULT = {
+  _id: string;
+  title: string;
+  outlet: string;
+  summary: string;
+  body: BlockContent | null;
+  slug: string;
+} | null;
+
+// Source: src/sanity/lib/news.ts
+// Variable: OWNED_NEWS_SLUGS_QUERY
+// Query: *[_type == "newsItem" && linkType == "article" && defined(slug.current)]{"slug": slug.current}
+export type OWNED_NEWS_SLUGS_QUERY_RESULT = Array<{
+  slug: string;
+}>;
+
+// Source: src/sanity/lib/news.ts
+// Variable: NEWS_GRID_HEADER_QUERY
+// Query: *[_id == "newsPage"][0].grid{  eyebrow,  headingLead,  headingStrong}
+export type NEWS_GRID_HEADER_QUERY_RESULT = null | {
+  eyebrow: string;
+  headingLead: string;
+  headingStrong: string;
 };
 
 // Source: src/sanity/lib/practiceAreasBand.ts
@@ -939,12 +1256,21 @@ declare module "@sanity/client" {
     "*[_id == $pageId][0].attorneys{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  lede\n}": ATTORNEYS_BAND_QUERY_RESULT;
     'coalesce(\n  *[_id == $pageId][0].consult,\n  *[_id == "consult"][0].content\n){\n  eyebrow,\n  headingLead,\n  headingStrong,\n  body,\n  fineprint,\n  thankYou\n}': CONSULT_QUERY_RESULT;
     'coalesce(\n  *[_id == $pageId][0].ctaBar,\n  *[_id == "ctaBar"][0].content\n){\n  eyebrow,\n  headingLead,\n  headingRest,\n  body,\n  cta{\n    label,\n    href\n  }\n}': CTA_BAR_QUERY_RESULT;
-    '*[_id == "firmDetails"][0]{\n  title,\n  phone,\n  logo{\n    ...,\n    "dimensions": asset->metadata.dimensions\n  }\n}': FIRM_DETAILS_QUERY_RESULT;
+    '*[_type == "faq"] | order(orderRank){\n  _id,\n  question,\n  answer\n}': FAQS_QUERY_RESULT;
+    '*[_id == "homePage"][0].faq{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  lede,\n  questions[]->{\n    _id,\n    question,\n    answer\n  }\n}': FAQ_BAND_QUERY_RESULT;
+    '*[_id == "firmDetails"][0]{\n  title,\n  tagline,\n  phone,\n  email,\n  address,\n  socials[]{\n    platform,\n    url\n  },\n  copyrightNotice,\n  legalLinks[]{\n    label,\n    href\n  },\n  logo{\n    ...,\n    "dimensions": asset->metadata.dimensions\n  }\n}': FIRM_DETAILS_QUERY_RESULT;
     '*[_id == "homePage"][0].hero{\n  eyebrow,\n  titleAccent,\n  titleSecond,\n  lead,\n  ctas[]{\n    _key,\n    label,\n    href\n  },\n  caption{\n    name,\n    role,\n    watchLabel,\n    video->{\n      wistiaId\n    }\n  }\n}': HOME_HERO_QUERY_RESULT;
     '*[_id == "homePage"][0].sellingPoints.points[]{\n  _key,\n  value,\n  label\n}': HOME_SELLING_POINTS_QUERY_RESULT;
     '*[_id == "homePage"][0].about{\n  eyebrow,\n  titleLead,\n  titleStrong,\n  body,\n  resultsEyebrow,\n  quote,\n  featured[]->{\n    _id,\n    "outcome": coalesce(teaser.outcome, outcome),\n    "caseName": coalesce(teaser.title, name),\n    "note": coalesce(teaser.note, note)\n  }\n}': HOME_ABOUT_QUERY_RESULT;
     '*[_id == "homePage"][0].statement{\n  eyebrow,\n  headingItalic,\n  headingBold,\n  body,\n  cta{\n    label,\n    href\n  }\n}': HOME_STATEMENT_QUERY_RESULT;
     '*[_id == "homePage"][0].firmStory{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  body,\n  cta{\n    label,\n    href\n  }\n}': HOME_FIRM_STORY_QUERY_RESULT;
+    '*[_id == "homePage"][0].practiceReach{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  lede,\n  stats[]{\n    _key,\n    label,\n    value\n  }\n}': HOME_PRACTICE_REACH_QUERY_RESULT;
+    '*[_id == "homePage"][0].press.logos[]{\n  _key,\n  alt,\n  image,\n  "dimensions": image.asset->metadata.dimensions\n}': HOME_PRESS_QUERY_RESULT;
+    '*[_type == "newsItem"] | order(coalesce(publishedAt, _createdAt) desc){\n  _id,\n  title,\n  outlet,\n  media,\n  summary,\n  ctaLabel,\n  linkType,\n  externalUrl,\n  "slug": slug.current,\n  "date": coalesce(publishedAt, _createdAt),\n  outletLogo\n}': ALL_NEWS_QUERY_RESULT;
+    '*[_id == "homePage"][0].news{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  lede,\n  "featured": featured->{\n  _id,\n  title,\n  outlet,\n  media,\n  summary,\n  ctaLabel,\n  linkType,\n  externalUrl,\n  "slug": slug.current,\n  "date": coalesce(publishedAt, _createdAt),\n  outletLogo\n},\n  "featuredId": featured._ref\n}': NEWS_BAND_QUERY_RESULT;
+    '*[_type == "newsItem" && slug.current == $slug][0]{\n  _id,\n  title,\n  outlet,\n  summary,\n  body,\n  "slug": slug.current\n}': NEWS_ITEM_QUERY_RESULT;
+    '*[_type == "newsItem" && linkType == "article" && defined(slug.current)]{"slug": slug.current}': OWNED_NEWS_SLUGS_QUERY_RESULT;
+    '*[_id == "newsPage"][0].grid{\n  eyebrow,\n  headingLead,\n  headingStrong\n}': NEWS_GRID_HEADER_QUERY_RESULT;
     "*[_id == $pageId][0].practiceAreas{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  description,\n  cards[]{\n    _key,\n    icon,\n    title,\n    desc\n  }\n}": PRACTICE_AREAS_BAND_QUERY_RESULT;
     '*[\n  _type == "testimonial" && featured == true\n] | order(orderRank) [0...3]{\n  _id,\n  quote,\n  author,\n  tag\n}': FEATURED_TESTIMONIALS_QUERY_RESULT;
     '*[_type == "testimonial"] | order(orderRank){\n  _id,\n  quote,\n  author\n}': ALL_TESTIMONIALS_QUERY_RESULT;

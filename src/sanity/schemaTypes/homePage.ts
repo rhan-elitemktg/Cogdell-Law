@@ -307,6 +307,79 @@ export const homePage = defineType({
       options: { collapsible: true, collapsed: true },
     }),
     defineField({
+      name: "practiceReach",
+      title: "Practice Reach",
+      type: "object",
+      options: { collapsible: true, collapsed: true },
+      fields: [
+        defineField({
+          name: "eyebrow",
+          title: "Eyebrow",
+          type: "string",
+          validation: (rule) => rule.required(),
+        }),
+        defineField({
+          name: "headingLead",
+          title: "Heading — italic",
+          type: "string",
+          description: 'The italic first line — e.g. "Based in Houston.".',
+          validation: (rule) => rule.required(),
+        }),
+        defineField({
+          name: "headingStrong",
+          title: "Heading — bold",
+          type: "string",
+          description: 'The bold second line — e.g. "Available Nationwide.".',
+          validation: (rule) => rule.required(),
+        }),
+        defineField({
+          name: "lede",
+          title: "Lede",
+          type: "blockContent",
+          description:
+            "The paragraph under the heading. This band styles paragraphs only. The US map beside it is fixed reference art and isn't editable.",
+          validation: (rule) => rule.required().min(1),
+        }),
+        defineField({
+          name: "stats",
+          title: "Stats",
+          type: "array",
+          of: [defineArrayMember({ type: "practiceReachStat" })],
+          description: "Shown in this order; the row wraps, so any number fits.",
+          validation: (rule) => rule.required().min(1),
+        }),
+      ],
+    }),
+    defineField({
+      name: "press",
+      title: "Press",
+      type: "object",
+      options: { collapsible: true, collapsed: true },
+      fields: [
+        defineField({
+          name: "logos",
+          title: "Logos",
+          type: "array",
+          of: [defineArrayMember({ type: "pressLogo" })],
+          description:
+            "The scrolling \"As seen in\" strip. Shown in this order and looped seamlessly.",
+          validation: (rule) => rule.required().min(1),
+        }),
+      ],
+    }),
+    defineField({
+      name: "faq",
+      title: "FAQ",
+      type: "faqBand",
+      options: { collapsible: true, collapsed: true },
+    }),
+    defineField({
+      name: "news",
+      title: "News",
+      type: "newsBand",
+      options: { collapsible: true, collapsed: true },
+    }),
+    defineField({
       name: "consult",
       title: "Consult override",
       type: "consultContent",
