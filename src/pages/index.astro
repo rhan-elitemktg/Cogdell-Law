@@ -4,7 +4,7 @@ import Hero from "../components/Hero.astro";
 import SellingPoints from "../components/SellingPoints.astro";
 import PracticeAreas from "../components/PracticeAreas.astro";
 import About from "../components/About.astro";
-import VideoBand from "../components/VideoBand.astro";
+import StatementBand from "../components/StatementBand.astro";
 import CtaBar from "../components/CtaBar.astro";
 import Attorneys from "../components/Attorneys.astro";
 import FirmStory from "../components/FirmStory.astro";
@@ -13,24 +13,74 @@ import WhyChoose from "../components/WhyChoose.astro";
 import PracticeReach from "../components/PracticeReach.astro";
 import Press from "../components/Press.astro";
 import Faq from "../components/Faq.astro";
-import Blog from "../components/Blog.astro";
+import News from "../components/News.astro";
 import Consult from "../components/Consult.astro";
+import { getHomeSellingPoints } from "../sanity/lib/homePage";
+import { getPracticeAreasBand } from "../sanity/lib/practiceAreasBand";
+import { getAttorneysBand } from "../sanity/lib/attorneys";
+import { getTestimonialsBand } from "../sanity/lib/testimonials";
+import { getWhyChooseBand } from "../sanity/lib/whyChoose";
+
+// Both components are shared with other pages, so this page supplies the content.
+const sellingPoints = await getHomeSellingPoints();
+const practiceAreas = await getPracticeAreasBand("homePage");
+const attorneysBand = await getAttorneysBand("homePage");
+const testimonialsBand = await getTestimonialsBand("homePage");
+const whyChooseBand = await getWhyChooseBand("homePage");
+
+if (!sellingPoints?.length) {
+  throw new Error(
+    "No Selling Points found on the Home Page in Sanity.\n" +
+      "Add them in the Studio at /admin → Home Page, or seed them with:\n" +
+      "  npx sanity exec scripts/seed-selling-points.ts --with-user-token",
+  );
+}
+
+if (!whyChooseBand) {
+  throw new Error(
+    "No Why Choose band found in Sanity for this page.\n" +
+      "Seed it with: npx sanity exec scripts/seed-why-choose.ts --with-user-token",
+  );
+}
+
+if (!testimonialsBand) {
+  throw new Error(
+    "No Testimonials band found in Sanity for this page.\n" +
+      "Seed it with: npx sanity exec scripts/seed-testimonials.ts --with-user-token",
+  );
+}
+
+if (!attorneysBand) {
+  throw new Error(
+    "No Attorneys Band found on the Home Page in Sanity.\n" +
+      "Add it in the Studio at /admin → Home Page, or seed it with:\n" +
+      "  npx sanity exec scripts/seed-attorneys-band.ts --with-user-token",
+  );
+}
+
+if (!practiceAreas) {
+  throw new Error(
+    "No Practice Areas band found on the Home Page in Sanity.\n" +
+      "Add it in the Studio at /admin → Home Page, or seed it with:\n" +
+      "  npx sanity exec scripts/seed-practice-areas.ts --with-user-token",
+  );
+}
 ---
 
 <Layout title="Cogdell Law" videoEmbed>
   <Hero />
-  <SellingPoints />
-  <PracticeAreas />
+  <SellingPoints points={sellingPoints} />
+  <PracticeAreas band={practiceAreas} />
   <About />
-  <VideoBand />
-  <CtaBar />
-  <Attorneys />
+  <StatementBand />
+  <CtaBar pageId="homePage" />
+  <Attorneys band={attorneysBand} />
   <FirmStory />
-  <Testimonials />
-  <WhyChoose />
+  <Testimonials band={testimonialsBand} />
+  <WhyChoose band={whyChooseBand} />
   <PracticeReach />
   <Press />
   <Faq />
-  <Blog />
-  <Consult />
+  <News />
+  <Consult pageId="homePage" />
 </Layout>

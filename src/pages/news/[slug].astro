@@ -1,32 +1,29 @@
 ---
-// Owned news/post detail page at /news/[slug]. Only builds for items that carry
-// their own `body` and no `externalUrl` (external press mentions link straight
-// out from the index and never reach here). Same format as the practice leaf page.
+// Owned news article at /news/[slug]. Builds only for items with linkType
+// "article" (external mentions link straight out and never reach here).
+import { PortableText } from "astro-portabletext";
 import Layout from "../../layouts/Layout.astro";
 import Breadcrumb from "../../components/practice/Breadcrumb.astro";
 import PageHero from "../../components/PageHero.astro";
-import PracticeBody from "../../components/practice/PracticeBody.astro";
 import CtaBar from "../../components/CtaBar.astro";
 import Consult from "../../components/Consult.astro";
-import { getNewsPaths } from "../../data/news";
-import type { NewsItem } from "../../data/news";
+import { proseComponents } from "../../components/prose/components";
+import { getNewsItem, getOwnedNewsSlugs } from "../../sanity/lib/news";
 import type { Crumb } from "../../data/practice-areas";
 
-export function getStaticPaths() {
-  return getNewsPaths();
+export async function getStaticPaths() {
+  const slugs = await getOwnedNewsSlugs();
+  return slugs.map(({ slug }) => ({ params: { slug } }));
 }
 
-interface Props {
-  item: NewsItem;
+const { slug } = Astro.params;
+const item = await getNewsItem(slug!);
+
+if (!item) {
+  throw new Error(`No news article found in Sanity for slug "${slug}".`);
 }
 
-const { item } = Astro.props;
-
-const trail: Crumb[] = [
-  { title: "News", href: "/news" },
-  { title: item.title },
-];
-
+const trail: Crumb[] = [{ title: "News", href: "/news" }, { title: item.title }];
 const description = item.summary ?? `${item.title} — Cogdell Law Firm.`;
 ---
 
@@ -45,8 +42,19 @@ const description = item.summary ?? `${item.title} — Cogdell Law Firm.`;
     </a>
   </PageHero>
 
-  <PracticeBody intro={item.body} />
+  <section class="news-article">
+    <div class="container news-article__body">
+      <PortableText value={item.body} components={proseComponents} />
+    </div>
+  </section>
 
   <CtaBar />
   <Consult />
 </Layout>
+
+<style>
+  .news-article__body {
+    max-width: 760px;
+    padding-block: var(--space-section);
+  }
+</style>

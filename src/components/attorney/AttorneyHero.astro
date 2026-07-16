@@ -3,12 +3,13 @@
 // photo across every attorney, per brand) with the profile card overlapping up
 // into it — portrait, name, contact, and practice-area tags.
 import { Image } from "astro:assets";
-import type { Attorney } from "../../data/attorneys";
+import { urlFor } from "../../sanity/lib/image";
+import type { AttorneyDoc } from "../../sanity/lib/attorneys";
 // Shared hero image for ALL attorney bios (matches the Trial Experience hero).
 import heroImage from "../../assets/firm-steps.jpg";
 
 interface Props {
-  attorney: Attorney;
+  attorney: AttorneyDoc;
 }
 
 const { attorney }: Props = Astro.props;
@@ -37,12 +38,15 @@ const emailHref = attorney.email ? `mailto:${attorney.email}` : "#contact";
 <section class="a-profile">
   <div class="container">
     <div class="a-profile__card">
-      <Image
-        src={attorney.photo}
+      <img
+        src={urlFor(attorney.photo).width(520).url()}
+        srcset={[260, 400, 520].map((w) => `${urlFor(attorney.photo).width(w).url()} ${w}w`).join(", ")}
         alt={attorney.photoAlt}
-        widths={[260, 400, 520]}
         sizes="(max-width: 860px) 220px, 260px"
         loading="eager"
+        decoding="async"
+        width={790}
+        height={790}
         class="a-profile__photo"
       />
       <div class="a-profile__meta">

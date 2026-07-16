@@ -2,8 +2,24 @@
 // Homepage "Why Cogdell" band — full-bleed courthouse-steps photo with a
 // bottom-solid scrim and centered firm story + CTA.
 import { Image } from "astro:assets";
+import { PortableText } from "astro-portabletext";
+import { proseComponents } from "./prose/components";
 import Eyebrow from "./Eyebrow.astro";
+import FirmStoryBody from "./firm/FirmStoryBody.astro";
 import bgPhoto from "../assets/firm-steps.jpg";
+import { getHomeFirmStory } from "../sanity/lib/homePage";
+
+// Homepage-only, so it fetches its own content (D9). The courthouse photo is
+// art direction and stays in the repo (D6).
+const story = await getHomeFirmStory();
+
+if (!story) {
+  throw new Error(
+    "No Firm Story found on the Home Page in Sanity.\n" +
+      "Add it in the Studio at /admin → Home Page, or seed it with:\n" +
+      "  npx sanity exec scripts/seed-firm-story.ts --with-user-token",
+  );
+}
 ---
 
 <section class="firm-story">
@@ -17,39 +33,21 @@ import bgPhoto from "../assets/firm-steps.jpg";
   <div class="firm-story__overlay" aria-hidden="true"></div>
 
   <div class="firm-story__inner">
-    <Eyebrow center rule={false} tone="white">Why Cogdell Law Firm</Eyebrow>
+    <Eyebrow center rule={false} tone="white">{story.eyebrow}</Eyebrow>
     <h2 class="firm-story__heading">
-      <span class="firm-story__heading-lead">The Firm the Opposition</span>
+      <span class="firm-story__heading-lead">{story.headingLead}</span>
       <br/>
-      <span class="firm-story__heading-strong"> Doesn't Want to Face.</span>
+      <span class="firm-story__heading-strong"> {story.headingStrong}</span>
     </h2>
 
-    <p class="firm-story__body">
-      When the gavel sounds, and the courtroom doors swing open, there's one name
-      that makes the opposition quake in their polished loafers: Cogdell Law Firm.
-      It isn't just a law firm; it's the law firm of choice for people facing
-      charges for federal white collar and criminal offenses, state felony
-      charges, grand jury investigations, medical kickback, securities fraud or
-      criminal appeals.
-    </p>
-    <p class="firm-story__body">
-      Dan Cogdell is one of the elite 2% of attorneys admitted to the Fellow
-      American College of Trial Lawyers. His reputation for strategy and skill
-      isn't just respected, it's revered. Mr. Cogdell knows the play before the
-      opposition's even decided on the game. Settlements are his specialty, but
-      should a trial beckon, he's the maestro ready to conduct a legal symphony
-      like no other.
-    </p>
-    <p class="firm-story__body">
-      Mr. Cogdell has spent his career collecting acquittals in cases written off
-      by others. Impossible isn't in his lexicon — it's just another word for
-      challenge. He doesn't take cases he thinks he can win; he takes those he
-      knows he will.
-    </p>
+    <PortableText value={story.body} components={{
+          ...proseComponents,
+          block: { ...proseComponents.block, normal: FirmStoryBody },
+        }} />
 
     <div class="firm-story__actions">
-      <a href="/our-firm" class="btn btn--primary">
-        About the Firm
+      <a href={story.cta?.href} class="btn btn--primary">
+        {story.cta?.label}
         <svg class="btn__icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
       </a>
     </div>
@@ -117,7 +115,7 @@ import bgPhoto from "../assets/firm-steps.jpg";
     color: var(--cog-white);
   }
 
-  .firm-story__body {
+  .firm-story__inner :global(.firm-story__body) {
     max-width: 760px;
     margin-inline: auto;
     margin-top: var(--space-6);

@@ -3,8 +3,25 @@
 // header and a horizontal carousel of glassy feature cards.
 import { Image } from "astro:assets";
 import Eyebrow from "./Eyebrow.astro";
+
+// `band` is supplied by the page: this component is shared between / and
+// /attorneys and each holds its own copy (D9, D11). The boardroom photo is art
+// direction and stays in the repo (D6).
+interface Props {
+  band: {
+    eyebrow: string | null;
+    headingLead: string | null;
+    headingStrong: string | null;
+    features: { _key: string; icon: string | null; title: string | null; body: string | null }[] | null;
+  };
+}
+const { band } = Astro.props;
+const features = band.features ?? [];
 import bgPhoto from "../assets/whychoose-bg.jpg";
 
+// Lucide-style icon inner-paths (viewBox 0 0 24 24), rendered inline via set:html.
+// Presentation, so it stays in code — Sanity only stores the key. Keep in sync
+// with WHY_CHOOSE_ICONS in src/sanity/schemaTypes/whyChooseFeature.ts.
 const icons: Record<string, string> = {
   trophy:
     '<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>',
@@ -15,28 +32,6 @@ const icons: Record<string, string> = {
     '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><circle cx="12" cy="10" r="2"/><path d="M9 15a3 3 0 0 1 6 0"/>',
 };
 
-const features = [
-  {
-    icon: "trophy",
-    title: "Trial-First Approach",
-    body: "Insurance companies and prosecutors settle because they know we will try the case. That changes everything.",
-  },
-  {
-    icon: "landmark",
-    title: "National Reach",
-    body: "Licensed and experienced in federal courts across the country. Your case isn't limited by geography.",
-  },
-  {
-    icon: "check",
-    title: "Proven Track Record",
-    body: "Over 500 jury trials. Exposed corruption, won acquittals, and secured landmark verdicts.",
-  },
-  {
-    icon: "shield",
-    title: "Accessible & Personal",
-    body: "Dan Cogdell personally handles every case. No hand-offs to junior associates.",
-  },
-];
 ---
 
 <section class="why-choose">
@@ -51,10 +46,10 @@ const features = [
 
   <div class="container why-choose__inner">
     <div class="why-choose__head">
-    <Eyebrow center rule={false}>The Cogdell Difference</Eyebrow>
+    <Eyebrow center rule={false}>{band.eyebrow}</Eyebrow>
       <h2 class="why-choose__heading">
-        <span class="why-choose__heading-lead">Why Choose</span>
-        <span class="why-choose__heading-strong">Cogdell Law Firm.</span>
+        <span class="why-choose__heading-lead">{band.headingLead}</span>
+        <span class="why-choose__heading-strong">{band.headingStrong}</span>
       </h2>
     </div>
 
@@ -82,7 +77,7 @@ const features = [
               stroke-linecap="round"
               stroke-linejoin="round"
               aria-hidden="true"
-              set:html={icons[f.icon]}
+              set:html={icons[f.icon ?? ""]}
             />
             <h3 class="why-choose__card-title">{f.title}</h3>
             <p class="why-choose__card-body">{f.body}</p>
@@ -212,11 +207,9 @@ const features = [
     -webkit-backdrop-filter: blur(2px);
     transition:
       background-color var(--transition),
-      transform var(--transition);
   }
   .why-choose__card:hover {
     background-color: rgba(12, 21, 38, 0.86);
-    transform: translateY(-4px);
   }
   .why-choose__icon {
     color: var(--cog-accent);

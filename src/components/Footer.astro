@@ -5,12 +5,39 @@ import logo from "../assets/cogdell-logo-light.png";
 import { getFirmDetails } from "../sanity/lib/firmDetails";
 
 const firm = await getFirmDetails();
-const phone = firm?.phone ?? "713-426-2244";
+
+if (!firm) {
+  throw new Error(
+    "No Firm Details found in Sanity.\n" +
+      "Fill them at /admin → Firm Details, or seed with:\n" +
+      "  npx sanity exec scripts/seed-firm-details.ts --with-user-token",
+  );
+}
+
+const phone = firm.phone!;
 const phoneHref = `tel:+1${phone.replace(/[^0-9]/g, "")}`;
 const year = new Date().getFullYear();
 
-const mapQuery = "Cogdell Law Firm, 712 Main St Ste 2400, Houston, TX 77002";
+// Map is derived from the firm address, so it follows a single source of truth.
+const mapQuery = `${firm.title}, ${firm.address?.street}, ${firm.address?.cityStateZip}`;
 const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(mapQuery)}&z=15&output=embed`;
+
+// SVG glyphs live in code, keyed by platform; the Studio only holds URLs.
+const SOCIAL_PATHS: Record<string, string> = {
+  facebook: '<path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>',
+  x: '<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>',
+  linkedin: '<path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-12h4v1.6A6 6 0 0 1 16 8z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/>',
+  instagram: '<rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/>',
+  youtube: '<path d="M22 12s0-3.5-.4-5.2a2.7 2.7 0 0 0-1.9-1.9C17.9 4.5 12 4.5 12 4.5s-5.9 0-7.7.4A2.7 2.7 0 0 0 2.4 6.8 28 28 0 0 0 2 12a28 28 0 0 0 .4 5.2 2.7 2.7 0 0 0 1.9 1.9c1.8.4 7.7.4 7.7.4s5.9 0 7.7-.4a2.7 2.7 0 0 0 1.9-1.9C22 15.5 22 12 22 12z"/><path d="m10 15 5-3-5-3z"/>',
+};
+const SOCIAL_LABELS: Record<string, string> = {
+  facebook: "Facebook",
+  x: "X",
+  linkedin: "LinkedIn",
+  instagram: "Instagram",
+  youtube: "YouTube",
+};
+const socials = (firm.socials ?? []).filter((s) => s.platform && SOCIAL_PATHS[s.platform]);
 
 const practiceLinks = [
   { label: "Federal Criminal Cases", href: "/practice-areas/federal-criminal-cases" },
@@ -25,11 +52,6 @@ const firmLinks = [
   { label: "News", href: "/news" },
 ];
 
-const socials = [
-  { label: "Facebook", href: "#", path: '<path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>' },
-  { label: "X", href: "#", path: '<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>' },
-  { label: "LinkedIn", href: "#", path: '<path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-12h4v1.6A6 6 0 0 1 16 8z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/>' },
-];
 ---
 
 <footer class="footer">
@@ -40,10 +62,7 @@ const socials = [
         <a href="/" class="footer__logo" aria-label="Cogdell Law Firm — home">
           <Image src={logo} alt="Cogdell Law Firm" densities={[1, 2]} />
         </a>
-        <p class="footer__tagline">
-          Trusted Texas counsel for high-stakes federal and white collar
-          criminal defense — legal triumphs are a tradition.
-        </p>
+        <p class="footer__tagline">{firm.tagline}</p>
 
         <ul class="footer__contact">
           <li class="footer__contact-item">
@@ -61,7 +80,7 @@ const socials = [
             </span>
             <div>
               <span class="footer__contact-label">Email</span>
-              <a class="footer__contact-value" href="mailto:info@cogdell-law.com">info@cogdell-law.com</a>
+              <a class="footer__contact-value" href={`mailto:${firm.email}`}>{firm.email}</a>
             </div>
           </li>
           <li class="footer__contact-item">
@@ -70,7 +89,7 @@ const socials = [
             </span>
             <div>
               <span class="footer__contact-label">Office</span>
-              <span class="footer__contact-value">712 Main St., Suite 2400 <br/>Houston, TX 77002</span>
+              <span class="footer__contact-value">{firm.address?.street} <br/>{firm.address?.cityStateZip}</span>
             </div>
           </li>
         </ul>
@@ -79,8 +98,8 @@ const socials = [
           {
             socials.map((s) => (
               <li>
-                <a class="footer__social-link" href={s.href} aria-label={s.label}>
-                  <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true" set:html={s.path} />
+                <a class="footer__social-link" href={s.url} aria-label={SOCIAL_LABELS[s.platform!]} target="_blank">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true" set:html={SOCIAL_PATHS[s.platform!]} />
                 </a>
               </li>
             ))
@@ -122,10 +141,17 @@ const socials = [
 
     <div class="footer__bottom">
       <div class="footer__legal">
-        <p>© {year} Cogdell Law Firm. All rights reserved.</p>
+        <p>© {year} {firm.title}. {firm.copyrightNotice}</p>
+        &nbsp;
         <nav class="footer__legal-links" aria-label="Legal">
-          <a href="/privacy">Privacy Policy | </a>
-          <a href="/disclaimer">Disclaimer</a>
+          {
+            (firm.legalLinks ?? []).map((l, i) => (
+              <>
+                {i > 0 && <span class="footer__legal-sep" aria-hidden="true"> | </span>}
+                <a href={l.href}>{l.label}</a>
+              </>
+            ))
+          }
         </nav>
       </div>
       <a
@@ -306,6 +332,9 @@ const socials = [
     gap: var(--space-1);
     font-size: var(--text-sm);
     transition: color var(--transition);
+  }
+  .footer__legal-sep {
+    color: var(--cog-muted);
   }
   .footer__legal-links a {
     text-decoration: none;

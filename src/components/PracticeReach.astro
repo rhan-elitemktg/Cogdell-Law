@@ -1,30 +1,43 @@
 ---
 // Homepage "Where We Practice" band — Houston-based / nationwide reach, with a
 // US map that highlights Texas and marks Houston.
+import { PortableText } from "astro-portabletext";
 import Eyebrow from "./Eyebrow.astro";
+import PracticeReachLede from "./reach/PracticeReachLede.astro";
+import { proseComponents } from "./prose/components";
+// The US map is fixed reference geometry, not content — it stays in code (D6).
 import { US_BASE_PATH, TX_PATH, US_MAP_VIEWBOX, HOUSTON } from "../data/us-states";
+import { getHomePracticeReach } from "../sanity/lib/homePage";
 
-const stats = [
-  { label: "Principal Office", value: "Houston, Texas" },
-  { label: "State Courts", value: "Throughout Texas" },
-  { label: "Federal Courts", value: "Nationwide" },
-];
+// Homepage-only, so it fetches its own content (D9).
+const reach = await getHomePracticeReach();
+
+if (!reach) {
+  throw new Error(
+    "No Practice Reach band found on the Home Page in Sanity.\n" +
+      "Add it in the Studio at /admin → Home Page, or seed it with:\n" +
+      "  npx sanity exec scripts/seed-practice-reach.ts --with-user-token",
+  );
+}
+
+const stats = reach.stats ?? [];
 ---
 
 <section class="practice-reach">
   <div class="container practice-reach__inner">
     <div class="practice-reach__body">
-      <Eyebrow>Where We Practice</Eyebrow>
+      <Eyebrow>{reach.eyebrow}</Eyebrow>
       <h2 class="practice-reach__heading">
-        <span class="practice-reach__heading-lead">Based in Houston.</span>
-        <span class="practice-reach__heading-strong">Available Nationwide.</span>
+        <span class="practice-reach__heading-lead">{reach.headingLead}</span>
+        <span class="practice-reach__heading-strong">{reach.headingStrong}</span>
       </h2>
-      <p class="practice-reach__lede">
-        Our principal office is in downtown Houston, but our practice reaches
-        every federal courtroom in the country. We regularly try cases across
-        Texas and in federal districts nationwide — wherever our clients need us,
-        we go.
-      </p>
+      <PortableText
+        value={reach.lede}
+        components={{
+          ...proseComponents,
+          block: { ...proseComponents.block, normal: PracticeReachLede },
+        }}
+      />
       <dl class="practice-reach__stats">
         {
           stats.map((s) => (
@@ -85,7 +98,7 @@ const stats = [
     font-weight: 700;
     color: var(--cog-white);
   }
-  .practice-reach__lede {
+  .practice-reach__body :global(.practice-reach__lede) {
     max-width: 520px;
     margin-top: var(--space-6);
     font-size: var(--text-base);

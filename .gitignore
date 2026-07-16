@@ -3,6 +3,10 @@ dist/
 # generated types
 .astro/
 
+# Sanity TypeGen intermediate — regenerate with `npm run typegen`.
+# sanity.types.ts IS committed, so types are there straight after a clone.
+schema.json
+
 # dependencies
 node_modules/
 

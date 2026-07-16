@@ -3,25 +3,43 @@
 // top rule, serif accents) in a masonry column layout, since testimonial
 // lengths vary widely. No filter tabs.
 import Eyebrow from "./Eyebrow.astro";
-import { testimonials } from "../data/testimonials";
+import { PortableText } from "astro-portabletext";
+import { proseComponents } from "./prose/components";
+import TestimonialsWallLede from "./testimonials/TestimonialsWallLede.astro";
+import { getAllTestimonials, getTestimonialsWallBand } from "../sanity/lib/testimonials";
+
+// Only /testimonials renders this, so it fetches its own content (D9).
+const testimonials = await getAllTestimonials();
+const band = await getTestimonialsWallBand();
+
+if (!testimonials.length || !band) {
+  throw new Error(
+    "No testimonials (or wall header) found in Sanity.\n" +
+      "Seed them with:\n" +
+      "  npx sanity exec scripts/seed-testimonials.ts --with-user-token\n" +
+      "  npx sanity exec scripts/seed-testimonials-wall.ts --with-user-token",
+  );
+}
 ---
 
 <section class="twall">
   <div class="container twall__inner">
     <header class="twall__head">
       <div class="twall__head-left">
-        <Eyebrow>Client Testimonials</Eyebrow>
+        <Eyebrow>{band.eyebrow}</Eyebrow>
         <h2 class="twall__heading">
-          <span class="twall__heading-lead">In Their</span>
-          <span class="twall__heading-strong">Own Words.</span>
+          <span class="twall__heading-lead">{band.headingLead}</span>
+          <span class="twall__heading-strong">{band.headingStrong}</span>
         </h2>
       </div>
       <div class="twall__head-right">
-        <p>
-          Across four decades of high-stakes trials, the people Dan Cogdell has
-          defended have shared what representation at the highest level meant to
-          them — often at the most difficult moment of their lives.
-        </p>
+        <PortableText
+          value={band.lede}
+          components={{
+            ...proseComponents,
+            block: { ...proseComponents.block, normal: TestimonialsWallLede },
+          }}
+        />
       </div>
     </header>
 
@@ -80,7 +98,7 @@ import { testimonials } from "../data/testimonials";
     font-weight: 700;
     color: var(--cog-ink);
   }
-  .twall__head-right p {
+  .twall__head-right :global(.twall__lede) {
     margin: 0;
     font-size: var(--text-base);
     line-height: 1.7;

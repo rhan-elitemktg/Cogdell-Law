@@ -4,8 +4,18 @@ import PageHero from "../../components/PageHero.astro";
 import NewsGrid from "../../components/news/NewsGrid.astro";
 import CtaBar from "../../components/CtaBar.astro";
 import Consult from "../../components/Consult.astro";
-import { news } from "../../data/news";
+import { getAllNews, getNewsGridHeader } from "../../sanity/lib/news";
 import heroImage from "../../assets/firm-steps.jpg";
+
+const news = await getAllNews();
+const gridHeader = await getNewsGridHeader();
+
+if (!news.length || !gridHeader) {
+  throw new Error(
+    "No news items or grid header found in Sanity.\n" +
+      "Seed them with: npx sanity exec scripts/seed-news.ts --with-user-token",
+  );
+}
 ---
 
 <Layout
@@ -31,11 +41,11 @@ import heroImage from "../../assets/firm-steps.jpg";
 
   <NewsGrid
     items={news}
-    eyebrow="Press & Media"
-    headingLead="In the"
-    headingStrong="Headlines."
+    eyebrow={gridHeader.eyebrow}
+    headingLead={gridHeader.headingLead}
+    headingStrong={gridHeader.headingStrong}
   />
 
   <CtaBar />
-  <Consult />
+  <Consult pageId="newsPage" />
 </Layout>

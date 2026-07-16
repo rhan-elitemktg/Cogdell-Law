@@ -1,77 +1,56 @@
 ---
 // Homepage "About" band — two columns on paper: firm story + Notable Results
 // carousel on the left, courthouse photo with brand seal + pull-quote on the right.
+//
+// Homepage-only, so it fetches its own content (D9). The photo and the seal are
+// design, not content, and stay in the repo.
 import { Image } from "astro:assets";
+import { PortableText } from "astro-portabletext";
+import { proseComponents } from "./prose/components";
 import Eyebrow from "./Eyebrow.astro";
+import AboutParagraph from "./about/AboutParagraph.astro";
+import QuoteParagraph from "./about/QuoteParagraph.astro";
+import QuoteAccent from "./about/QuoteAccent.astro";
 import aboutPhoto from "../assets/about-courthouse.jpg";
+import { getHomeAbout } from "../sanity/lib/homePage";
 
-const results = [
-  {
-    outcome: "Acquitted",
-    caseName: "The Enron Trial",
-    note: "Our client was the sole person acquitted in any Enron-related trial.",
-  },
-  {
-    outcome: "Acquitted",
-    caseName: "Waco / Branch Davidian",
-    note: "Won acquittal for Clive Doyle on charges tied to the deaths of federal agents at the Waco siege.",
-  },
-  {
-    outcome: "Acquitted",
-    caseName: "Fraud Acquittal",
-    note: "An orthopedic surgeon acquitted of all charges — wire fraud, health care fraud and insurance fraud.",
-  },
-  {
-    outcome: "Acquitted",
-    caseName: "Physician Victory",
-    note: "An alternative-treatment physician acquitted of multiple charges; the rest dismissed after two trials.",
-  },
-  {
-    outcome: "Mistrial",
-    caseName: "Pharmacy Fraud Mistrial",
-    note: "Charged with wire and mail fraud — the court declared a mistrial for prosecutorial misconduct after six weeks.",
-  },
-  {
-    outcome: "Acquitted",
-    caseName: "Psychiatric Fraud Victory",
-    note: "In the “Spring Shadows Glenn” trial, our client was acquitted of all charges after a six-month prosecution.",
-  },
-];
+const about = await getHomeAbout();
+
+if (!about) {
+  throw new Error(
+    "No About section found on the Home Page in Sanity.\n" +
+      "Add it in the Studio at /admin → Home Page, or seed it with:\n" +
+      "  npx sanity exec scripts/seed-about.ts --with-user-token",
+  );
+}
+
+// Each featured case shows its homepage teaser wording, falling back to the full
+// case copy — the coalesce happens in the GROQ projection.
+const results = about.featured ?? [];
+
 ---
 
 <section class="about" id="about">
   <div class="container about__inner">
     <!-- Left column: story + notable results -->
     <div class="about__col">
-      <Eyebrow>Texas Criminal Defense Lawyer</Eyebrow>
+      <Eyebrow>{about.eyebrow}</Eyebrow>
       <h2 class="about__title">
-        <span class="about__title-lead">Four Decades of</span>
-        <span class="about__title-strong">High-Profile Victories</span>
+        <span class="about__title-lead">{about.titleLead}</span>
+        <span class="about__title-strong">{about.titleStrong}</span>
       </h2>
 
-      <p class="about__body">
-        Dan Cogdell has spent more than 40 years trying complex cases in
-        courtrooms across Texas and the nation. Named one of the state’s best
-        lawyers by the Texas Tribune and recognized by Texas Monthly, he has
-        built a practice defined by high-profile wins in cases others deemed
-        unwinnable.
-      </p>
-      <p class="about__body">
-        His acquittal of a defendant in the Enron trial remains a landmark in
-        white-collar defense, while his victory in the Waco/Branch Davidian
-        prosecution cemented his reputation as a trial lawyer willing to take on
-        the government at its most aggressive.
-      </p>
-      <p class="about__body">
-        Today, the firm focuses on complex civil disputes, catastrophic personal
-        injury, federal criminal defense, and government investigations — always
-        with the same philosophy: prepare every case for trial, and try it to
-        win.
-      </p>
+      <PortableText
+        value={about.body}
+        components={{
+          ...proseComponents,
+          block: { ...proseComponents.block, normal: AboutParagraph },
+        }}
+      />
 
       <div class="about__results" id="results">
         <div class="about__results-head">
-          <Eyebrow>Notable Results</Eyebrow>
+          <Eyebrow>{about.resultsEyebrow}</Eyebrow>
           <div class="about__arrows">
             <button class="about__arrow" data-dir="prev" type="button" aria-label="Previous results">
               <svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true"><path d="M10.5 2.5L5 8l5.5 5.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -123,12 +102,13 @@ const results = [
       </div>
 
       <blockquote class="about__quote">
-        <p class="about__quote-text">
-          Sought-after advocates for the cases others call
-          <span class="about__quote-accent"> unwinnable</span> — with
-          <span class="about__quote-accent"> 40+ years</span> of courtroom
-          victories behind every defense.
-        </p>
+        <PortableText
+          value={about.quote}
+          components={{
+            block: { normal: QuoteParagraph },
+            mark: { accent: QuoteAccent },
+          }}
+        />
       </blockquote>
     </div>
   </div>
@@ -176,13 +156,16 @@ const results = [
   }
 
   /* ---- Body copy ---- */
-  .about__body {
+  /* Emitted by AboutParagraph.astro (a Portable Text renderer), so it carries no
+     scoping attribute of its own — see F14. The scoped .about__col parent bounds
+     the :global. */
+  .about__col :global(.about__body) {
     margin-bottom: var(--space-4);
     font-size: var(--text-base);
     line-height: 1.7;
     color: var(--cog-ink-body);
   }
-  .about__body:last-of-type {
+  .about__col :global(.about__body:last-of-type) {
     margin-bottom: 0;
   }
 
@@ -332,7 +315,12 @@ const results = [
     border-left: 3px solid var(--cog-accent);
     border-top: 3px solid var(--cog-accent);
   }
-  .about__quote-text {
+  /* The quote's <p> and accent <span> are emitted by the Portable Text
+     renderers (QuoteParagraph / QuoteAccent), so they don't carry this
+     component's scoping attribute and plain scoped selectors would never match
+     them. `:global()` opts the selector out of scoping, and the scoped
+     `.about__quote` parent keeps it from leaking past this band. */
+  .about__quote :global(.about__quote-text) {
     font-family: var(--font-heading);
     font-weight: 600;
     font-size: clamp(1.5rem, 2.3vw, 1.9375rem); /* 24 → 31px */
@@ -341,7 +329,7 @@ const results = [
     color: var(--cog-ink);
     text-wrap: balance;
   }
-  .about__quote-accent {
+  .about__quote :global(.about__quote-accent) {
     font-style: italic;
     color: var(--cog-accent);
   }

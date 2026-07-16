@@ -1,7 +1,26 @@
 ---
 // Trial Experience "Notable Results" — intro + filterable grid of verdicts.
+//
+// The cases come from Sanity (`trialResult` documents), shared with the homepage
+// About carousel so a verdict is described in exactly one place. This page shows
+// the full write-ups; the homepage shows each case's teaser copy.
+//
+// The intro copy, filter buttons and disclaimer are page design and stay in code
+// — they aren't duplicated anywhere. See docs/sanity-integration.md §3b.
 import Eyebrow from "./Eyebrow.astro";
+import { getTrialResults } from "../sanity/lib/trialResults";
 
+const cases = await getTrialResults();
+
+if (!cases?.length) {
+  throw new Error(
+    "No Trial Results found on the Trial Experience Page in Sanity.\n" +
+      "Add them in the Studio at /admin → Trial Experience Page, or seed them with:\n" +
+      "  npx sanity exec scripts/seed-trial-results.ts --with-user-token",
+  );
+}
+
+// Filter buttons — `id` matches trialResult.category; "all" is the reset.
 const filters = [
   { id: "all", label: "All Results" },
   { id: "landmark", label: "Landmark Cases" },
@@ -9,120 +28,6 @@ const filters = [
   { id: "fraud", label: "Fraud & White Collar" },
 ];
 
-const cases = [
-  {
-    category: "landmark",
-    categoryLabel: "Landmark Case",
-    outcome: "Charges Dropped",
-    name: "Texas Attorney General",
-    note: "Amid the political frenzy surrounding the impeachment saga of Texas Attorney General Ken Paxton, Mr. Cogdell didn't just enter the fray — he dominated it. With a mere three months to ready his arsenal, he and his team stormed into battle before the Texas Senate. It ended in a triumphant smackdown of 16 charges and the outright dismissal of the remaining four.",
-  },
-  {
-    category: "landmark",
-    categoryLabel: "Landmark Case",
-    outcome: "Acquitted",
-    name: "The Enron Scandal",
-    note: "One of — if not the — greatest corporate corruption cases in the history of the world was Enron. Executives scrambled to secure the best legal minds money could buy, mostly from the glitzy towers of New York. But not Sheila Kahanek. She placed her faith in Mr. Cogdell, who turned what seemed like an insurmountable legal Everest into a mere speed bump on the road to exoneration, while the others faltered under the weight of guilty verdicts.",
-  },
-  {
-    category: "landmark",
-    categoryLabel: "Landmark Case",
-    outcome: "Acquitted",
-    name: "Waco & the Branch Davidians",
-    note: "Mr. Cogdell took up the defense of Clive Doyle, who faced charges over the deaths of federal agents at the Waco siege. Despite relentless media bias, he achieved a remarkable victory: his client was acquitted of all charges — against a backdrop of six other defendants convicted on multiple counts. His skill and tenacity became the focal point of the 2019 documentary and the 2025 Showtime series Waco: The Aftermath.",
-  },
-  {
-    category: "federal",
-    categoryLabel: "Federal Victory",
-    outcome: "Acquitted",
-    name: "Prosecutorial Misconduct",
-    note: "In a case marred by prosecutorial misconduct, Mr. Cogdell's client emerged victorious. A United States District Judge issued a judgment of acquittal, uncovering instances of misconduct and holding the prosecution accountable.",
-  },
-  {
-    category: "federal",
-    categoryLabel: "Federal Victory",
-    outcome: "Acquitted",
-    name: "Corruption Acquittal",
-    note: "In a riveting legal saga, the former New Orleans City Attorney was acquitted of conspiracy, bribery, and corruption charges — while multiple co-defendants faced convictions, underscoring our firm's commitment to justice.",
-  },
-  {
-    category: "fraud",
-    categoryLabel: "White Collar",
-    outcome: "Acquitted",
-    name: "Bribery Acquittal",
-    note: "In the widely publicized “Houston City Hall Bribery Case,” Mr. Cogdell and his client faced the battleground in two separate trials. Remarkably, his client — a former state district judge and city council member — was acquitted of all charges, including bribery and corruption, while multiple co-defendants faced convictions and imprisonment.",
-  },
-  {
-    category: "fraud",
-    categoryLabel: "Health Care Fraud",
-    outcome: "Acquitted",
-    name: "Surgeon Fraud Acquittal",
-    note: "In a high-profile legal saga, Mr. Cogdell's client — an orthopedic surgeon — was acquitted of all charges leveled against them, which included wire fraud, health care fraud, and insurance fraud.",
-  },
-  {
-    category: "fraud",
-    categoryLabel: "Health Care Fraud",
-    outcome: "Dismissed",
-    name: "Physician Victory",
-    note: "In an exceptionally challenging legal battle, an alternative-treatment physician found themselves acquitted of multiple charges. The remaining charges were ultimately dismissed by the government following two separate trials.",
-  },
-  {
-    category: "fraud",
-    categoryLabel: "Federal Fraud",
-    outcome: "Acquitted",
-    name: "Conspiracy Acquittal",
-    note: "In the District Court for the Southern District of Texas, Mr. Cogdell's client was accused of bank fraud. After a rigorous trial, his client prevailed — acquitted of all charges, including conspiracy, wire fraud, and bank fraud — while all others involved were convicted of multiple federal offenses.",
-  },
-  {
-    category: "fraud",
-    categoryLabel: "Federal Fraud",
-    outcome: "Acquitted",
-    name: "Mail Fraud Acquittal",
-    note: "The former President and CEO of Continental Savings and Loan faced a barrage of accusations, including conspiracy, bank fraud, mail fraud, and wire fraud. Thanks to Mr. Cogdell's expertise, the client emerged unscathed — acquitted of all charges.",
-  },
-  {
-    category: "fraud",
-    categoryLabel: "Federal Fraud",
-    outcome: "Acquitted",
-    name: "Wire Fraud Acquittal",
-    note: "Dubbed the “NASA Operation Lightning Strike Trial,” Mr. Cogdell's client faced charges of wire fraud, mail fraud, and defrauding the United States government. Once again, his strategic defense led to a favorable outcome, with the client acquitted of all charges.",
-  },
-  {
-    category: "fraud",
-    categoryLabel: "White Collar",
-    outcome: "Mistrial",
-    name: "Pharmacy Fraud Mistrial",
-    note: "A pharmacy owner was charged with wire fraud and mail fraud. The trial judge granted the court's own mistrial motion based on prosecutorial misconduct following six weeks in trial.",
-  },
-  {
-    category: "fraud",
-    categoryLabel: "White Collar",
-    outcome: "Acquitted",
-    name: "Insurance Fraud Acquittal",
-    note: "Mr. Cogdell's client, a surgeon, faced a daunting legal battle. After a rigorous trial, the client emerged triumphant — acquitted of all charges, including insurance fraud and practicing medicine without a license.",
-  },
-  {
-    category: "fraud",
-    categoryLabel: "White Collar",
-    outcome: "Dismissed",
-    name: "Judge's Dismissal",
-    note: "A state district judge faced accusations of tampering with a governmental record. Remarkably, all charges against the judge were dismissed prior to trial.",
-  },
-  {
-    category: "fraud",
-    categoryLabel: "Health Care Fraud",
-    outcome: "Dismissed",
-    name: "Psychiatric Fraud Victory",
-    note: "Dubbed the “Spring Shadows Glenn Psychiatric Fraud Trial,” Mr. Cogdell's clients found themselves embroiled in a high-profile prosecution. Despite an exhaustive six-month trial, the client's case was ultimately dismissed, with the individual acquitted of all charges.",
-  },
-  {
-    category: "fraud",
-    categoryLabel: "White Collar",
-    outcome: "No-Billed",
-    name: "Innocence Preserved",
-    note: "A cardiovascular and thoracic physician faced scrutiny during a euthanasia investigation. Mr. Cogdell's client emerged unscathed as the grand jury “no-billed” the case. Following a Texas State Medical Board investigation, the client prevailed, further solidifying their innocence.",
-  },
-];
 ---
 
 <section class="trial">

@@ -173,6 +173,120 @@ a:hover {
   color: var(--cog-accent-dark);
 }
 
+/* ---- Prose (Portable Text bodies) -------------------------
+   Shared by every blockContent renderer AND practice/Blocks.astro, so body copy
+   looks the same wherever it appears. Global on purpose: the elements are
+   emitted by child components, which carry no scoping attribute (F14).
+
+   NOTE the site resets `* { margin: 0 }` and lets components own their spacing,
+   so these rules must supply their own — a bare <h2> from the CMS has none. */
+.prose__p {
+    margin: 0 0 var(--space-4);
+    font-size: var(--text-base);
+    line-height: 1.75;
+    color: var(--cog-ink-body);
+  }
+  .prose__p:last-child {
+    margin-bottom: 0;
+  }
+  .prose__list {
+    margin: 0 0 var(--space-4);
+    padding: 0;
+    list-style: none;
+  }
+  .prose__list:last-child {
+    margin-bottom: 0;
+  }
+  .prose__list li {
+    position: relative;
+    padding-left: var(--space-6);
+    margin-bottom: var(--space-3);
+    font-size: var(--text-base);
+    line-height: 1.65;
+    color: var(--cog-ink-body);
+  }
+  .prose__list li:last-child {
+    margin-bottom: 0;
+  }
+  .prose__list li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.6em;
+    width: 7px;
+    height: 7px;
+    background-color: var(--cog-accent);
+    transform: rotate(45deg);
+  }
+  .prose__link {
+    color: var(--cog-accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-thickness: 1px;
+    transition: color var(--transition);
+  }
+  .prose__link:hover {
+    color: var(--cog-accent-dark);
+  }
+  .prose__quote {
+    position: relative;
+    margin: var(--space-8) 0;
+    padding: var(--space-6) var(--space-8) var(--space-6) var(--space-12);
+    background-color: var(--cog-paper-card);
+    border-left: 4px solid var(--cog-accent);
+    box-shadow: 0 14px 34px rgba(7, 16, 29, 0.06);
+    font-family: var(--font-heading);
+    font-style: italic;
+    font-weight: 500;
+    font-size: var(--text-xl);
+    line-height: 1.5;
+    color: var(--cog-ink);
+  }
+  /* Decorative opening quotation mark. */
+  .prose__quote::before {
+    content: "\201C";
+    position: absolute;
+    top: 0.28em;
+    left: var(--space-4);
+    font-family: var(--font-heading);
+    font-size: 2.75rem;
+    line-height: 1;
+    color: var(--cog-gold);
+  }
+
+/* Numbered lists reuse the list spacing but keep real numbering. */
+.prose__list--numbered {
+  padding-left: var(--space-6);
+  list-style: decimal;
+}
+.prose__list--numbered li {
+  padding-left: 0;
+}
+.prose__list--numbered li::before {
+  content: none;
+}
+
+/* Headings. blockContent offers H2–H4 (no H1 — the page hero owns that, D12).
+   global.css already gives them font/size; only the spacing was missing. */
+.prose__h2,
+.prose__h3,
+.prose__h4 {
+  margin: var(--space-8) 0 var(--space-4);
+  color: var(--cog-ink);
+}
+/* A heading opening the body shouldn't push off the top. */
+.prose__h2:first-child,
+.prose__h3:first-child,
+.prose__h4:first-child {
+  margin-top: 0;
+}
+/* h4 has no size of its own in the base rules — keep it below h3. */
+.prose__h4 {
+  font-size: var(--text-base);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
 /* ---- Helpers -------------------------------------------- */
 
 .container {

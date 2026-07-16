@@ -6,6 +6,36 @@ import Testimonials from "../components/Testimonials.astro";
 import WhyChoose from "../components/WhyChoose.astro";
 import Consult from "../components/Consult.astro";
 import heroImage from "../assets/about-courthouse.jpg";
+import { getAttorneysBand } from "../sanity/lib/attorneys";
+import { getTestimonialsBand } from "../sanity/lib/testimonials";
+import { getWhyChooseBand } from "../sanity/lib/whyChoose";
+
+// This page holds its own copy of the band header, separate from the Home Page.
+const attorneysBand = await getAttorneysBand("attorneysPage");
+const testimonialsBand = await getTestimonialsBand("attorneysPage");
+const whyChooseBand = await getWhyChooseBand("attorneysPage");
+
+if (!whyChooseBand) {
+  throw new Error(
+    "No Why Choose band found in Sanity for this page.\n" +
+      "Seed it with: npx sanity exec scripts/seed-why-choose.ts --with-user-token",
+  );
+}
+
+if (!testimonialsBand) {
+  throw new Error(
+    "No Testimonials band found in Sanity for this page.\n" +
+      "Seed it with: npx sanity exec scripts/seed-testimonials.ts --with-user-token",
+  );
+}
+
+if (!attorneysBand) {
+  throw new Error(
+    "No Attorneys Band found on the Attorneys Page in Sanity.\n" +
+      "Add it in the Studio at /admin → Attorneys Page, or seed it with:\n" +
+      "  npx sanity exec scripts/seed-attorneys-band.ts --with-user-token",
+  );
+}
 ---
 
 <Layout
@@ -30,8 +60,8 @@ import heroImage from "../assets/about-courthouse.jpg";
     </a>
   </PageHero>
 
-  <Attorneys background="card" />
-  <Testimonials />
-  <WhyChoose />
-  <Consult />
+  <Attorneys band={attorneysBand} background="card" />
+  <Testimonials band={testimonialsBand} />
+  <WhyChoose band={whyChooseBand} />
+  <Consult pageId="attorneysPage" />
 </Layout>

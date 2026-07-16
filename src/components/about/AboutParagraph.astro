@@ -1,0 +1,9 @@
+---
+// Portable Text `normal` block for the About band's body copy.
+//
+// Only the paragraph needs overriding: headings (h2–h4), links and bold fall
+// through to astro-portabletext's plain <h2>/<a>/<strong>, which global.css
+// already styles as base elements. Nothing is invented for this band.
+---
+
+<p class="about__body"><slot /></p>

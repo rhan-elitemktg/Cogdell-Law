@@ -1,18 +1,12 @@
 ---
-// Selling-points / stats bar. Defaults to the homepage set; pages can pass
-// their own `points`. Static for now (can move to Sanity later).
+// Selling-points / stats bar. Presentational: the caller owns the content, since
+// this is shared between the homepage (from Sanity) and /our-firm (its own set).
+// The layout expects exactly four — see the flex-basis / nth-child rules below.
 interface Props {
-  points?: { value: string; label: string }[];
+  points: { value: string; label: string }[];
 }
 
-const defaultPoints = [
-  { value: "40+", label: "Years of Trial Experience" },
-  { value: "Nationwide", label: "Federal & State Courts" },
-  { value: "Elite", label: "Top 2% of Trial Lawyers" },
-  { value: "Confidential", label: "Free Case Evaluation" },
-];
-
-const { points = defaultPoints } = Astro.props;
+const { points } = Astro.props;
 ---
 
 <section class="selling-points">

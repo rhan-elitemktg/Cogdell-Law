@@ -1,0 +1,14 @@
+---
+// Portable Text `link` annotation. The href is authored in the Studio and may be
+// a relative path ("/contact") or an external URL.
+//
+// Phase 5 swaps this for an internal/external toggle backed by a reference (D4),
+// so slug changes can't rot links.
+import type { Mark } from "astro-portabletext/types";
+
+type Props = { node: Mark<{ href?: string }> };
+const { node } = Astro.props;
+const href = node.markDef?.href;
+---
+
+<a class="prose__link" href={href}><slot /></a>
