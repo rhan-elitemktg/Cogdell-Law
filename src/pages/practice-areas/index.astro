@@ -4,13 +4,27 @@ import PageHero from "../../components/PageHero.astro";
 import PracticeGrid from "../../components/practice/PracticeGrid.astro";
 import CtaBar from "../../components/CtaBar.astro";
 import Consult from "../../components/Consult.astro";
-import { topLevelCards } from "../../data/practice-areas";
+import { getTopLevelPracticeAreas } from "../../sanity/lib/practiceAreas";
+import { PRACTICE_AREA_ICONS } from "../../lib/practiceAreaIcons";
 import heroImage from "../../assets/firm-steps.jpg";
+
+const topAreas = await getTopLevelPracticeAreas();
+if (!topAreas.length) {
+  throw new Error(
+    "No practice areas found in Sanity.\n" +
+      "Seed with: npx sanity exec scripts/seed-practice-areas-tree.ts --with-user-token",
+  );
+}
 
 // A closing "get in touch" card fills the grid's last cell (5 areas leave one
 // empty in a 3-col grid) and gives an easy path to the consult form.
 const gridCards = [
-  ...topLevelCards,
+  ...topAreas.map((a) => ({
+    title: a.title,
+    summary: a.summary,
+    href: a.href,
+    icon: a.icon ? PRACTICE_AREA_ICONS[a.icon] : undefined,
+  })),
   {
     title: "Not Sure Where You Fit?",
     summary:

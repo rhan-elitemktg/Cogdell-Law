@@ -226,6 +226,48 @@ export type CtaButton = {
   href: string;
 };
 
+export type PracticeAreaReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "practiceArea";
+};
+
+export type PracticeArea = {
+  _id: string;
+  _type: "practiceArea";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  orderRank?: string;
+  title: string;
+  slug: Slug;
+  parent?: PracticeAreaReference;
+  heroTitle: string;
+  lede?: string;
+  cardSummary?: string;
+  icon?: "health" | "federal" | "fraud" | "collar" | "appeals";
+  intro?: BlockContent;
+  sections?: Array<{
+    heading: string;
+    body: BlockContent;
+    _type: "section";
+    _key: string;
+  }>;
+  faqs?: Array<{
+    question: string;
+    answer: BlockContent;
+    _type: "practiceFaq";
+    _key: string;
+  }>;
+};
+
+export type Slug = {
+  _type: "slug";
+  current: string;
+  source?: string;
+};
+
 export type LegalPage = {
   _id: string;
   _type: "legalPage";
@@ -281,12 +323,6 @@ export type SanityImageHotspot = {
   y: number;
   height: number;
   width: number;
-};
-
-export type Slug = {
-  _type: "slug";
-  current: string;
-  source?: string;
 };
 
 export type Faq = {
@@ -743,11 +779,13 @@ export type AllSanitySchemaTypes =
   | PracticeAreaCard
   | SellingPoint
   | CtaButton
+  | PracticeAreaReference
+  | PracticeArea
+  | Slug
   | LegalPage
   | NewsItem
   | SanityImageCrop
   | SanityImageHotspot
-  | Slug
   | Faq
   | Testimonial
   | Attorney
@@ -1130,6 +1168,15 @@ export type LEGAL_PAGE_QUERY_RESULT =
       intro: null;
       sections: null;
     }
+  | {
+      title: string;
+      intro: BlockContent | null;
+      sections: Array<{
+        _key: string;
+        heading: string;
+        body: BlockContent;
+      }> | null;
+    }
   | null;
 
 // Source: src/sanity/lib/news.ts
@@ -1212,6 +1259,31 @@ export type NEWS_GRID_HEADER_QUERY_RESULT = null | {
   headingLead: string;
   headingStrong: string;
 };
+
+// Source: src/sanity/lib/practiceAreas.ts
+// Variable: ALL_QUERY
+// Query: *[_type == "practiceArea"] | order(orderRank){  _id,  title,  heroTitle,  lede,  cardSummary,  icon,  intro,  sections[]{ _key, heading, body },  faqs[]{ _key, question, answer },  "slug": slug.current,  "parentId": parent._ref}
+export type ALL_QUERY_RESULT = Array<{
+  _id: string;
+  title: string;
+  heroTitle: string;
+  lede: string | null;
+  cardSummary: string | null;
+  icon: "appeals" | "collar" | "federal" | "fraud" | "health" | null;
+  intro: BlockContent | null;
+  sections: Array<{
+    _key: string;
+    heading: string;
+    body: BlockContent;
+  }> | null;
+  faqs: Array<{
+    _key: string;
+    question: string;
+    answer: BlockContent;
+  }> | null;
+  slug: string;
+  parentId: string | null;
+}>;
 
 // Source: src/sanity/lib/practiceAreasBand.ts
 // Variable: PRACTICE_AREAS_BAND_QUERY
@@ -1343,6 +1415,7 @@ declare module "@sanity/client" {
     '*[_type == "newsItem" && slug.current == $slug][0]{\n  _id,\n  title,\n  outlet,\n  summary,\n  body,\n  "slug": slug.current\n}': NEWS_ITEM_QUERY_RESULT;
     '*[_type == "newsItem" && linkType == "article" && defined(slug.current)]{"slug": slug.current}': OWNED_NEWS_SLUGS_QUERY_RESULT;
     '*[_id == "newsPage"][0].grid{\n  eyebrow,\n  headingLead,\n  headingStrong\n}': NEWS_GRID_HEADER_QUERY_RESULT;
+    '*[_type == "practiceArea"] | order(orderRank){\n  _id,\n  title,\n  heroTitle,\n  lede,\n  cardSummary,\n  icon,\n  intro,\n  sections[]{ _key, heading, body },\n  faqs[]{ _key, question, answer },\n  "slug": slug.current,\n  "parentId": parent._ref\n}': ALL_QUERY_RESULT;
     "*[_id == $pageId][0].practiceAreas{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  description,\n  cards[]{\n    _key,\n    icon,\n    title,\n    desc\n  }\n}": PRACTICE_AREAS_BAND_QUERY_RESULT;
     '*[\n  _type == "testimonial" && featured == true\n] | order(orderRank) [0...3]{\n  _id,\n  quote,\n  author,\n  tag\n}': FEATURED_TESTIMONIALS_QUERY_RESULT;
     '*[_type == "testimonial"] | order(orderRank){\n  _id,\n  quote,\n  author\n}': ALL_TESTIMONIALS_QUERY_RESULT;

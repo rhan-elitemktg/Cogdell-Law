@@ -80,7 +80,14 @@ export const structure: StructureResolver = (S, context) =>
         S,
         context,
       }),
+      orderableDocumentListDeskItem({
+        type: "practiceArea",
+        title: "Practice Areas",
+        icon: icons.case,
+        S,
+        context,
+      }),
       ...S.documentTypeListItems().filter(
-        (li) => !SINGLETONS.includes(li.getId() as string) && !["attorney", "faq", "video", "legalPage"].includes(li.getId() as string),
+        (li) => !SINGLETONS.includes(li.getId() as string) && !["attorney", "faq", "video", "legalPage", "practiceArea"].includes(li.getId() as string),
       ),
     ]);

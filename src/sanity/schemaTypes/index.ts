@@ -16,6 +16,7 @@ import { attorney } from "./attorney";
 import { faq } from "./faq";
 import { newsItem } from "./newsItem";
 import { legalPage } from "./legalPage";
+import { practiceArea } from "./practiceArea";
 import { testimonial } from "./testimonial";
 import { trialResult } from "./trialResult";
 import { ctaButton } from "./ctaButton";
@@ -60,6 +61,7 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   faq,
   newsItem,
   legalPage,
+  practiceArea,
   // Objects
   ctaButton,
   sellingPoint,
