@@ -226,6 +226,58 @@ export type CtaButton = {
   href: string;
 };
 
+export type ServiceCityReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "serviceCity";
+};
+
+export type LocationPage = {
+  _id: string;
+  _type: "locationPage";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  orderRank?: string;
+  city: ServiceCityReference;
+  title: string;
+  navLabel: string;
+  slug: Slug;
+  heroTitle: string;
+  lede?: string;
+  intro?: BlockContent;
+  sections?: Array<{
+    heading: string;
+    body: BlockContent;
+    _type: "section";
+    _key: string;
+  }>;
+  faqs?: Array<{
+    question: string;
+    answer: BlockContent;
+    _type: "practiceFaq";
+    _key: string;
+  }>;
+};
+
+export type Slug = {
+  _type: "slug";
+  current: string;
+  source?: string;
+};
+
+export type ServiceCity = {
+  _id: string;
+  _type: "serviceCity";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  orderRank?: string;
+  city: string;
+  citySlug: Slug;
+};
+
 export type PracticeAreaReference = {
   _ref: string;
   _type: "reference";
@@ -260,12 +312,6 @@ export type PracticeArea = {
     _type: "practiceFaq";
     _key: string;
   }>;
-};
-
-export type Slug = {
-  _type: "slug";
-  current: string;
-  source?: string;
 };
 
 export type LegalPage = {
@@ -779,9 +825,12 @@ export type AllSanitySchemaTypes =
   | PracticeAreaCard
   | SellingPoint
   | CtaButton
+  | ServiceCityReference
+  | LocationPage
+  | Slug
+  | ServiceCity
   | PracticeAreaReference
   | PracticeArea
-  | Slug
   | LegalPage
   | NewsItem
   | SanityImageCrop
@@ -812,6 +861,31 @@ export type AllSanitySchemaTypes =
   | SanityAssetSourceData
   | SanityImageAsset
   | Geopoint;
+
+// Source: src/sanity/lib/areasWeServe.ts
+// Variable: PATHS_QUERY
+// Query: *[_type == "locationPage"] | order(orderRank){  _id,  title,  navLabel,  heroTitle,  lede,  intro,  sections[]{ _key, heading, body },  faqs[]{ _key, question, answer },  "slug": slug.current,  "cityName": city->city,  "citySlug": city->citySlug.current}
+export type PATHS_QUERY_RESULT = Array<{
+  _id: string;
+  title: string;
+  navLabel: string;
+  heroTitle: string;
+  lede: string | null;
+  intro: BlockContent | null;
+  sections: Array<{
+    _key: string;
+    heading: string;
+    body: BlockContent;
+  }> | null;
+  faqs: Array<{
+    _key: string;
+    question: string;
+    answer: BlockContent;
+  }> | null;
+  slug: string;
+  cityName: string;
+  citySlug: string;
+}>;
 
 // Source: src/sanity/lib/attorneys.ts
 // Variable: ATTORNEY_CARDS_QUERY
@@ -1393,6 +1467,7 @@ export type WHY_CHOOSE_BAND_QUERY_RESULT = {
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
+    '*[_type == "locationPage"] | order(orderRank){\n  _id,\n  title,\n  navLabel,\n  heroTitle,\n  lede,\n  intro,\n  sections[]{ _key, heading, body },\n  faqs[]{ _key, question, answer },\n  "slug": slug.current,\n  "cityName": city->city,\n  "citySlug": city->citySlug.current\n}': PATHS_QUERY_RESULT;
     '*[_type == "attorney"] | order(orderRank){\n  _id,\n  name,\n  role,\n  credential,\n  photo,\n  photoAlt,\n  "slug": slug.current\n}': ATTORNEY_CARDS_QUERY_RESULT;
     '*[_type == "attorney" && defined(slug.current)]{"slug": slug.current}': ATTORNEY_SLUGS_QUERY_RESULT;
     '*[_type == "attorney" && slug.current == $slug][0]{\n  _id,\n  name,\n  role,\n  credential,\n  photo,\n  photoAlt,\n  phone,\n  email,\n  practiceTags,\n  bio,\n  education[]{\n    _key,\n    school,\n    location,\n    lines\n  },\n  barAdmissions,\n  honors,\n  classesSeminars,\n  publishedWorks,\n  associations,\n  pastPositions,\n  representativeCases,\n  "slug": slug.current\n}': ATTORNEY_QUERY_RESULT;

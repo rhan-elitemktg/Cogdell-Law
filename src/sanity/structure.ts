@@ -87,7 +87,21 @@ export const structure: StructureResolver = (S, context) =>
         S,
         context,
       }),
+      orderableDocumentListDeskItem({
+        type: "serviceCity",
+        title: "Service Cities",
+        icon: icons.pin,
+        S,
+        context,
+      }),
+      orderableDocumentListDeskItem({
+        type: "locationPage",
+        title: "Location Pages",
+        icon: icons.document,
+        S,
+        context,
+      }),
       ...S.documentTypeListItems().filter(
-        (li) => !SINGLETONS.includes(li.getId() as string) && !["attorney", "faq", "video", "legalPage", "practiceArea"].includes(li.getId() as string),
+        (li) => !SINGLETONS.includes(li.getId() as string) && !["attorney", "faq", "video", "legalPage", "practiceArea", "serviceCity", "locationPage"].includes(li.getId() as string),
       ),
     ]);

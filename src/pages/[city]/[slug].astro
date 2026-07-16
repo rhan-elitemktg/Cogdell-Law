@@ -1,42 +1,34 @@
 ---
-// "Areas We Serve" location pages at /{city}/{slug}. Same page format as the
-// practice-area leaf pages (Breadcrumb → hero → body → optional FAQs → CTA).
+// "Areas We Serve" location pages at /{city}/{slug}. Same format as practice
+// leaf pages (Breadcrumb → hero → body → optional FAQs → CTA).
 import Layout from "../../layouts/Layout.astro";
 import Breadcrumb from "../../components/practice/Breadcrumb.astro";
 import PageHero from "../../components/PageHero.astro";
-import PracticeBody from "../../components/practice/PracticeBody.astro";
+import ProseBody from "../../components/prose/ProseBody.astro";
 import PracticeFaqs from "../../components/practice/PracticeFaqs.astro";
 import CtaBar from "../../components/CtaBar.astro";
 import Consult from "../../components/Consult.astro";
-import { getAreaPaths } from "../../data/areas-we-serve";
-import type { LocationPage, ServiceCity } from "../../data/areas-we-serve";
-import type { Crumb } from "../../data/practice-areas";
+import { getAreaPaths } from "../../sanity/lib/areasWeServe";
 
-export function getStaticPaths() {
+export async function getStaticPaths() {
   return getAreaPaths();
 }
 
-interface Props {
-  page: LocationPage;
-  city: ServiceCity;
-  trail: Crumb[];
-}
-
-const { page, city, trail } = Astro.props;
+const { page, cityName, trail } = Astro.props;
 
 const description = page.lede ?? `${page.title} — Cogdell Law Firm.`;
 
-// The opening line (lede) leads the content body, then the overview blocks.
-const bodyIntro = page.lede
-  ? [{ p: page.lede }, ...(page.intro ?? [])]
-  : page.intro;
+const ledeBlock = page.lede
+  ? [{ _type: "block", _key: "lede", style: "normal", markDefs: [], children: [{ _type: "span", _key: "ledes", text: page.lede, marks: [] }] }]
+  : [];
+const introValue = [...ledeBlock, ...(page.intro ?? [])];
 ---
 
 <Layout title={page.title} description={description}>
   <Breadcrumb trail={trail} />
 
   <PageHero
-    eyebrow={`Serving ${city.city}`}
+    eyebrow={`Serving ${cityName}`}
     titleStrong={page.heroTitle}
     align="center"
     contentMaxWidth="700px"
@@ -51,7 +43,7 @@ const bodyIntro = page.lede
     </a>
   </PageHero>
 
-  <PracticeBody intro={bodyIntro} sections={page.sections} />
+  <ProseBody intro={introValue} sections={page.sections} />
 
   {page.faqs && page.faqs.length > 0 && <PracticeFaqs faqs={page.faqs} />}
 

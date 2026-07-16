@@ -17,6 +17,8 @@ import { faq } from "./faq";
 import { newsItem } from "./newsItem";
 import { legalPage } from "./legalPage";
 import { practiceArea } from "./practiceArea";
+import { serviceCity } from "./serviceCity";
+import { locationPage } from "./locationPage";
 import { testimonial } from "./testimonial";
 import { trialResult } from "./trialResult";
 import { ctaButton } from "./ctaButton";
@@ -62,6 +64,8 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   newsItem,
   legalPage,
   practiceArea,
+  serviceCity,
+  locationPage,
   // Objects
   ctaButton,
   sellingPoint,
