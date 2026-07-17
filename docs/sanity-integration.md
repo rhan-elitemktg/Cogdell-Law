@@ -53,15 +53,15 @@ The schema layer. Everything in section 2 and 3 depends on these.
 | `homePage.statement` | `StatementBand.astro` | object | — | `[x]` | `[x]` | `[x]` | ✅ done |
 | `homePage.firmStory` | `FirmStory.astro` | object | — | `[x]` | `[x]` | `[x]` | ✅ done |
 | `ctaBar` + `ctaBarContent` | `CtaBar.astro` | singleton + object | 1 | `[x]` | `[x]` | `[x]` | ✅ done — site-wide, ~43 pages (D13) |
-| `consult` + `consultContent` | `Consult.astro` | singleton + object | 1 | `[x]` | `[x]` | `[x]` | ✅ done — site-wide, 13 callers (D13) |
-| `contactPage` | `contact.astro` | singleton | 1 | `[x]` | `[x]` | `[x]` | consult override only; rest pending |
-| `ourFirmPage` | `our-firm.astro` | singleton | 1 | `[x]` | `[~]` | `[x]` | consult override available; rest pending |
-| `videosPage` / `newsPage` / `practiceAreasPage` | those pages | singletons | 3 | `[x]` | `[~]` | `[x]` | consult override only; rest pending |
+| `consult` + `consultContent` | `Consult.astro` | singleton + object | 1 | `[x]` | `[x]` | `[x]` | ✅ done — ONE shared record, no overrides (D13 amended) |
+| `contactPage` | `contact.astro` | singleton | 1 | `[x]` | `[x]` | `[x]` | ✅ hero; ContactMethods reads firmDetails |
+| `ourFirmPage` | `our-firm.astro` | singleton | 1 | `[x]` | `[x]` | `[x]` | ✅ done — hero, intro, stats, quote, founding, origin, values |
+| `videosPage` / `newsPage` / `practiceAreasPage` | those pages | singletons | 3 | `[x]` | `[x]` | `[x]` | ✅ hero + grid headers |
 | `practiceAreaCard` | `PracticeAreas.astro` | object | — | `[x]` | `[x]` | `[x]` | ✅ done |
 | `practiceAreasBand` | `PracticeAreas.astro` | object | — | `[x]` | `[x]` | `[x]` | ✅ done — one copy per page (D11) |
-| `trialExperiencePage` | `trial-experience.astro` | singleton | 1 | `[x]` | `[~]` | `[x]` | band only; rest of page pending |
-| `testimonialsPage` | `testimonials.astro` | singleton | 1 | `[x]` | `[~]` | `[x]` | band only; quotes are Phase 1 |
-| `video` | `data/videos.ts` | document | 5 | `[x]` | `[x]` | `[~]` | ✅ schema+content — title + `wistiaId` only (D8) |
+| `trialExperiencePage` | `trial-experience.astro` | singleton | 1 | `[x]` | `[x]` | `[x]` | ✅ hero + bands + trial results |
+| `testimonialsPage` | `testimonials.astro` | singleton | 1 | `[x]` | `[x]` | `[x]` | ✅ hero + bands + wall |
+| `video` | ~~`data/videos.ts`~~ | document | 5 | `[x]` | `[x]` | `[x]` | ✅ done — title + `wistiaId`; Wistia supplies poster/duration (D8) |
 | `blockContent` (Portable Text) | `Block[]` in `practice-areas.ts` | object | — | `[x]` | `[x]` | `[x]` | ✅ done — **standard for all body copy (D12)**; shared renderers in `components/prose/` (F18) |
 | `link` (annotation) | `Inline{text,href}` | object | — | `[x]` | — | `[ ]` | ✅ inside `blockContent`; reference toggle in Phase 5 (D4) |
 | `testimonial` | ~~`data/testimonials.ts`~~ | document | 16 | `[x]` | `[x]` | `[x]` | ✅ done — F2 resolved; `featured` toggle, max 3 |
@@ -73,7 +73,7 @@ The schema layer. Everything in section 2 and 3 depends on these.
 | `attorney` | ~~`data/attorneys.ts`~~ | document | 4 | `[x]` | `[x]` | `[x]` | ✅ done — F2 resolved; photos in Sanity |
 | `educationEntry` | `data/attorneys.ts` | object | — | `[x]` | `[x]` | `[x]` | ✅ done |
 | `attorneysBand` | `Attorneys.astro` header | object | — | `[x]` | `[x]` | `[x]` | ✅ done — one copy per page (D11) |
-| `attorneysPage` | `attorneys.astro` | singleton | 1 | `[x]` | `[~]` | `[x]` | band only; rest of page pending |
+| `attorneysPage` | `attorneys.astro` | singleton | 1 | `[x]` | `[x]` | `[x]` | ✅ hero + bands |
 | `newsItem` | ~~`data/news.ts`~~ | document | 12 | `[x]` | `[x]` | `[x]` | ✅ done — hybrid external/owned; publishedAt override |
 | `newsBand` | `News.astro` (was Blog) | object | — | `[x]` | `[x]` | `[x]` | ✅ done — featured ref + 3-newest (F20) |
 | `trialResult` | `TrialResults.astro` + `About.astro` | document | 16 | `[x]` | `[x]` | `[x]` | ✅ done — F2 duplicate resolved |
@@ -81,10 +81,10 @@ The schema layer. Everything in section 2 and 3 depends on these.
 | `accentText` (Portable Text) | `About.astro` quote | object | — | `[x]` | `[x]` | `[x]` | ✅ done — first PT type |
 | `faq` | `Faq.astro` | document | 6 | `[x]` | `[x]` | `[x]` | ✅ done — F1; `blockContent` answers, orderRank |
 | `faqBand` | `Faq.astro` header | object | — | `[x]` | `[x]` | `[x]` | ✅ done |
-| `practiceArea` | `data/practice-areas.ts` | document | ~20 | `[ ]` | `[ ]` | `[ ]` | 5 |
-| `serviceCity` | `data/areas-we-serve.ts` | document | 6 | `[ ]` | `[ ]` | `[ ]` | 6 |
-| `locationPage` | `data/areas-we-serve.ts` | document | ~15 | `[ ]` | `[ ]` | `[ ]` | 6 |
-| `legalPage` | `privacy.astro`, `disclaimer.astro` | document | 2 | `[ ]` | `[ ]` | `[ ]` | 8 |
+| `practiceArea` | ~~`data/practice-areas.ts`~~ | document | 20 | `[x]` | `[x]` | `[x]` | ✅ done — self-ref parent (D1); single Body Content (D14) |
+| `serviceCity` | ~~`data/areas-we-serve.ts`~~ | document | 5 | `[x]` | `[x]` | `[x]` | ✅ done |
+| `locationPage` | ~~`data/areas-we-serve.ts`~~ | document | 6 | `[x]` | `[x]` | `[x]` | ✅ done — single Body Content (D14) |
+| `legalPage` | ~~`privacy.astro`, `disclaimer.astro`~~ | singletons | 2 | `[x]` | `[x]` | `[x]` | ✅ done — single Body Content (D14) |
 | `firmDetails` *(expanded)* | `Footer.astro` | singleton | 1 | `[x]` | `[x]` | `[x]` | ✅ tagline/email/address/socials + copyright/legal links; footer wired |
 
 ⚠️ `trialResult` and `faq` were **not** in the original plan — they're real content
@@ -108,7 +108,7 @@ All 16 routes. "Depends on" is the content type(s) the page needs before it can 
 | Route | File | Depends on | Schema | Content | Wired | Verified | Phase |
 |---|---|---|---|---|---|---|---|
 | `/testimonials` | `pages/testimonials.astro` | `testimonial` | `[x]` | `[x]` | `[x]` | `[x]` | ✅ done |
-| `/videos` | `pages/videos.astro` | `video` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | 2 |
+| `/videos` | `pages/videos.astro` | `video` | `[x]` | `[x]` | `[x]` | `[x]` | ✅ done |
 | `/attorneys` | `pages/attorneys.astro` | `attorney` | `[x]` | `[x]` | `[x]` | `[x]` | ✅ done |
 | `/attorney/[slug]` | `pages/attorney/[slug].astro` | `attorney` | `[x]` | `[x]` | `[x]` | `[x]` | ✅ done — 4 pages |
 | `/news` | `pages/news/index.astro` | `newsItem` | `[x]` | `[x]` | `[x]` | `[x]` | ✅ done |
