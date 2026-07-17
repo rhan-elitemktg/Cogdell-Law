@@ -7,7 +7,7 @@
  * Singletons with fixed ids. setIfMissing, so it won't clobber Studio edits.
  */
 import { getCliClient } from "sanity/cli";
-import { blocksToPT } from "./lib/blockToPortableText";
+import { toBlockContent } from "./lib/blockToPortableText";
 import type { Block, Section } from "./lib/blockToPortableText";
 
 const client = getCliClient();
@@ -61,13 +61,7 @@ async function main() {
       .patch(page.id)
       .setIfMissing({
         title: page.title,
-        intro: blocksToPT(page.intro, `${page.id}-intro`),
-        sections: page.sections.map((sec, i) => ({
-          _key: `${page.id}-s${i}`,
-          _type: "section",
-          heading: sec.heading,
-          body: blocksToPT(sec.blocks, `${page.id}-s${i}`),
-        })),
+        body: toBlockContent({ intro: page.intro, sections: page.sections }, page.id),
       })
       .commit();
     console.log(`  ${page.title}: ${page.sections.length} sections`);

@@ -14,7 +14,7 @@ import { getCliClient } from "sanity/cli";
 import { LexoRank } from "lexorank";
 import { practiceAreas } from "../src/data/practice-areas";
 import { PRACTICE_AREA_ICONS } from "../src/lib/practiceAreaIcons";
-import { blocksToPT } from "./lib/blockToPortableText";
+import { toBlockContent } from "./lib/blockToPortableText";
 import type { Block, Section } from "./lib/blockToPortableText";
 
 const client = getCliClient();
@@ -54,20 +54,14 @@ async function upsert(area: Area, parentId: string | null, rank: string, keyBase
   if (area.cardSummary) doc.cardSummary = area.cardSummary;
   if (area.icon) doc.icon = PATH_TO_KEY.get(area.icon);
   if (parentId) doc.parent = { _type: "reference", _ref: parentId };
-  if (area.intro?.length) doc.intro = blocksToPT(area.intro, `${keyBase}-intro`);
-  if (area.sections?.length)
-    doc.sections = area.sections.map((sec, i) => ({
-      _key: `${keyBase}-s${i}`,
-      _type: "section",
-      heading: sec.heading,
-      body: blocksToPT(sec.blocks, `${keyBase}-s${i}`),
-    }));
+  const body = toBlockContent({ intro: area.intro, sections: area.sections }, keyBase);
+  if (body.length) doc.body = body;
   if (area.faqs?.length)
     doc.faqs = area.faqs.map((f, i) => ({
       _key: `${keyBase}-f${i}`,
       _type: "practiceFaq",
       question: f.question,
-      answer: blocksToPT(f.answer, `${keyBase}-f${i}`),
+      answer: toBlockContent({ intro: f.answer }, `${keyBase}-f${i}`),
     }));
 
   if (existing?._id) {

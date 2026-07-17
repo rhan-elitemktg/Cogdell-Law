@@ -26,10 +26,12 @@ const childItems = (children ?? []).map((c: any) => ({
 const description = node.lede ?? `${node.title} — Cogdell Law Firm.`;
 
 // The opening line (lede) leads the content body, exactly as before.
+// The lede is its own field (meta description + card summary) and also opens the
+// body, exactly as before the intro/sections merge.
 const ledeBlock = node.lede
   ? [{ _type: "block", _key: "lede", style: "normal", markDefs: [], children: [{ _type: "span", _key: "ledes", text: node.lede, marks: [] }] }]
   : [];
-const introValue = [...ledeBlock, ...(node.intro ?? [])];
+const bodyValue = [...ledeBlock, ...(node.body ?? [])];
 ---
 
 <Layout title={node.title} description={description}>
@@ -51,7 +53,7 @@ const introValue = [...ledeBlock, ...(node.intro ?? [])];
     </a>
   </PageHero>
 
-  <ProseBody intro={introValue} sections={node.sections} />
+  <ProseBody body={bodyValue} />
 
   {node.faqs && node.faqs.length > 0 && <PracticeFaqs faqs={node.faqs} />}
 

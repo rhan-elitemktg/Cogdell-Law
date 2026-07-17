@@ -1,39 +1,29 @@
 ---
-// Long-form content body: an optional title + lead intro, then h2 sections.
-// The blockContent equivalent of practice/PracticeBody.astro (which renders the
-// legacy Block[] model and is retired once practice areas migrate).
+// Long-form content body: an optional title, then one Portable Text body.
 //
-// Same .pbody markup/styles, so migrated pages render identically.
+// The body is a SINGLE blockContent field (the firm chose one "Body Content"
+// field over a separate intro + sections). Section headings are H2 blocks inside
+// it, styled here to match the bespoke section headings this replaced.
 import { PortableText } from "astro-portabletext";
 import { proseBodyComponents } from "./bodyComponents";
 
 interface Props {
   title?: string;
-  intro?: unknown; // blockContent
-  sections?: { _key?: string; heading: string; body: unknown }[];
+  body?: unknown; // blockContent
 }
-const { title, intro, sections } = Astro.props;
-const hasIntro = Array.isArray(intro) && intro.length > 0;
+const { title, body } = Astro.props;
+const hasBody = Array.isArray(body) && body.length > 0;
 ---
 
 <section class="pbody">
   <div class="container pbody__inner">
     {title && <h1 class="pbody__title">{title}</h1>}
 
-    {hasIntro && (
-      <div class="pbody__lead">
-        <PortableText value={intro} components={proseBodyComponents} />
+    {hasBody && (
+      <div class="pbody__content">
+        <PortableText value={body} components={proseBodyComponents} />
       </div>
     )}
-
-    {
-      sections?.map((section) => (
-        <div class="pbody__section">
-          <h2 class="pbody__heading">{section.heading}</h2>
-          <PortableText value={section.body} components={proseBodyComponents} />
-        </div>
-      ))
-    }
   </div>
 </section>
 
@@ -54,23 +44,22 @@ const hasIntro = Array.isArray(intro) && intro.length > 0;
     letter-spacing: -0.01em;
     color: var(--cog-ink);
   }
-  .pbody__lead {
-    font-size: var(--text-lg);
-  }
-  .pbody__lead :global(.prose__p) {
-    font-size: var(--text-lg);
-    line-height: 1.7;
-    color: var(--cog-ink);
-  }
-  .pbody__section {
-    margin-top: var(--space-14);
-  }
-  .pbody__heading {
-    margin: 0 0 var(--space-6);
+
+  /* Section headings come from the body's H2 blocks (a Portable Text renderer,
+     so no scoping attribute — hence :global, see F14). Sized to match the
+     section headings that the intro/sections split used to render. */
+  .pbody__content :global(.prose__h2) {
+    margin: var(--space-14) 0 var(--space-6);
     font-family: var(--font-heading);
     font-weight: 600;
     font-size: clamp(1.625rem, 2.4vw, 2.25rem);
     line-height: 1.15;
     color: var(--cog-ink);
+    text-transform: none;
+    letter-spacing: normal;
+  }
+  /* A heading that opens the body shouldn't push off the top. */
+  .pbody__content :global(.prose__h2:first-child) {
+    margin-top: 0;
   }
 </style>

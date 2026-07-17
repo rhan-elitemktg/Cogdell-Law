@@ -10,7 +10,7 @@
 import { getCliClient } from "sanity/cli";
 import { LexoRank } from "lexorank";
 import { areasWeServe } from "../src/data/areas-we-serve";
-import { blocksToPT } from "./lib/blockToPortableText";
+import { toBlockContent } from "./lib/blockToPortableText";
 import type { Block, Section } from "./lib/blockToPortableText";
 
 const client = getCliClient();
@@ -53,14 +53,11 @@ async function main() {
         orderRank: pageRank.toString(),
       };
       if (page.lede) doc.lede = page.lede;
-      if (page.intro?.length) doc.intro = blocksToPT(page.intro as Block[], `${kb}-intro`);
-      if (page.sections?.length)
-        doc.sections = (page.sections as Section[]).map((sec, i) => ({
-          _key: `${kb}-s${i}`, _type: "section", heading: sec.heading, body: blocksToPT(sec.blocks, `${kb}-s${i}`),
-        }));
+      const body = toBlockContent({ intro: page.intro as Block[], sections: page.sections as Section[] }, kb);
+      if (body.length) doc.body = body;
       if (page.faqs?.length)
         doc.faqs = page.faqs.map((f: any, i: number) => ({
-          _key: `${kb}-f${i}`, _type: "practiceFaq", question: f.question, answer: blocksToPT(f.answer, `${kb}-f${i}`),
+          _key: `${kb}-f${i}`, _type: "practiceFaq", question: f.question, answer: toBlockContent({ intro: f.answer }, `${kb}-f${i}`),
         }));
 
       if (existing?._id) await client.patch(existing._id).set(doc).commit();

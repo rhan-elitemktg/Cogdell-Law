@@ -9,8 +9,7 @@ const ALL_QUERY = defineQuery(`*[_type == "practiceArea"] | order(orderRank){
   lede,
   cardSummary,
   icon,
-  intro,
-  sections[]{ _key, heading, body },
+  body,
   faqs[]{ _key, question, answer },
   "slug": slug.current,
   "parentId": parent._ref

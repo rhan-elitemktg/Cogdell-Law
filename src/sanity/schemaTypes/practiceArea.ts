@@ -19,17 +19,12 @@ export const practiceArea = defineType({
   type: "document",
   icon: icons.case,
   orderings: [orderRankOrdering],
-  groups: [
-    { name: "main", title: "Content", default: true },
-    { name: "body", title: "Body" },
-  ],
   fields: [
     orderRankField({ type: "practiceArea" }),
     defineField({
       name: "title",
       title: "Title",
       type: "string",
-      group: "main",
       description: "Short label — nav, breadcrumb, cards, <title>.",
       validation: (rule) => rule.required(),
     }),
@@ -37,7 +32,6 @@ export const practiceArea = defineType({
       name: "slug",
       title: "Slug",
       type: "slug",
-      group: "main",
       description: "A SINGLE path segment (e.g. stark-law). The full URL is built from ancestors.",
       options: { source: "title", maxLength: 96 },
       validation: (rule) => rule.required(),
@@ -47,14 +41,12 @@ export const practiceArea = defineType({
       title: "Parent area",
       type: "reference",
       to: [{ type: "practiceArea" }],
-      group: "main",
       description: "Leave empty for a top-level area. Set it to nest this as a sub-topic.",
     }),
     defineField({
       name: "heroTitle",
       title: "Hero title",
       type: "string",
-      group: "main",
       description: "The full descriptive H1 shown in the page hero.",
       validation: (rule) => rule.required(),
     }),
@@ -63,7 +55,6 @@ export const practiceArea = defineType({
       title: "Lede",
       type: "text",
       rows: 3,
-      group: "main",
       description: "Opening line — leads the content body and the meta description.",
     }),
     defineField({
@@ -71,46 +62,27 @@ export const practiceArea = defineType({
       title: "Card summary",
       type: "text",
       rows: 2,
-      group: "main",
       description: "Short blurb for the parent/index grid card.",
     }),
     defineField({
       name: "icon",
       title: "Icon",
       type: "string",
-      group: "main",
       description: "Grid-card icon. Only top-level areas show one.",
       options: { list: PRACTICE_AREA_ICON_KEYS.map((k) => ({ title: k, value: k })) },
     }),
-    defineField({
-      name: "intro",
-      title: "Intro",
+            defineField({
+      name: "body",
+      title: "Body Content",
       type: "blockContent",
-      group: "body",
-      description: "Overview paragraphs under the hero, before the sections.",
-    }),
-    defineField({
-      name: "sections",
-      title: "Sections",
-      type: "array",
-      group: "body",
-      of: [
-        defineArrayMember({
-          type: "object",
-          name: "section",
-          fields: [
-            defineField({ name: "heading", title: "Heading", type: "string", validation: (rule) => rule.required() }),
-            defineField({ name: "body", title: "Body", type: "blockContent", validation: (rule) => rule.required().min(1) }),
-          ],
-          preview: { select: { title: "heading" } },
-        }),
-      ],
+      description:
+        "The whole page body — paragraphs, headings, lists, links. Use Heading 2 for section titles.",
+      validation: (rule) => rule.required().min(1),
     }),
     defineField({
       name: "faqs",
       title: "FAQs",
       type: "array",
-      group: "body",
       of: [
         defineArrayMember({
           type: "object",

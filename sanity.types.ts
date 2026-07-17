@@ -254,13 +254,7 @@ export type LocationPage = {
   slug: Slug;
   heroTitle: string;
   lede?: string;
-  intro?: BlockContent;
-  sections?: Array<{
-    heading: string;
-    body: BlockContent;
-    _type: "section";
-    _key: string;
-  }>;
+  body: BlockContent;
   faqs?: Array<{
     question: string;
     answer: BlockContent;
@@ -307,13 +301,7 @@ export type PracticeArea = {
   lede?: string;
   cardSummary?: string;
   icon?: "health" | "federal" | "fraud" | "collar" | "appeals";
-  intro?: BlockContent;
-  sections?: Array<{
-    heading: string;
-    body: BlockContent;
-    _type: "section";
-    _key: string;
-  }>;
+  body: BlockContent;
   faqs?: Array<{
     question: string;
     answer: BlockContent;
@@ -329,13 +317,7 @@ export type LegalPage = {
   _updatedAt: string;
   _rev: string;
   title: string;
-  intro: BlockContent;
-  sections?: Array<{
-    heading: string;
-    body: BlockContent;
-    _type: "section";
-    _key: string;
-  }>;
+  body: BlockContent;
 };
 
 export type NewsItem = {
@@ -925,19 +907,14 @@ export type AllSanitySchemaTypes =
 
 // Source: src/sanity/lib/areasWeServe.ts
 // Variable: PATHS_QUERY
-// Query: *[_type == "locationPage"] | order(orderRank){  _id,  title,  navLabel,  heroTitle,  lede,  intro,  sections[]{ _key, heading, body },  faqs[]{ _key, question, answer },  "slug": slug.current,  "cityName": city->city,  "citySlug": city->citySlug.current}
+// Query: *[_type == "locationPage"] | order(orderRank){  _id,  title,  navLabel,  heroTitle,  lede,  body,  faqs[]{ _key, question, answer },  "slug": slug.current,  "cityName": city->city,  "citySlug": city->citySlug.current}
 export type PATHS_QUERY_RESULT = Array<{
   _id: string;
   title: string;
   navLabel: string;
   heroTitle: string;
   lede: string | null;
-  intro: BlockContent | null;
-  sections: Array<{
-    _key: string;
-    heading: string;
-    body: BlockContent;
-  }> | null;
+  body: BlockContent;
   faqs: Array<{
     _key: string;
     question: string;
@@ -1287,50 +1264,27 @@ export type HOME_PRESS_QUERY_RESULT = Array<{
 
 // Source: src/sanity/lib/legalPages.ts
 // Variable: LEGAL_PAGE_QUERY
-// Query: *[_id == $id][0]{  title,  intro,  sections[]{    _key,    heading,    body  }}
+// Query: *[_id == $id][0]{  title,  body}
 export type LEGAL_PAGE_QUERY_RESULT =
   | {
       title: string;
-      intro: BlockContent;
-      sections: Array<{
-        _key: string;
-        heading: string;
-        body: BlockContent;
-      }> | null;
+      body: BlockContent;
     }
   | {
       title: null;
-      intro: null;
-      sections: null;
+      body: null;
     }
   | {
       title: string;
-      intro: null;
-      sections: null;
+      body: null;
     }
   | {
       title: string | null;
-      intro: null;
-      sections: null;
+      body: null;
     }
   | {
       title: string;
-      intro: BlockContent | null;
-      sections: Array<{
-        _key: string;
-        heading: string;
-        body: BlockContent;
-      }> | null;
-    }
-  | {
-      title: null;
-      intro: {
-        eyebrow: string;
-        headingLead: string;
-        headingStrong: string;
-        body: BlockContent;
-      } | null;
-      sections: null;
+      body: BlockContent | null;
     }
   | null;
 
@@ -1545,7 +1499,7 @@ export type PAGE_HERO_QUERY_RESULT =
 
 // Source: src/sanity/lib/practiceAreas.ts
 // Variable: ALL_QUERY
-// Query: *[_type == "practiceArea"] | order(orderRank){  _id,  title,  heroTitle,  lede,  cardSummary,  icon,  intro,  sections[]{ _key, heading, body },  faqs[]{ _key, question, answer },  "slug": slug.current,  "parentId": parent._ref}
+// Query: *[_type == "practiceArea"] | order(orderRank){  _id,  title,  heroTitle,  lede,  cardSummary,  icon,  body,  faqs[]{ _key, question, answer },  "slug": slug.current,  "parentId": parent._ref}
 export type ALL_QUERY_RESULT = Array<{
   _id: string;
   title: string;
@@ -1553,12 +1507,7 @@ export type ALL_QUERY_RESULT = Array<{
   lede: string | null;
   cardSummary: string | null;
   icon: "appeals" | "collar" | "federal" | "fraud" | "health" | null;
-  intro: BlockContent | null;
-  sections: Array<{
-    _key: string;
-    heading: string;
-    body: BlockContent;
-  }> | null;
+  body: BlockContent;
   faqs: Array<{
     _key: string;
     question: string;
@@ -1676,7 +1625,7 @@ export type WHY_CHOOSE_BAND_QUERY_RESULT = {
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
-    '*[_type == "locationPage"] | order(orderRank){\n  _id,\n  title,\n  navLabel,\n  heroTitle,\n  lede,\n  intro,\n  sections[]{ _key, heading, body },\n  faqs[]{ _key, question, answer },\n  "slug": slug.current,\n  "cityName": city->city,\n  "citySlug": city->citySlug.current\n}': PATHS_QUERY_RESULT;
+    '*[_type == "locationPage"] | order(orderRank){\n  _id,\n  title,\n  navLabel,\n  heroTitle,\n  lede,\n  body,\n  faqs[]{ _key, question, answer },\n  "slug": slug.current,\n  "cityName": city->city,\n  "citySlug": city->citySlug.current\n}': PATHS_QUERY_RESULT;
     '*[_type == "attorney"] | order(orderRank){\n  _id,\n  name,\n  role,\n  credential,\n  photo,\n  photoAlt,\n  "slug": slug.current\n}': ATTORNEY_CARDS_QUERY_RESULT;
     '*[_type == "attorney" && defined(slug.current)]{"slug": slug.current}': ATTORNEY_SLUGS_QUERY_RESULT;
     '*[_type == "attorney" && slug.current == $slug][0]{\n  _id,\n  name,\n  role,\n  credential,\n  photo,\n  photoAlt,\n  phone,\n  email,\n  practiceTags,\n  bio,\n  education[]{\n    _key,\n    school,\n    location,\n    lines\n  },\n  barAdmissions,\n  honors,\n  classesSeminars,\n  publishedWorks,\n  associations,\n  pastPositions,\n  representativeCases,\n  "slug": slug.current\n}': ATTORNEY_QUERY_RESULT;
@@ -1693,7 +1642,7 @@ declare module "@sanity/client" {
     '*[_id == "homePage"][0].firmStory{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  body,\n  cta{\n    label,\n    href\n  }\n}': HOME_FIRM_STORY_QUERY_RESULT;
     '*[_id == "homePage"][0].practiceReach{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  lede,\n  stats[]{\n    _key,\n    label,\n    value\n  }\n}': HOME_PRACTICE_REACH_QUERY_RESULT;
     '*[_id == "homePage"][0].press.logos[]{\n  _key,\n  alt,\n  image,\n  "dimensions": image.asset->metadata.dimensions\n}': HOME_PRESS_QUERY_RESULT;
-    "*[_id == $id][0]{\n  title,\n  intro,\n  sections[]{\n    _key,\n    heading,\n    body\n  }\n}": LEGAL_PAGE_QUERY_RESULT;
+    "*[_id == $id][0]{\n  title,\n  body\n}": LEGAL_PAGE_QUERY_RESULT;
     '*[_type == "newsItem"] | order(coalesce(publishedAt, _createdAt) desc){\n  _id,\n  title,\n  outlet,\n  media,\n  summary,\n  ctaLabel,\n  linkType,\n  externalUrl,\n  "slug": slug.current,\n  "date": coalesce(publishedAt, _createdAt),\n  outletLogo\n}': ALL_NEWS_QUERY_RESULT;
     '*[_id == "homePage"][0].news{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  lede,\n  "featured": featured->{\n  _id,\n  title,\n  outlet,\n  media,\n  summary,\n  ctaLabel,\n  linkType,\n  externalUrl,\n  "slug": slug.current,\n  "date": coalesce(publishedAt, _createdAt),\n  outletLogo\n},\n  "featuredId": featured._ref\n}': NEWS_BAND_QUERY_RESULT;
     '*[_type == "newsItem" && slug.current == $slug][0]{\n  _id,\n  title,\n  outlet,\n  summary,\n  body,\n  "slug": slug.current\n}': NEWS_ITEM_QUERY_RESULT;
@@ -1701,7 +1650,7 @@ declare module "@sanity/client" {
     '*[_id == "newsPage"][0].grid{\n  eyebrow,\n  headingLead,\n  headingStrong\n}': NEWS_GRID_HEADER_QUERY_RESULT;
     '*[_id == "ourFirmPage"][0]{\n  hero,\n  intro{ eyebrow, headingLead, headingStrong, body },\n  stats{ items[]{ _key, value, label } },\n  quote{ lead, accent, attribution },\n  foundingAttorney{ eyebrow, headingLead, headingStrong, body },\n  originStory{ eyebrow, headingLead, headingStrong, body, milestones[]{ _key, key, title, desc } },\n  values{ eyebrow, headingLead, headingStrong, items[]{ _key, icon, title, body } }\n}': OUR_FIRM_QUERY_RESULT;
     "*[_id == $pageId][0].hero{\n  eyebrow,\n  titleLead,\n  titleStrong,\n  lede\n}": PAGE_HERO_QUERY_RESULT;
-    '*[_type == "practiceArea"] | order(orderRank){\n  _id,\n  title,\n  heroTitle,\n  lede,\n  cardSummary,\n  icon,\n  intro,\n  sections[]{ _key, heading, body },\n  faqs[]{ _key, question, answer },\n  "slug": slug.current,\n  "parentId": parent._ref\n}': ALL_QUERY_RESULT;
+    '*[_type == "practiceArea"] | order(orderRank){\n  _id,\n  title,\n  heroTitle,\n  lede,\n  cardSummary,\n  icon,\n  body,\n  faqs[]{ _key, question, answer },\n  "slug": slug.current,\n  "parentId": parent._ref\n}': ALL_QUERY_RESULT;
     "*[_id == $pageId][0].practiceAreas{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  description,\n  cards[]{\n    _key,\n    icon,\n    title,\n    desc\n  }\n}": PRACTICE_AREAS_BAND_QUERY_RESULT;
     '*[\n  _type == "testimonial" && featured == true\n] | order(orderRank) [0...3]{\n  _id,\n  quote,\n  author,\n  tag\n}': FEATURED_TESTIMONIALS_QUERY_RESULT;
     '*[_type == "testimonial"] | order(orderRank){\n  _id,\n  quote,\n  author\n}': ALL_TESTIMONIALS_QUERY_RESULT;

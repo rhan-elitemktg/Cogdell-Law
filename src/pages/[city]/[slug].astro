@@ -18,10 +18,12 @@ const { page, cityName, trail } = Astro.props;
 
 const description = page.lede ?? `${page.title} — Cogdell Law Firm.`;
 
+// The lede is its own field (meta description + card summary) and also opens the
+// body, exactly as before the intro/sections merge.
 const ledeBlock = page.lede
   ? [{ _type: "block", _key: "lede", style: "normal", markDefs: [], children: [{ _type: "span", _key: "ledes", text: page.lede, marks: [] }] }]
   : [];
-const introValue = [...ledeBlock, ...(page.intro ?? [])];
+const bodyValue = [...ledeBlock, ...(page.body ?? [])];
 ---
 
 <Layout title={page.title} description={description}>
@@ -43,7 +45,7 @@ const introValue = [...ledeBlock, ...(page.intro ?? [])];
     </a>
   </PageHero>
 
-  <ProseBody intro={introValue} sections={page.sections} />
+  <ProseBody body={bodyValue} />
 
   {page.faqs && page.faqs.length > 0 && <PracticeFaqs faqs={page.faqs} />}
 

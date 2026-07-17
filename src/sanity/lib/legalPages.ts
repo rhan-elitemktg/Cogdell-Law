@@ -3,12 +3,7 @@ import { defineQuery } from "groq";
 
 const LEGAL_PAGE_QUERY = defineQuery(`*[_id == $id][0]{
   title,
-  intro,
-  sections[]{
-    _key,
-    heading,
-    body
-  }
+  body
 }`);
 
 /** A legal page (privacy | disclaimer) by its fixed id. */

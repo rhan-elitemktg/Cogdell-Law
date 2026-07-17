@@ -20,28 +20,14 @@ export const legalPage = defineType({
       type: "string",
       validation: (rule) => rule.required(),
     }),
-    defineField({
-      name: "intro",
-      title: "Intro",
+            defineField({
+      name: "body",
+      title: "Body Content",
       type: "blockContent",
-      description: "The opening paragraphs, shown slightly larger.",
+      
+      description:
+        "The whole page body — paragraphs, headings, lists, links. Use Heading 2 for section titles.",
       validation: (rule) => rule.required().min(1),
-    }),
-    defineField({
-      name: "sections",
-      title: "Sections",
-      type: "array",
-      of: [
-        defineArrayMember({
-          type: "object",
-          name: "section",
-          fields: [
-            defineField({ name: "heading", title: "Heading", type: "string", validation: (rule) => rule.required() }),
-            defineField({ name: "body", title: "Body", type: "blockContent", validation: (rule) => rule.required().min(1) }),
-          ],
-          preview: { select: { title: "heading" } },
-        }),
-      ],
     }),
   ],
   preview: {
