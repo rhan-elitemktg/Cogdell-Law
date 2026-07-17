@@ -379,14 +379,6 @@ export const homePage = defineType({
       type: "newsBand",
       options: { collapsible: true, collapsed: true },
     }),
-    defineField({
-      name: "consult",
-      title: "Consult override",
-      type: "consultContent",
-      description:
-        "Optional. Leave empty to use the site-wide Consult; fill this in only to give this page its own wording.",
-      options: { collapsible: true, collapsed: true },
-    }),
   ],
   preview: {
     select: { subtitle: "hero.eyebrow" },

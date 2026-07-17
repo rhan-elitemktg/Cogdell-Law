@@ -438,7 +438,6 @@ export type Attorney = {
   associations?: Array<string>;
   pastPositions?: Array<string>;
   representativeCases?: Array<string>;
-  consult?: ConsultContent;
 };
 
 export type TrialResult = {
@@ -489,7 +488,6 @@ export type PracticeAreasPage = {
   _updatedAt: string;
   _rev: string;
   hero?: PageHero;
-  consult?: ConsultContent;
 };
 
 export type NewsPage = {
@@ -504,7 +502,6 @@ export type NewsPage = {
     headingLead: string;
     headingStrong: string;
   };
-  consult?: ConsultContent;
 };
 
 export type VideosPage = {
@@ -519,7 +516,6 @@ export type VideosPage = {
     headingLead: string;
     headingStrong: string;
   };
-  consult?: ConsultContent;
 };
 
 export type OurFirmPage = {
@@ -583,7 +579,6 @@ export type OurFirmPage = {
       _key: string;
     }>;
   };
-  consult?: ConsultContent;
 };
 
 export type ContactPage = {
@@ -593,7 +588,6 @@ export type ContactPage = {
   _updatedAt: string;
   _rev: string;
   hero?: PageHero;
-  consult?: ConsultContent;
 };
 
 export type AttorneysPage = {
@@ -606,7 +600,6 @@ export type AttorneysPage = {
   attorneys?: AttorneysBand;
   testimonials?: TestimonialsBand;
   whyChoose?: WhyChooseBand;
-  consult?: ConsultContent;
 };
 
 export type TestimonialsPage = {
@@ -619,7 +612,6 @@ export type TestimonialsPage = {
   testimonialsWall?: TestimonialsWallBand;
   practiceAreas?: PracticeAreasBand;
   ctaBar?: CtaBarContent;
-  consult?: ConsultContent;
 };
 
 export type TrialExperiencePage = {
@@ -632,7 +624,6 @@ export type TrialExperiencePage = {
   trialResults?: TrialResultList;
   practiceAreas?: PracticeAreasBand;
   ctaBar?: CtaBarContent;
-  consult?: ConsultContent;
 };
 
 export type VideoReference = {
@@ -724,7 +715,6 @@ export type HomePage = {
   };
   faq?: FaqBand;
   news?: NewsBand;
-  consult?: ConsultContent;
 };
 
 export type Video = {
@@ -1032,7 +1022,7 @@ export type ATTORNEYS_BAND_QUERY_RESULT = {
 
 // Source: src/sanity/lib/consult.ts
 // Variable: CONSULT_QUERY
-// Query: coalesce(  *[_id == $pageId][0].consult,  *[_id == "consult"][0].content){  eyebrow,  headingLead,  headingStrong,  body,  fineprint,  thankYou}
+// Query: *[_id == "consult"][0].content{  eyebrow,  headingLead,  headingStrong,  body,  fineprint,  thankYou}
 export type CONSULT_QUERY_RESULT =
   | {
       eyebrow: string;
@@ -1691,7 +1681,7 @@ declare module "@sanity/client" {
     '*[_type == "attorney" && defined(slug.current)]{"slug": slug.current}': ATTORNEY_SLUGS_QUERY_RESULT;
     '*[_type == "attorney" && slug.current == $slug][0]{\n  _id,\n  name,\n  role,\n  credential,\n  photo,\n  photoAlt,\n  phone,\n  email,\n  practiceTags,\n  bio,\n  education[]{\n    _key,\n    school,\n    location,\n    lines\n  },\n  barAdmissions,\n  honors,\n  classesSeminars,\n  publishedWorks,\n  associations,\n  pastPositions,\n  representativeCases,\n  "slug": slug.current\n}': ATTORNEY_QUERY_RESULT;
     "*[_id == $pageId][0].attorneys{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  lede\n}": ATTORNEYS_BAND_QUERY_RESULT;
-    'coalesce(\n  *[_id == $pageId][0].consult,\n  *[_id == "consult"][0].content\n){\n  eyebrow,\n  headingLead,\n  headingStrong,\n  body,\n  fineprint,\n  thankYou\n}': CONSULT_QUERY_RESULT;
+    '*[_id == "consult"][0].content{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  body,\n  fineprint,\n  thankYou\n}': CONSULT_QUERY_RESULT;
     'coalesce(\n  *[_id == $pageId][0].ctaBar,\n  *[_id == "ctaBar"][0].content\n){\n  eyebrow,\n  headingLead,\n  headingRest,\n  body,\n  cta{\n    label,\n    href\n  }\n}': CTA_BAR_QUERY_RESULT;
     '*[_type == "faq"] | order(orderRank){\n  _id,\n  question,\n  answer\n}': FAQS_QUERY_RESULT;
     '*[_id == "homePage"][0].faq{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  lede,\n  questions[]->{\n    _id,\n    question,\n    answer\n  }\n}': FAQ_BAND_QUERY_RESULT;

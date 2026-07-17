@@ -1,9 +1,8 @@
 ---
 // "Schedule Your Consultation" band — contact form + photo. Renders on 13 pages.
 //
-// The copy is one shared Consult record with an optional per-page override (D13);
-// pages that have a document pass `pageId` so their override can win. Dynamic
-// routes have no document and get the shared default.
+// The copy is ONE shared Consult record used on every page (the per-page override
+// was removed at the firm's request).
 //
 // The photo stays a prop: it's art direction (D6), and /our-firm and /contact use
 // their own. The form's labels, placeholders and button text stay in code — only
@@ -19,19 +18,16 @@ import defaultPhoto from "../assets/consult-portrait.jpg";
 import { getConsult } from "../sanity/lib/consult";
 
 interface Props {
-  /** Document id of the host page, when it has one — enables its override. */
-  pageId?: string;
   photo?: ImageMetadata;
   photoAlt?: string;
 }
 
 const {
-  pageId,
   photo = defaultPhoto,
   photoAlt = "Dan Cogdell seated in the firm's study",
 } = Astro.props;
 
-const consult = await getConsult(pageId);
+const consult = await getConsult();
 
 if (!consult) {
   throw new Error(

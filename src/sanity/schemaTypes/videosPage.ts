@@ -30,14 +30,6 @@ export const videosPage = defineType({
         defineField({ name: "headingStrong", title: "Heading — bold", type: "string", validation: (rule) => rule.required() }),
       ],
     }),
-    defineField({
-      name: "consult",
-      title: "Consult override",
-      type: "consultContent",
-      description:
-        "Optional. Leave empty to use the site-wide Consult; fill this in only to give this page its own wording.",
-      options: { collapsible: true, collapsed: true },
-    }),
   ],
   preview: {
     prepare: () => ({ title: "Videos Page" }),

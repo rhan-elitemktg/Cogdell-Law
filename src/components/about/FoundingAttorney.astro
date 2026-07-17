@@ -45,14 +45,20 @@ import portrait from "../../assets/consult-portrait.jpg";
   }
   .founding__inner {
     display: grid;
-    grid-template-columns: minmax(0, 640px) minmax(0, 790px);
+    grid-template-columns: minmax(0, 790px) minmax(0, 640px);
     justify-content: space-between;
     column-gap: var(--space-16);
     align-items: center;
     padding-block: var(--space-section);
   }
 
+  /* Content left, image right on desktop. DOM order stays media-first so the
+     stacked mobile layout still leads with the photo (see the 900px query). */
+  .founding__body {
+    order: 1;
+  }
   .founding__media {
+    order: 2;
     align-self: stretch;
     display: flex;
   }
@@ -101,6 +107,12 @@ import portrait from "../../assets/consult-portrait.jpg";
     .founding__inner {
       grid-template-columns: minmax(0, 1fr);
       row-gap: var(--space-8);
+    }
+    .founding__media {
+      order: 1;
+    }
+    .founding__body {
+      order: 2;
     }
     .founding__photo {
       max-height: 480px;

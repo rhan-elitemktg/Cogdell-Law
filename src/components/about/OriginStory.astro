@@ -89,12 +89,18 @@ import motoPhoto from "../../assets/cogdell-motorcycle.jpg";
   /* ---- Story grid ---- */
   .origin__grid {
     display: grid;
-    grid-template-columns: minmax(0, 720px) minmax(0, 790px);
+    grid-template-columns: minmax(0, 790px) minmax(0, 720px);
     justify-content: space-between;
     column-gap: var(--space-16);
     align-items: center;
   }
+  /* Content left, image right on desktop. DOM order stays media-first so the
+     stacked mobile layout still leads with the photo (see the 900px query). */
+  .origin__body {
+    order: 1;
+  }
   .origin__media {
+    order: 2;
     align-self: stretch;
     display: flex;
   }
@@ -160,6 +166,12 @@ import motoPhoto from "../../assets/cogdell-motorcycle.jpg";
     .origin__grid {
       grid-template-columns: minmax(0, 1fr);
       row-gap: var(--space-8);
+    }
+    .origin__media {
+      order: 1;
+    }
+    .origin__body {
+      order: 2;
     }
     .origin__photo {
       max-height: 520px;
