@@ -905,6 +905,36 @@ export type AllSanitySchemaTypes =
   | SanityImageAsset
   | Geopoint;
 
+// Source: src/data/navigation.ts
+// Variable: ATTORNEYS_NAV_QUERY
+// Query: *[_type == "attorney"] | order(orderRank){  "label": name,  "slug": slug.current}
+export type ATTORNEYS_NAV_QUERY_RESULT = Array<{
+  label: string;
+  slug: string;
+}>;
+
+// Source: src/data/navigation.ts
+// Variable: PRACTICE_AREAS_NAV_QUERY
+// Query: *[_type == "practiceArea"] | order(orderRank){  _id,  title,  "slug": slug.current,  "parentId": parent._ref}
+export type PRACTICE_AREAS_NAV_QUERY_RESULT = Array<{
+  _id: string;
+  title: string;
+  slug: string;
+  parentId: string | null;
+}>;
+
+// Source: src/data/navigation.ts
+// Variable: AREAS_WE_SERVE_NAV_QUERY
+// Query: *[_type == "serviceCity"] | order(orderRank){  "city": city,  "citySlug": citySlug.current,  "pages": *[_type == "locationPage" && references(^._id)] | order(orderRank){    "navLabel": navLabel,    "slug": slug.current  }}
+export type AREAS_WE_SERVE_NAV_QUERY_RESULT = Array<{
+  city: string;
+  citySlug: string;
+  pages: Array<{
+    navLabel: string;
+    slug: string;
+  }>;
+}>;
+
 // Source: src/sanity/lib/areasWeServe.ts
 // Variable: PATHS_QUERY
 // Query: *[_type == "locationPage"] | order(orderRank){  _id,  title,  navLabel,  heroTitle,  lede,  body,  faqs[]{ _key, question, answer },  "slug": slug.current,  "cityName": city->city,  "citySlug": city->citySlug.current}
@@ -1625,6 +1655,9 @@ export type WHY_CHOOSE_BAND_QUERY_RESULT = {
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
+    '*[_type == "attorney"] | order(orderRank){\n  "label": name,\n  "slug": slug.current\n}': ATTORNEYS_NAV_QUERY_RESULT;
+    '*[_type == "practiceArea"] | order(orderRank){\n  _id,\n  title,\n  "slug": slug.current,\n  "parentId": parent._ref\n}': PRACTICE_AREAS_NAV_QUERY_RESULT;
+    '*[_type == "serviceCity"] | order(orderRank){\n  "city": city,\n  "citySlug": citySlug.current,\n  "pages": *[_type == "locationPage" && references(^._id)] | order(orderRank){\n    "navLabel": navLabel,\n    "slug": slug.current\n  }\n}': AREAS_WE_SERVE_NAV_QUERY_RESULT;
     '*[_type == "locationPage"] | order(orderRank){\n  _id,\n  title,\n  navLabel,\n  heroTitle,\n  lede,\n  body,\n  faqs[]{ _key, question, answer },\n  "slug": slug.current,\n  "cityName": city->city,\n  "citySlug": city->citySlug.current\n}': PATHS_QUERY_RESULT;
     '*[_type == "attorney"] | order(orderRank){\n  _id,\n  name,\n  role,\n  credential,\n  photo,\n  photoAlt,\n  "slug": slug.current\n}': ATTORNEY_CARDS_QUERY_RESULT;
     '*[_type == "attorney" && defined(slug.current)]{"slug": slug.current}': ATTORNEY_SLUGS_QUERY_RESULT;

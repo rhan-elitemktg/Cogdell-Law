@@ -1,15 +1,16 @@
 ---
 import { Image } from "astro:assets";
 import logoLight from "../assets/cogdell-logo-light.png";
-import { navItems, isOnTrail, normalizePath, type NavItem } from "../data/navigation";
+import { isOnTrail, normalizePath, type NavItem } from "../data/navigation";
 
 interface Props {
+  items: NavItem[];
   pathname: string;
   phone: string;
   phoneHref: string;
 }
 
-const { pathname, phone, phoneHref } = Astro.props;
+const { items, pathname, phone, phoneHref } = Astro.props;
 const current = normalizePath(pathname);
 
 // Flatten the nav tree into sibling "panels" (one per menu level). Each parent
@@ -31,7 +32,7 @@ const buildPanels = (
     }
   });
 };
-buildPanels(navItems, "root", "Menu", null);
+buildPanels(items, "root", "Menu", null);
 ---
 
 <div class="mobile-nav">

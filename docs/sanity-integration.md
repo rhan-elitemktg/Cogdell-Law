@@ -6,21 +6,23 @@ component in the site is listed below. Check cells off as we go.
 **Guiding rule:** the site works today. Every row must leave `astro build` green and
 the rendered page identical. One content type at a time — never a big bang.
 
-## Status — interior migration complete (2026-07-16)
+## Status — navigation async, only publish pipeline remains (2026-07-17)
 
-**Everything except navigation (Phase 7 / D5) and the publish pipeline (Phase 9) is on
-Sanity.** Homepage, all interior pages, both legal pages, the full practice-area tree (20
-pages), all location pages, videos, news, and Firm Details. Every migrated page verified
-byte-identical (or, for /our-firm, identical in visible output — see F21). Safe revert
-tag: `pre-interior-migration`.
+**Everything except the publish pipeline (Phase 9) is on Sanity.** Homepage, all interior
+pages, both legal pages, the full practice-area tree (20 pages), all location pages,
+videos, news, Firm Details, and — as of 2026-07-17 — **navigation** (Phase 7 / D5). Every
+migrated page verified byte-identical (or, for /our-firm, identical in visible output —
+see F21). Safe revert tag: `pre-interior-migration`.
 
-**Still in code by design:** `data/navigation.ts` (Phase 7 makes nav async once it can
-read practice areas / locations from Sanity), `data/us-states.ts` (SVG map geometry). The
-practice-areas and areas-we-serve data files remain ONLY because navigation.ts still
-imports them; they're dead to the pages.
+**Still in code by design:** `data/navigation.ts` (structure only — now async via
+`getNavItems()`, taxonomy branches fetched from Sanity), `data/us-states.ts` (SVG map
+geometry). The practice-areas and areas-we-serve data files are no longer imported for
+their *values* by any runtime page, but `data/practice-areas.ts` still exports the `Crumb`
+**type** used by `Breadcrumb.astro` / `news/[slug].astro`, and both files are still read by
+the seed scripts — so their deletion is Phase 9 cleanup.
 
-**Remaining:** Phase 7 (navigation → async, D5) and Phase 9 (Sanity → Vercel deploy hook)
-— both explicitly deferred.
+**Remaining:** Phase 9 (Sanity → Vercel deploy hook, plus deleting the `src/data`
+leftovers) — explicitly deferred.
 
 ## Legend
 
@@ -95,7 +97,7 @@ currently buried inside components. See section 4, finding F1.
 | What | Why |
 |---|---|
 | `data/us-states.ts` | SVG path reference data for the map. Never CMS. |
-| `data/navigation.ts` | Structure, not content — but must go async. See D5. |
+| `data/navigation.ts` | Structure, not content. ✅ Now async (`getNavItems()`) — the taxonomy branches fetch from Sanity; only the top-level order + labels stay in code (D5). |
 | `wistiaEmbed()` | Pure URL helper. |
 | Design assets (`hero-boardroom`, `whychoose-bg`, `firm-steps`…) | Layout, not content. Keep `astro:assets`. |
 
@@ -166,9 +168,9 @@ All 41 components + the layout. Grouped by how much Sanity work each needs.
 | `practice/PracticeFaqs.astro` | `practice-areas.ts` (type) | `practiceArea` | `[ ]` | `[ ]` | 5 |
 | `practice/Breadcrumb.astro` | `Crumb` type | `practiceArea` | `[ ]` | `[ ]` | 5 |
 | `PracticeAreas.astro` | ~~own array~~ | `practiceAreasBand` ×3 pages | `[x]` | `[x]` | ✅ done |
-| `Header.astro` | `navigation` + `firmDetails` | nav async | `[~]` | `[ ]` | 7 |
-| `MenuList.astro` | `data/navigation.ts` | nav async | `[ ]` | `[ ]` | 7 |
-| `MobileNav.astro` | `data/navigation.ts` | nav async | `[ ]` | `[ ]` | 7 |
+| `Header.astro` | `navigation` + `firmDetails` | nav async | `[x]` | `[x]` | ✅ nav async (D5); `await getNavItems()` |
+| `MenuList.astro` | `data/navigation.ts` | nav async | `[x]` | `[x]` | ✅ done — pure presentational, unchanged (helpers stable) |
+| `MobileNav.astro` | `data/navigation.ts` | nav async | `[x]` | `[x]` | ✅ done — now takes `items` prop from `Header` (single fetch) |
 | `Footer.astro` | `firmDetails` + hardcoded links | `firmDetails` | `[~]` | `[ ]` | 7–8 |
 | `ContactMethods.astro` | hardcoded phone/email | `firmDetails` | `[ ]` | `[ ]` | 8 |
 | `Press.astro` | ~~10 logo imports~~ | `homePage.press` (logos in Sanity) | `[x]` | `[x]` | ✅ done |
@@ -254,10 +256,11 @@ Every list's order today is array order in a file — deliberate curation. `news
 no dates at all. Sanity documents have **no inherent order**. Do nothing and the site
 reshuffles with no error. See D2.
 
-### F4 — `navigation.ts` statically imports the taxonomy
+### F4 — `navigation.ts` statically imports the taxonomy ✅ RESOLVED (2026-07-17, D5)
 
-It imports `practiceAreas` and `areasWeServe` and generates both menus. That import dies
-the moment those move. See D5.
+It imported `practiceAreas` and `areasWeServe` and generated both menus. Now `getNavItems()`
+fetches those branches (plus Attorneys) from Sanity; no runtime `src/` code imports the
+static values anymore. See D5.
 
 ### F5 — Import scripts can't import the data files directly
 
@@ -602,7 +605,7 @@ add schema types.
 | **D2** | Ordering (F3) | ✅ **Landed 2026-07-15 via `@sanity/orderable-document-list`** (attorneys were the first type to need it). Adds `orderRankField` + `orderRankOrdering` to the type, an `orderableDocumentListDeskItem` in `structure.ts`, and `| order(orderRank)` in the query — the Studio list becomes drag-to-reorder and a new document lands last. Ranks are `lexorank` strings (`0\|hzzzzz:`); backfill pre-existing docs with a script using the same lib (see `scripts/backfill-attorney-order.ts`) or their order is arbitrary. <br><br>**Use this for every type with no curating page** — testimonials, news, practice areas. Types ordered by a page's reference array (trial results, D11/F13) don't need it.
 | **D3** | `Block` → Portable Text | ✅ Maps **1:1**. `{p}`→normal, `{ul}`→bullet listItem, `{quote}`→blockquote, `Inline`→link mark. Source is already structured, so it's an in-memory transform — no HTML parsing, no JSDOM. `Blocks.astro` → `<PortableText>` emitting the same `prose__*` classes, so CSS is untouched. |
 | **D4** | Internal links in rich text | ✅ A `link` annotation toggling internal (`reference`) / external (`url`); internal resolves to a path at query time. Kills link rot when slugs change. Alt: keep raw `href` strings. |
-| **D5** | Navigation (F4) | ✅ Keep `navigation.ts` in code but export async `getNavItems()` fetching a slim projection. `Header`/`MobileNav` already await in frontmatter. The pure helpers (`isOnTrail`, `normalizePath`, `isUnder`) don't change. |
+| **D5** | Navigation (F4) | ✅ **Landed 2026-07-17.** `navigation.ts` stays in code but exports async `getNavItems()`; the three taxonomy branches — **Attorneys, Practice Areas, Areas We Serve** — come from slim `order(orderRank)` projections (attorney / practiceArea / serviceCity+locationPage). The pure helpers (`isOnTrail`, `normalizePath`, `isUnder`) are unchanged, so `MenuList` needed no edit. `Header` fetches once via `await getNavItems()` and passes `items` to `MobileNav` (was a second static import). Nav output verified **byte-identical** on home, a nested practice-area page, and a location page — desktop bar + mobile drawer. <br><br>**Note:** the static-import *values* are now gone from all runtime `src/`; only the seed scripts still import them. But `data/practice-areas.ts` can't be deleted yet — its `Crumb` **type** is still imported by `Breadcrumb.astro` and `news/[slug].astro`. Relocating `Crumb` + deleting the data files is Phase 9 ("delete `src/data` leftovers"). |
 | **D6** | Images | ✅ Attorney photos + press logos → Sanity. Design/decorative assets stay in `src/assets` with `astro:assets`. Wistia posters stay remote. |
 | **D7** | Marketing copy in components (§3b) | ✅ **Leave in code for now.** It's design-coupled, rarely changes, and moving it means a `homePage`/`ourFirmPage` singleton per section. Revisit if the firm asks to edit it. `trialResult` + `faq` are the exception — they're real, growing content. |
 | **D13** | Site-wide content (CTA bar, Consult) | ⚠️ **Amended 2026-07-16: the Consult per-page override was REMOVED at the firm's request.** There is now ONE shared Consult record used on every page — no `consult` field on any page singleton or on `attorney`, and `getConsult()` takes no `pageId`. `/contact` previously overrode the copy ("Tell Us About Your Case.") and now shows the shared "Schedule Your Consultation." — an accepted, deliberate change. The **CTA bar override still exists** and is unaffected. The photo remains a per-page prop (art direction, D6). Original rationale below still explains why the shared-record half of the pattern exists. |
@@ -636,7 +639,7 @@ add schema types.
 - [x] **Phase 4 — `newsItem` + `trialResult` + `faq`.** External/owned toggle; press logos; replace `latestNews` with a GROQ slice. Resolve F2 `About.astro` overlap.
 - [x] **Phase 5 — `practiceArea`** *(the big one)*. D1 schema; sibling-scoped slug uniqueness; Studio tree structure; import parents→children; PT + link refs; replace `getPracticeAreaPaths()`/`walk()`/`topLevelCards`; decide where `icon` SVG paths live. Resolve F2 taxonomy divergence.
 - [x] **Phase 6 — `serviceCity` + `locationPage`.** Replace `getAreaPaths()`; verify cross-links into `/practice-areas/*`.
-- [ ] **Phase 7 — Navigation.** D5. **Full nav regression, desktop + mobile.**
+- [x] **Phase 7 — Navigation.** D5. Nav is async off Sanity; full desktop + mobile regression verified byte-identical (home, nested practice area, location page). 2026-07-17.
 - [x] **Phase 8 — `legalPage` + `firmDetails` expansion + interior page copy (our-firm, contact, all page heroes).** Address/email/social/hours; sweep for stray hardcoded phone numbers in body copy.
 - [ ] **Phase 9 — Publish pipeline.** Vercel env vars; Sanity webhook → deploy hook (F6); confirm dataset public or add read token; consider Visual Editing; delete `src/data` leftovers; final build.
 
