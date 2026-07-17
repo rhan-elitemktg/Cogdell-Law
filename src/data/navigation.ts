@@ -3,11 +3,14 @@
 // matching routes / redirects later. An item with no `href` is a toggle-only
 // parent (a grouping label that only opens its submenu).
 //
-// Static-first: this lives in code for now; it can move to Sanity later if the
-// firm wants CMS-managed navigation.
+// The structure lives in code; the taxonomy branches (Attorneys, Practice
+// Areas, Areas We Serve) are generated from Sanity so the nav and the pages
+// stay in sync — add/reorder a document in the Studio and it shows up here too
+// (D5). Fetch the tree with `await getNavItems()`; the pure active-trail helpers
+// below take a built tree and don't touch Sanity.
 
-import { practiceAreas } from "./practice-areas";
-import { areasWeServe } from "./areas-we-serve";
+import { sanityClient } from "sanity:client";
+import { defineQuery } from "groq";
 
 export type NavItem = {
   label: string;
@@ -47,63 +50,118 @@ export const isOnTrail = (item: NavItem, current: string): boolean =>
   isUnder(item.href, current) ||
   (item.children?.some((child) => isOnTrail(child, current)) ?? false);
 
-// Practice Areas menu is generated from the practice-areas data so the nav and
-// the pages stay in sync — add a sub-topic there and it shows up here too.
-const practiceAreasNav: NavItem = {
-  label: "Practice Areas",
-  href: "/practice-areas",
-  children: practiceAreas.map((area): NavItem => {
-    const item: NavItem = {
-      label: area.title,
-      href: `/practice-areas/${area.slug}`,
-    };
-    if (area.children?.length) {
-      item.children = area.children.map((child) => ({
-        label: child.title,
-        href: `/practice-areas/${area.slug}/${child.slug}`,
-      }));
-    }
-    return item;
-  }),
-};
+// ---- Taxonomy branches, generated from Sanity (D5) ----
 
-// Areas We Serve menu is generated from the location data — cities are grouping
-// labels (no href) that open a submenu of their pages.
-const areasWeServeNav: NavItem = {
-  label: "Areas We Serve",
-  children: areasWeServe.map((city): NavItem => ({
-    label: city.city,
-    children: city.pages.map((page) => ({
-      label: page.navLabel,
-      href: `/${city.citySlug}/${page.slug}`,
-    })),
-  })),
-};
+// Slim projections — just what the menus render. Each type is drag-ordered in
+// the Studio (D2), so `order(orderRank)` fixes the menu order.
 
-export const navItems: NavItem[] = [
-  { label: "Home", href: "/" },
-  {
+const ATTORNEYS_NAV_QUERY = defineQuery(`*[_type == "attorney"] | order(orderRank){
+  "label": name,
+  "slug": slug.current
+}`);
+
+const PRACTICE_AREAS_NAV_QUERY = defineQuery(`*[_type == "practiceArea"] | order(orderRank){
+  _id,
+  title,
+  "slug": slug.current,
+  "parentId": parent._ref
+}`);
+
+// Cities are grouping labels (no page of their own); each carries its ordered
+// location pages inline.
+const AREAS_WE_SERVE_NAV_QUERY = defineQuery(`*[_type == "serviceCity"] | order(orderRank){
+  "city": city,
+  "citySlug": citySlug.current,
+  "pages": *[_type == "locationPage" && references(^._id)] | order(orderRank){
+    "navLabel": navLabel,
+    "slug": slug.current
+  }
+}`);
+
+/** Attorneys submenu — bio pages under /attorney/*. */
+async function getAttorneysNav(): Promise<NavItem> {
+  const attorneys = (await sanityClient.fetch(ATTORNEYS_NAV_QUERY)) ?? [];
+  return {
     label: "Attorneys",
     href: "/attorneys",
-    children: [
-      { label: "Dan L. Cogdell", href: "/attorney/cogdell-dan-l" },
-      { label: "Aisha J. Dennis", href: "/attorney/dennis-aisha-j" },
-      { label: "Anthony Osso", href: "/attorney/osso-anthony" },
-      { label: "Brent E. Newton", href: "/attorney/newton-brent-e" },
-    ],
-  },
-  {
-    label: "Our Firm",
-    href: "/our-firm",
-    children: [
-      areasWeServeNav,
-      { label: "Testimonials", href: "/testimonials" },
-      { label: "Videos", href: "/videos" },
-    ],
-  },
-  practiceAreasNav,
+    children: attorneys.map((a) => ({
+      label: a.label!,
+      href: `/attorney/${a.slug}`,
+    })),
+  };
+}
 
-  { label: "Trial Experience", href: "/trial-experience" },
-  { label: "News", href: "/news" },
-  { label: "Contact", href: "/contact" },
-];
+/**
+ * Practice Areas submenu — the flat `practiceArea` docs rebuilt into their
+ * two-level tree via the self-referencing `parent` ref (D1). Order is preserved
+ * because the query is already ranked and we filter it in place.
+ */
+async function getPracticeAreasNav(): Promise<NavItem> {
+  const areas = (await sanityClient.fetch(PRACTICE_AREAS_NAV_QUERY)) ?? [];
+  const childrenOf = (parentId: string | null) =>
+    areas.filter((a) => (a.parentId ?? null) === parentId);
+
+  return {
+    label: "Practice Areas",
+    href: "/practice-areas",
+    children: childrenOf(null).map((area): NavItem => {
+      const item: NavItem = {
+        label: area.title!,
+        href: `/practice-areas/${area.slug}`,
+      };
+      const kids = childrenOf(area._id);
+      if (kids.length) {
+        item.children = kids.map((child) => ({
+          label: child.title!,
+          href: `/practice-areas/${area.slug}/${child.slug}`,
+        }));
+      }
+      return item;
+    }),
+  };
+}
+
+/**
+ * Areas We Serve submenu — cities are grouping labels (no href) that open a
+ * submenu of their location pages.
+ */
+async function getAreasWeServeNav(): Promise<NavItem> {
+  const cities = (await sanityClient.fetch(AREAS_WE_SERVE_NAV_QUERY)) ?? [];
+  return {
+    label: "Areas We Serve",
+    children: cities.map((city): NavItem => ({
+      label: city.city!,
+      children: (city.pages ?? []).map((page) => ({
+        label: page.navLabel!,
+        href: `/${city.citySlug}/${page.slug}`,
+      })),
+    })),
+  };
+}
+
+/** The full primary-nav tree. Fetches the taxonomy branches in parallel. */
+export async function getNavItems(): Promise<NavItem[]> {
+  const [attorneysNav, practiceAreasNav, areasWeServeNav] = await Promise.all([
+    getAttorneysNav(),
+    getPracticeAreasNav(),
+    getAreasWeServeNav(),
+  ]);
+
+  return [
+    { label: "Home", href: "/" },
+    attorneysNav,
+    {
+      label: "Our Firm",
+      href: "/our-firm",
+      children: [
+        areasWeServeNav,
+        { label: "Testimonials", href: "/testimonials" },
+        { label: "Videos", href: "/videos" },
+      ],
+    },
+    practiceAreasNav,
+    { label: "Trial Experience", href: "/trial-experience" },
+    { label: "News", href: "/news" },
+    { label: "Contact", href: "/contact" },
+  ];
+}

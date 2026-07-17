@@ -3,11 +3,11 @@ import { Image } from "astro:assets";
 import logoFallback from "../assets/cogdell-logo-light.png";
 import MenuList from "./MenuList.astro";
 import MobileNav from "./MobileNav.astro";
-import { navItems } from "../data/navigation";
+import { getNavItems } from "../data/navigation";
 import { getFirmDetails } from "../sanity/lib/firmDetails";
 import { urlFor } from "../sanity/lib/image";
 
-const firm = await getFirmDetails();
+const [firm, navItems] = await Promise.all([getFirmDetails(), getNavItems()]);
 
 const firmName = firm?.title ?? "Cogdell Law";
 const phone = firm?.phone ?? "713-426-2244";
@@ -73,7 +73,7 @@ const logoWidth = logoDimensions
   </div>
 </header>
 
-<MobileNav pathname={pathname} phone={phone} phoneHref={phoneHref} />
+<MobileNav items={navItems} pathname={pathname} phone={phone} phoneHref={phoneHref} />
 
 <style>
   .site-header {
