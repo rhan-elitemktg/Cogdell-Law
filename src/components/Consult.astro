@@ -71,16 +71,26 @@ if (!consult) {
           <label class="consult__label" for="consult-message">How can we help?</label>
           <textarea class="consult__input consult__textarea" id="consult-message" name="message" rows="4" placeholder="Briefly describe your situation"></textarea>
         </div>
+        {/* Honeypot: hidden from people, tempting to bots. If filled, we treat
+            the submission as spam. Kept out of the tab order and off-screen. */}
+        <div class="consult__hp" aria-hidden="true">
+          <label for="consult-company">Company</label>
+          <input id="consult-company" name="company" type="text" tabindex="-1" autocomplete="off" />
+        </div>
         <p class="consult__fineprint">{consult.fineprint}</p>
         <div class="consult__actions">
           <button class="btn btn--primary" type="submit">
-            Request Consultation
+            <span class="btn__label">Request Consultation</span>
             <svg class="btn__icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
           </button>
         </div>
       </form>
 
       <p class="consult__thanks" hidden>{consult.thankYou}</p>
+      <p class="consult__error" role="alert" hidden>
+        Something went wrong sending your message. Please try again, or call us at
+        <a href="tel:7134262244">713-426-2244</a>.
+      </p>
     </div>
 
     <div class="consult__media">
@@ -202,6 +212,25 @@ if (!consult) {
     line-height: 1.5;
     color: var(--cog-ink);
   }
+  /* Honeypot — pulled off-screen; real visitors never see or tab to it. */
+  .consult__hp {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+  .consult__error {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    color: var(--cog-error, #b3261e);
+  }
+  .consult__error a {
+    color: inherit;
+    font-weight: 700;
+  }
 
   /* ---- Media ---- */
   .consult__media {
@@ -239,12 +268,40 @@ if (!consult) {
 </style>
 
 <script>
-  // No backend yet — confirm inline on submit (native validation still gates it).
+  // Submit the form to our /api/consult function (which emails the firm via
+  // Resend). Native `required` validation still runs first; on success we swap
+  // the form for the thank-you, on failure we surface an error and let them retry.
   const form = document.querySelector<HTMLFormElement>(".consult__form");
   const thanks = document.querySelector<HTMLElement>(".consult__thanks");
-  form?.addEventListener("submit", (e) => {
+  const errorEl = document.querySelector<HTMLElement>(".consult__error");
+  const submitBtn = form?.querySelector<HTMLButtonElement>("button[type='submit']");
+  const submitLabelEl = submitBtn?.querySelector<HTMLElement>(".btn__label");
+  const submitLabel = submitLabelEl?.textContent ?? "Request Consultation";
+
+  form?.addEventListener("submit", async (e) => {
     e.preventDefault();
-    form.hidden = true;
-    if (thanks) thanks.hidden = false;
+    if (!form.reportValidity()) return; // browser shows the built-in field errors
+
+    if (errorEl) errorEl.hidden = true;
+    if (submitBtn) submitBtn.disabled = true;
+    if (submitLabelEl) submitLabelEl.textContent = "Sending…";
+
+    try {
+      const payload = Object.fromEntries(new FormData(form).entries());
+      const res = await fetch("/api/consult", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+
+      form.hidden = true;
+      if (thanks) thanks.hidden = false;
+    } catch (err) {
+      console.error("Consult submit failed:", err);
+      if (errorEl) errorEl.hidden = false;
+      if (submitBtn) submitBtn.disabled = false;
+      if (submitLabelEl) submitLabelEl.textContent = submitLabel;
+    }
   });
 </script>
