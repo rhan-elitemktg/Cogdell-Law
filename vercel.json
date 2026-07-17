@@ -1,0 +1,45 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "redirects": [
+    {
+      "source": "/health-care-fraud-defense/:path*",
+      "destination": "/practice-areas/health-care-fraud-defense/:path*",
+      "statusCode": 301
+    },
+    {
+      "source": "/beaumont-federal-criminal-defense-attorney",
+      "destination": "/beaumont/beaumont-federal-criminal-defense-attorney",
+      "statusCode": 301
+    },
+    {
+      "source": "/sherman-federal-criminal-defense-lawyers",
+      "destination": "/sherman/sherman-federal-criminal-defense-lawyers",
+      "statusCode": 301
+    },
+    {
+      "source": "/dallas-federal-criminal-defense-lawyers",
+      "destination": "/dallas/dallas-federal-criminal-defense-lawyers",
+      "statusCode": 301
+    },
+    {
+      "source": "/dallas-health-care-fraud-defense-lawyer",
+      "destination": "/dallas/dallas-health-care-fraud-defense-lawyer",
+      "statusCode": 301
+    },
+    {
+      "source": "/houston-healthcare-fraud-defense-law-office",
+      "destination": "/houston/houston-healthcare-fraud-defense-law-office",
+      "statusCode": 301
+    },
+    {
+      "source": "/fort-worth-health-care-fraud-defense-lawyer",
+      "destination": "/fort-worth/fort-worth-health-care-fraud-defense-lawyer",
+      "statusCode": 301
+    },
+    {
+      "source": "/fort-worth-federal-criminal-defense-lawyers",
+      "destination": "/fort-worth/fort-worth-federal-criminal-defense-lawyers",
+      "statusCode": 301
+    }
+  ]
+}

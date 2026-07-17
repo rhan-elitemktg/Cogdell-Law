@@ -1,5 +1,6 @@
 ---
-// Breadcrumb trail for nested practice-area pages. Home / Practice Areas / … .
+// Breadcrumb trail for nested pages. Practice Areas / … — no Home crumb; Home
+// is always one click away in the header nav.
 import type { Crumb } from "../../lib/breadcrumb";
 
 interface Props {
@@ -11,11 +12,12 @@ const { trail } = Astro.props;
 
 <nav class="crumbs" aria-label="Breadcrumb">
   <div class="container crumbs__inner">
-    <a class="crumbs__link" href="/">Home</a>
     {
       trail.map((crumb, i) => (
         <Fragment>
-          <span class="crumbs__sep" aria-hidden="true">/</span>
+          {i > 0 && (
+            <span class="crumbs__sep" aria-hidden="true">/</span>
+          )}
           {i === trail.length - 1 ? (
             <span class="crumbs__current" aria-current="page">
               {crumb.title}

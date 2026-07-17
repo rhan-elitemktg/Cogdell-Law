@@ -1,0 +1,97 @@
+---
+// HTML sitemap at /site-map — an index of every public page, grouped by section.
+// The old WordPress site had /site-map/; this keeps that URL live and useful.
+// The tree is the primary nav (getNavItems — attorneys, practice-area tree,
+// areas-we-serve cities), plus a Legal group the nav doesn't carry.
+//
+// Styled to match a practice-area body (ProseBody): a paper section, an 800px
+// column, prose H2 section headings, prose bulleted lists. Like a practice
+// page, every H2 is followed by content — top-level pages without children are
+// grouped into one "Main Pages" list rather than standing as bare headings.
+import Layout from "../layouts/Layout.astro";
+import Breadcrumb from "../components/practice/Breadcrumb.astro";
+import PageHero from "../components/PageHero.astro";
+import SiteMapList from "../components/SiteMapList.astro";
+import { getNavItems, type NavItem } from "../data/navigation";
+import type { Crumb } from "../lib/breadcrumb";
+
+const navItems = await getNavItems();
+
+// Breadcrumb prepends Home itself, so the trail is just this page.
+const trail: Crumb[] = [{ title: "Site Map" }];
+
+// Every linked top-level page, in nav order (children handled by their section).
+const mainPages: NavItem[] = navItems
+  .filter((item) => item.href)
+  .map(({ label, href }) => ({ label, href }));
+
+const sections: { label: string; items: NavItem[] }[] = [
+  { label: "Main Pages", items: mainPages },
+  ...navItems
+    .filter((item) => item.children?.length)
+    .map((item) => ({ label: item.label, items: item.children! })),
+  {
+    label: "Legal",
+    items: [
+      { label: "Privacy Policy", href: "/privacy" },
+      { label: "Disclaimer", href: "/disclaimer" },
+    ],
+  },
+];
+---
+
+<Layout
+  title="Site Map"
+  description="An index of every page on the Cogdell Law Firm website, organized by section."
+>
+  <Breadcrumb trail={trail} />
+
+  <PageHero
+    eyebrow="Site Map"
+    titleStrong="Site Map"
+    lede="Every page on the Cogdell Law Firm website, organized by section."
+    align="center"
+    contentMaxWidth="700px"
+  />
+
+  <section class="pbody">
+    <div class="container pbody__inner">
+      <div class="pbody__content">
+        {
+          sections.map((section) => (
+            <div class="sitemap__section">
+              <h2 class="prose__h2">{section.label}</h2>
+              <SiteMapList items={section.items} />
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  /* Mirror ProseBody: paper section, 800px column, section padding. */
+  .pbody {
+    background-color: var(--cog-paper);
+  }
+  .pbody__inner {
+    max-width: 800px;
+    padding-block: var(--space-section);
+  }
+
+  /* Section headings match the practice-area body's H2 blocks. */
+  .pbody__content :global(.prose__h2) {
+    margin: var(--space-14) 0 var(--space-6);
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: clamp(1.625rem, 2.4vw, 2.25rem);
+    line-height: 1.15;
+    color: var(--cog-ink);
+    text-transform: none;
+    letter-spacing: normal;
+  }
+  .sitemap__section:first-child :global(.prose__h2) {
+    margin-top: 0;
+  }
+</style>

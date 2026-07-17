@@ -1,0 +1,40 @@
+---
+// Recursive nested list for the /site-map page, rendered in the same prose
+// styling as a practice-area body: `.prose__list` diamond bullets + accent
+// `.prose__link`s (both from global.css). Linked items become anchors; grouping
+// labels (no href, e.g. a city) become a bold sub-header. Presentational only.
+import type { NavItem } from "../data/navigation";
+
+interface Props {
+  items: NavItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<ul class="prose__list sitemap__list">
+  {
+    items.map((item) => (
+      <li class="sitemap__item">
+        {item.href ? (
+          <a class="prose__link" href={item.href}>{item.label}</a>
+        ) : (
+          <span class="sitemap__group">{item.label}</span>
+        )}
+        {item.children?.length ? <Astro.self items={item.children} /> : null}
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  /* Nested list tucks under its parent item. */
+  .sitemap__item > .sitemap__list {
+    margin-top: var(--space-3);
+  }
+  /* Grouping label — no page of its own, so a bold sub-header, not a link. */
+  .sitemap__group {
+    font-weight: 700;
+    color: var(--cog-ink);
+  }
+</style>
