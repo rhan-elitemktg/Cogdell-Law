@@ -2,11 +2,13 @@
 // Per-practice-area FAQ accordion. Native <details> (exclusive open via shared
 // name); answers are block content (paragraphs + lists).
 import Eyebrow from "../Eyebrow.astro";
-import Blocks from "./Blocks.astro";
-import type { PracticeFaq } from "../../data/practice-areas";
+import { PortableText } from "astro-portabletext";
+import { proseBodyComponents } from "../prose/bodyComponents";
+
+interface PracticeFaqItem { _key?: string; question: string; answer: unknown }
 
 interface Props {
-  faqs: PracticeFaq[];
+  faqs: PracticeFaqItem[];
   eyebrow?: string;
   headingLead?: string;
   headingStrong?: string;
@@ -39,7 +41,7 @@ const {
               <span class="pfaq__icon" aria-hidden="true" />
             </summary>
             <div class="pfaq__a">
-              <Blocks blocks={faq.answer} />
+              <PortableText value={faq.answer} components={proseBodyComponents} />
             </div>
           </details>
         ))

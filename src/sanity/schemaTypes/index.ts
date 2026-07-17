@@ -15,6 +15,10 @@ import { video } from "./video";
 import { attorney } from "./attorney";
 import { faq } from "./faq";
 import { newsItem } from "./newsItem";
+import { legalPage } from "./legalPage";
+import { practiceArea } from "./practiceArea";
+import { serviceCity } from "./serviceCity";
+import { locationPage } from "./locationPage";
 import { testimonial } from "./testimonial";
 import { trialResult } from "./trialResult";
 import { ctaButton } from "./ctaButton";
@@ -28,6 +32,7 @@ import { whyChooseFeature } from "./whyChooseFeature";
 import { whyChooseBand } from "./whyChooseBand";
 import { practiceReachStat } from "./practiceReachStat";
 import { pressLogo } from "./pressLogo";
+import { pageHero } from "./pageHero";
 import { faqBand } from "./faqBand";
 import { newsBand } from "./newsBand";
 import { ctaBarContent } from "./ctaBarContent";
@@ -58,6 +63,10 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   testimonial,
   faq,
   newsItem,
+  legalPage,
+  practiceArea,
+  serviceCity,
+  locationPage,
   // Objects
   ctaButton,
   sellingPoint,
@@ -70,6 +79,7 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   whyChooseBand,
   practiceReachStat,
   pressLogo,
+  pageHero,
   faqBand,
   newsBand,
   ctaBarContent,

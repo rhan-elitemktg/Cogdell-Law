@@ -14,12 +14,21 @@ export const videosPage = defineType({
   icon: icons.play,
   fields: [
     defineField({
-      name: "consult",
-      title: "Consult override",
-      type: "consultContent",
-      description:
-        "Optional. Leave empty to use the site-wide Consult; fill this in only to give this page its own wording.",
+      name: "hero",
+      title: "Hero",
+      type: "pageHero",
       options: { collapsible: true, collapsed: true },
+    }),
+    defineField({
+      name: "grid",
+      title: "Video Grid",
+      type: "object",
+      options: { collapsible: true, collapsed: true },
+      fields: [
+        defineField({ name: "eyebrow", title: "Eyebrow", type: "string", validation: (rule) => rule.required() }),
+        defineField({ name: "headingLead", title: "Heading — italic", type: "string", validation: (rule) => rule.required() }),
+        defineField({ name: "headingStrong", title: "Heading — bold", type: "string", validation: (rule) => rule.required() }),
+      ],
     }),
   ],
   preview: {

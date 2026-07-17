@@ -2,31 +2,15 @@
 // Our Firm origin story — the motocross track tale, photo left / story right,
 // with a four-milestone timeline below.
 import { Image } from "astro:assets";
+import { PortableText } from "astro-portabletext";
 import Eyebrow from "../Eyebrow.astro";
+import BareParagraph from "../prose/BareParagraph.astro";
+
+interface Milestone { _key?: string; key: string; title: string; desc: string }
+interface Props { eyebrow: string; headingLead: string; headingStrong: string; body: unknown; milestones: Milestone[] }
+const { eyebrow, headingLead, headingStrong, body, milestones } = Astro.props;
 import motoPhoto from "../../assets/cogdell-motorcycle.jpg";
 
-const milestones = [
-  {
-    key: "1970s",
-    title: "Rio Bravo",
-    desc: "A Houston motocross track — where a young rider first crossed paths with the legendary Richard “Racehorse” Haynes.",
-  },
-  {
-    key: "Age 25",
-    title: "Hired by a Legend",
-    desc: "After an unorthodox interview, Haynes hired the tenacious Dan Cogdell on the spot.",
-  },
-  {
-    key: "4 Years",
-    title: "Youngest Partner",
-    desc: "Cogdell became the youngest partner in the history of Haynes' firm.",
-  },
-  {
-    key: "Today",
-    title: "Cogdell Law Firm",
-    desc: "The firm of choice for the cases other lawyers call unwinnable.",
-  },
-];
 ---
 
 <section class="origin">
@@ -44,41 +28,14 @@ const milestones = [
 
       <div class="origin__body">
         <div class="origin__head">
-          <Eyebrow>Where It All Began</Eyebrow>
+          <Eyebrow>{eyebrow}</Eyebrow>
           <h2 class="origin__heading">
-            <span class="origin__heading-lead">A Motocross Track</span>
-            <span class="origin__heading-strong"> and a Legend.</span>
+            <span class="origin__heading-lead">{headingLead}</span>
+            <span class="origin__heading-strong"> {headingStrong}</span>
           </h2>
         </div>
-        <p>
-          In the gritty expanse of a Houston motocross track in the 1970s, known
-          as Rio Bravo, a fellow rider caught Mr. Cogdell's attention — it was
-          Richard “Racehorse” Haynes, a legal juggernaut who once tried 163 DWI
-          cases consecutively, resulting in a mere two convictions. About a year
-          later, Haynes took on the John Hill case, the basis for the book
-          <em>Blood and Money</em>.
-        </p>
-        <p>
-          It inspired Mr. Cogdell so much that he attended law school with the
-          sole intention of working alongside Haynes. Despite a
-          less-than-stellar undergraduate record, determination led to academic
-          excellence at South Texas College of Law — and, ultimately, an
-          interview with Haynes himself.
-        </p>
-        <p>
-          The interview was unorthodox. Rather than deliver the expected mock
-          closing argument, Cogdell recounted Haynes' distinctive style on the
-          motocross track, jolting his memory and earning an invitation for
-          drinks. His rationale was simple: if they were to collaborate on
-          grueling trials, they might as well gauge their camaraderie first.
-        </p>
-        <p>
-          More than a mentor, Haynes became a father figure — imparting lessons
-          that transcended legal strategy and reached into the core of human
-          connection with juries, bailiffs, and clerks alike. When everything is
-          on the line and liberty is at risk, hire the best.
-        </p>
-      </div>
+        <PortableText value={body} components={{ block: { normal: BareParagraph } }} />
+        </div>
     </div>
 
     <dl class="origin__milestones">
@@ -132,12 +89,18 @@ const milestones = [
   /* ---- Story grid ---- */
   .origin__grid {
     display: grid;
-    grid-template-columns: minmax(0, 720px) minmax(0, 790px);
+    grid-template-columns: minmax(0, 790px) minmax(0, 720px);
     justify-content: space-between;
     column-gap: var(--space-16);
     align-items: center;
   }
+  /* Content left, image right on desktop. DOM order stays media-first so the
+     stacked mobile layout still leads with the photo (see the 900px query). */
+  .origin__body {
+    order: 1;
+  }
   .origin__media {
+    order: 2;
     align-self: stretch;
     display: flex;
   }
@@ -149,14 +112,14 @@ const milestones = [
     object-position: center;
     border: 1px solid var(--cog-line-ink);
   }
-  .origin__body p {
+  .origin__body :global(p) {
     max-width: 660px;
     margin-bottom: var(--space-4);
     font-size: var(--text-base);
     line-height: 1.7;
     color: var(--cog-ink-body);
   }
-  .origin__body p:last-child {
+  .origin__body :global(p:last-child) {
     margin-bottom: 0;
   }
 
@@ -203,6 +166,12 @@ const milestones = [
     .origin__grid {
       grid-template-columns: minmax(0, 1fr);
       row-gap: var(--space-8);
+    }
+    .origin__media {
+      order: 1;
+    }
+    .origin__body {
+      order: 2;
     }
     .origin__photo {
       max-height: 520px;

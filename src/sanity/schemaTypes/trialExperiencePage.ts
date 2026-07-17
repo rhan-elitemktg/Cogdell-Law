@@ -15,6 +15,12 @@ export const trialExperiencePage = defineType({
   icon: icons.case,
   fields: [
     defineField({
+      name: "hero",
+      title: "Hero",
+      type: "pageHero",
+      options: { collapsible: true, collapsed: true },
+    }),
+    defineField({
       name: "trialResults",
       title: "Trial Results",
       type: "trialResultList",
@@ -32,14 +38,6 @@ export const trialExperiencePage = defineType({
       type: "ctaBarContent",
       description:
         "Optional. Leave empty to use the site-wide CTA Bar; fill this in only to give this page its own wording.",
-      options: { collapsible: true, collapsed: true },
-    }),
-    defineField({
-      name: "consult",
-      title: "Consult override",
-      type: "consultContent",
-      description:
-        "Optional. Leave empty to use the site-wide Consult; fill this in only to give this page its own wording.",
       options: { collapsible: true, collapsed: true },
     }),
   ],

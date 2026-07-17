@@ -15,11 +15,9 @@ export const contactPage = defineType({
   icon: icons.envelope,
   fields: [
     defineField({
-      name: "consult",
-      title: "Consult override",
-      type: "consultContent",
-      description:
-        "Optional. Leave empty to use the site-wide Consult; fill this in only to give this page its own wording.",
+      name: "hero",
+      title: "Hero",
+      type: "pageHero",
       options: { collapsible: true, collapsed: true },
     }),
   ],

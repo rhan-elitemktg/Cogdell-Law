@@ -2,17 +2,13 @@ import { sanityClient } from "sanity:client";
 import { defineQuery } from "groq";
 
 /**
- * The consult band renders on 13 pages — most of them dynamic routes with no page
- * document — so it's one shared record with an optional per-page override (D13).
+ * The consultation band's copy — ONE shared record used on every page.
  *
- * `coalesce` resolves override-over-default in a single query. When a page has no
- * document (or no override set), the first term is null and the shared default
- * wins.
+ * There used to be an optional per-page override (D13); the firm removed it, so
+ * there is a single Consult everywhere. The photo is still a per-page prop (art
+ * direction, D6).
  */
-const CONSULT_QUERY = defineQuery(`coalesce(
-  *[_id == $pageId][0].consult,
-  *[_id == "consult"][0].content
-){
+const CONSULT_QUERY = defineQuery(`*[_id == "consult"][0].content{
   eyebrow,
   headingLead,
   headingStrong,
@@ -21,11 +17,6 @@ const CONSULT_QUERY = defineQuery(`coalesce(
   thankYou
 }`);
 
-/**
- * @param pageId Document id of the page, when it has one — lets that page's
- *   override win. Omit on routes with no page document; the shared default is used.
- */
-export async function getConsult(pageId?: string) {
-  // A page id that can't exist, so the coalesce falls straight through.
-  return await sanityClient.fetch(CONSULT_QUERY, { pageId: pageId ?? " none" });
+export async function getConsult() {
+  return await sanityClient.fetch(CONSULT_QUERY);
 }

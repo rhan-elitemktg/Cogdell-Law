@@ -14,6 +14,12 @@ export const newsPage = defineType({
   icon: icons.documents,
   fields: [
     defineField({
+      name: "hero",
+      title: "Hero",
+      type: "pageHero",
+      options: { collapsible: true, collapsed: true },
+    }),
+    defineField({
       name: "grid",
       title: "News Grid",
       type: "object",
@@ -23,14 +29,6 @@ export const newsPage = defineType({
         defineField({ name: "headingLead", title: "Heading — italic", type: "string", validation: (rule) => rule.required() }),
         defineField({ name: "headingStrong", title: "Heading — bold", type: "string", validation: (rule) => rule.required() }),
       ],
-    }),
-    defineField({
-      name: "consult",
-      title: "Consult override",
-      type: "consultContent",
-      description:
-        "Optional. Leave empty to use the site-wide Consult; fill this in only to give this page its own wording.",
-      options: { collapsible: true, collapsed: true },
     }),
   ],
   preview: {

@@ -2,39 +2,36 @@
 import Layout from "../../layouts/Layout.astro";
 import Breadcrumb from "../../components/practice/Breadcrumb.astro";
 import PageHero from "../../components/PageHero.astro";
-import PracticeBody from "../../components/practice/PracticeBody.astro";
+import ProseBody from "../../components/prose/ProseBody.astro";
 import PracticeGrid from "../../components/practice/PracticeGrid.astro";
 import PracticeFaqs from "../../components/practice/PracticeFaqs.astro";
 import CtaBar from "../../components/CtaBar.astro";
 import Consult from "../../components/Consult.astro";
-import { getPracticeAreaPaths } from "../../data/practice-areas";
-import type { PracticeArea, Crumb } from "../../data/practice-areas";
+import { getPracticeAreaPaths } from "../../sanity/lib/practiceAreas";
+import { PRACTICE_AREA_ICONS } from "../../lib/practiceAreaIcons";
 
-export function getStaticPaths() {
+export async function getStaticPaths() {
   return getPracticeAreaPaths();
 }
 
-interface Props {
-  node: PracticeArea;
-  trail: Crumb[];
-  path: string;
-}
+const { node, trail, children } = Astro.props;
 
-const { node, trail, path } = Astro.props;
-
-const childItems = (node.children ?? []).map((child) => ({
-  title: child.title,
-  summary: child.cardSummary,
-  href: `/practice-areas/${path}/${child.slug}`,
-  icon: child.icon,
+const childItems = (children ?? []).map((c: any) => ({
+  title: c.title,
+  summary: c.summary,
+  href: c.href,
+  icon: c.icon ? PRACTICE_AREA_ICONS[c.icon] : undefined,
 }));
 
 const description = node.lede ?? `${node.title} — Cogdell Law Firm.`;
 
-// The opening line (former hero lede) now leads the content body.
-const bodyIntro = node.lede
-  ? [{ p: node.lede }, ...(node.intro ?? [])]
-  : node.intro;
+// The opening line (lede) leads the content body, exactly as before.
+// The lede is its own field (meta description + card summary) and also opens the
+// body, exactly as before the intro/sections merge.
+const ledeBlock = node.lede
+  ? [{ _type: "block", _key: "lede", style: "normal", markDefs: [], children: [{ _type: "span", _key: "ledes", text: node.lede, marks: [] }] }]
+  : [];
+const bodyValue = [...ledeBlock, ...(node.body ?? [])];
 ---
 
 <Layout title={node.title} description={description}>
@@ -56,7 +53,7 @@ const bodyIntro = node.lede
     </a>
   </PageHero>
 
-  <PracticeBody intro={bodyIntro} sections={node.sections} />
+  <ProseBody body={bodyValue} />
 
   {node.faqs && node.faqs.length > 0 && <PracticeFaqs faqs={node.faqs} />}
 

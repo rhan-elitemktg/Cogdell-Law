@@ -45,6 +45,14 @@ export const structure: StructureResolver = (S, context) =>
       page(S, "newsPage", "News Page", icons.documents),
       page(S, "videosPage", "Videos Page", icons.play),
       page(S, "contactPage", "Contact Page", icons.envelope),
+      S.listItem()
+        .title("Privacy Policy")
+        .icon(icons.document)
+        .child(S.document().schemaType("legalPage").documentId("privacy").title("Privacy Policy")),
+      S.listItem()
+        .title("Disclaimer")
+        .icon(icons.document)
+        .child(S.document().schemaType("legalPage").documentId("disclaimer").title("Disclaimer")),
       S.divider(),
       page(S, "ctaBar", "CTA Bar", icons.bell),
       page(S, "consult", "Consult", icons.envelope),
@@ -65,7 +73,35 @@ export const structure: StructureResolver = (S, context) =>
         S,
         context,
       }),
+      orderableDocumentListDeskItem({
+        type: "video",
+        title: "Videos",
+        icon: icons.play,
+        S,
+        context,
+      }),
+      orderableDocumentListDeskItem({
+        type: "practiceArea",
+        title: "Practice Areas",
+        icon: icons.case,
+        S,
+        context,
+      }),
+      orderableDocumentListDeskItem({
+        type: "serviceCity",
+        title: "Service Cities",
+        icon: icons.pin,
+        S,
+        context,
+      }),
+      orderableDocumentListDeskItem({
+        type: "locationPage",
+        title: "Location Pages",
+        icon: icons.document,
+        S,
+        context,
+      }),
       ...S.documentTypeListItems().filter(
-        (li) => !SINGLETONS.includes(li.getId() as string) && !["attorney", "faq"].includes(li.getId() as string),
+        (li) => !SINGLETONS.includes(li.getId() as string) && !["attorney", "faq", "video", "legalPage", "practiceArea", "serviceCity", "locationPage"].includes(li.getId() as string),
       ),
     ]);

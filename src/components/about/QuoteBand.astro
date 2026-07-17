@@ -2,6 +2,9 @@
 // Our Firm quote band — centered promise quote over a darkened boardroom photo.
 import { Image } from "astro:assets";
 import quoteBg from "../../assets/quote-boardroom.webp";
+
+interface Props { lead: string; accent: string; attribution: string }
+const { lead, accent, attribution } = Astro.props;
 ---
 
 <section class="quote-band">
@@ -18,12 +21,12 @@ import quoteBg from "../../assets/quote-boardroom.webp";
     <span class="quote-band__mark" aria-hidden="true">“</span>
     <blockquote class="quote-band__quote">
       <p class="quote-band__text">
-        Where being the greatest isn't a boast —
+        {lead}
         <br/>
-        <span class="quote-band__accent"> it's a promise.</span>
+        <span class="quote-band__accent"> {accent}</span>
       </p>
     </blockquote>
-    <figcaption class="quote-band__attr">Cogdell Law Firm</figcaption>
+    <figcaption class="quote-band__attr">{attribution}</figcaption>
   </figure>
 </section>
 

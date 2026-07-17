@@ -1,0 +1,105 @@
+{
+  "hero": {
+    "eyebrow": "About Cogdell Law Firm",
+    "titleLead": "The Firm the Opposition",
+    "titleStrong": "Doesn't Want to Face.",
+    "lede": "When the courtroom doors swing open, there's one name that makes the opposition think twice. For more than four decades, Cogdell Law Firm has defended the cases others call unwinnable — and won."
+  },
+  "stats": [
+    {
+      "value": "40+",
+      "label": "Years of Trial Experience"
+    },
+    {
+      "value": "500+",
+      "label": "Jury Trials"
+    },
+    {
+      "value": "Top 2%",
+      "label": "Fellow, American College of Trial Lawyers"
+    },
+    {
+      "value": "Nationwide",
+      "label": "Federal & State Courts"
+    }
+  ],
+  "intro": {
+    "eyebrow": "Who We Are",
+    "lead": "Not just a law firm —",
+    "strong": "the law firm of choice.",
+    "body": [
+      "Cogdell Law Firm is the firm of choice for people facing charges for federal white collar and criminal offenses, state felony charges, grand jury investigations, medical kickback, securities fraud, and criminal appeals. We are trial lawyers, brought in when the stakes are highest and the case must be won in the courtroom.",
+      "Dan Cogdell is one of the elite 2% of attorneys admitted as a Fellow of the American College of Trial Lawyers. His reputation for strategy and skill isn't just respected — it's revered."
+    ]
+  },
+  "quote": {
+    "lead": "Where being the greatest isn't a boast —",
+    "accent": "it's a promise.",
+    "attribution": "Cogdell Law Firm"
+  },
+  "foundingAttorney": {
+    "eyebrow": "Founding Attorney",
+    "lead": "A Career Built on",
+    "strong": "Winning the Unwinnable.",
+    "body": [
+      "Mr. Cogdell knows the play before the opposition has even decided on the game. He has spent his career collecting acquittals in cases written off by others — including the sole acquittal in any Enron-related trial and the defense of Clive Doyle following the siege of the Branch Davidian compound in Waco.",
+      "He doesn't take cases he thinks he can win; he takes those he knows he will. His work has drawn features in <em>The Texas Tribune</em> and <em>Texas Monthly</em>, and coverage in national publications from CNN to <em>The New York Times</em>.",
+      "The firm's attorneys, paralegals, and support staff live and breathe victory. Choosing Cogdell Law Firm means choosing success — not just navigating legal complexities, but partnering with a legal giant who stands shoulder to shoulder with you."
+    ]
+  },
+  "originStory": {
+    "eyebrow": "Where It All Began",
+    "lead": "A Motocross Track",
+    "strong": "and a Legend.",
+    "body": [
+      "In the gritty expanse of a Houston motocross track in the 1970s, known as Rio Bravo, a fellow rider caught Mr. Cogdell's attention — it was Richard “Racehorse” Haynes, a legal juggernaut who once tried 163 DWI cases consecutively, resulting in a mere two convictions. About a year later, Haynes took on the John Hill case, the basis for the book <em>Blood and Money</em>.",
+      "It inspired Mr. Cogdell so much that he attended law school with the sole intention of working alongside Haynes. Despite a less-than-stellar undergraduate record, determination led to academic excellence at South Texas College of Law — and, ultimately, an interview with Haynes himself.",
+      "The interview was unorthodox. Rather than deliver the expected mock closing argument, Cogdell recounted Haynes' distinctive style on the motocross track, jolting his memory and earning an invitation for drinks. His rationale was simple: if they were to collaborate on grueling trials, they might as well gauge their camaraderie first.",
+      "More than a mentor, Haynes became a father figure — imparting lessons that transcended legal strategy and reached into the core of human connection with juries, bailiffs, and clerks alike. When everything is on the line and liberty is at risk, hire the best."
+    ],
+    "milestones": [
+      {
+        "key": "1970s",
+        "title": "Rio Bravo",
+        "desc": "A Houston motocross track — where a young rider first crossed paths with the legendary Richard “Racehorse” Haynes."
+      },
+      {
+        "key": "Age 25",
+        "title": "Hired by a Legend",
+        "desc": "After an unorthodox interview, Haynes hired the tenacious Dan Cogdell on the spot."
+      },
+      {
+        "key": "4 Years",
+        "title": "Youngest Partner",
+        "desc": "Cogdell became the youngest partner in the history of Haynes' firm."
+      },
+      {
+        "key": "Today",
+        "title": "Cogdell Law Firm",
+        "desc": "The firm of choice for the cases other lawyers call unwinnable."
+      }
+    ]
+  },
+  "values": {
+    "eyebrow": "What Drives Us",
+    "lead": "The Standard",
+    "strong": "We Hold.",
+    "items": [
+      {
+        "icon": "sparkles",
+        "title": "Impossible Isn't in the Lexicon",
+        "body": "Mr. Cogdell has built a career collecting acquittals in cases written off by others. To him, impossible is just another word for challenge."
+      },
+      {
+        "icon": "gavel",
+        "title": "We Try the Cases Others Settle",
+        "body": "Settlements are a specialty, but should a trial beckon, he is the maestro ready to conduct a legal symphony like no other."
+      },
+      {
+        "icon": "users",
+        "title": "Shoulder to Shoulder",
+        "body": "Choosing Cogdell Law Firm means partnering with a legal giant who stands with you, from first call through verdict, in the pursuit of justice."
+      }
+    ]
+  }
+}

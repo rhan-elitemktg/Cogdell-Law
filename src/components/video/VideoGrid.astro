@@ -2,10 +2,10 @@
 // Poster-thumbnail grid of firm videos. Each card is a button that opens the
 // global VideoLightbox (via data-video-id) — the Wistia player only loads on click.
 import Eyebrow from "../Eyebrow.astro";
-import type { VideoItem } from "../../data/videos";
+type VideoCard = { _id: string; title: string; wistiaId: string; poster: string; duration: string };
 
 interface Props {
-  items: VideoItem[];
+  items: VideoCard[];
   eyebrow?: string;
   headingLead?: string;
   headingStrong?: string;
@@ -34,7 +34,7 @@ const hasHead = Boolean(eyebrow || headingLead);
     <div class="vgrid__grid">
       {
         items.map((v) => (
-          <button type="button" class="vcard" data-video-id={v.id} data-video-poster={v.poster} aria-label={`Play video: ${v.title}`}>
+          <button type="button" class="vcard" data-video-id={v.wistiaId} data-video-poster={v.poster} aria-label={`Play video: ${v.title}`}>
             <span class="vcard__thumb">
               <img
                 class="vcard__img"

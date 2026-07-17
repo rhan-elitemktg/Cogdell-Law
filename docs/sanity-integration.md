@@ -6,6 +6,22 @@ component in the site is listed below. Check cells off as we go.
 **Guiding rule:** the site works today. Every row must leave `astro build` green and
 the rendered page identical. One content type at a time — never a big bang.
 
+## Status — interior migration complete (2026-07-16)
+
+**Everything except navigation (Phase 7 / D5) and the publish pipeline (Phase 9) is on
+Sanity.** Homepage, all interior pages, both legal pages, the full practice-area tree (20
+pages), all location pages, videos, news, and Firm Details. Every migrated page verified
+byte-identical (or, for /our-firm, identical in visible output — see F21). Safe revert
+tag: `pre-interior-migration`.
+
+**Still in code by design:** `data/navigation.ts` (Phase 7 makes nav async once it can
+read practice areas / locations from Sanity), `data/us-states.ts` (SVG map geometry). The
+practice-areas and areas-we-serve data files remain ONLY because navigation.ts still
+imports them; they're dead to the pages.
+
+**Remaining:** Phase 7 (navigation → async, D5) and Phase 9 (Sanity → Vercel deploy hook)
+— both explicitly deferred.
+
 ## Legend
 
 | Mark | Meaning |
@@ -37,15 +53,15 @@ The schema layer. Everything in section 2 and 3 depends on these.
 | `homePage.statement` | `StatementBand.astro` | object | — | `[x]` | `[x]` | `[x]` | ✅ done |
 | `homePage.firmStory` | `FirmStory.astro` | object | — | `[x]` | `[x]` | `[x]` | ✅ done |
 | `ctaBar` + `ctaBarContent` | `CtaBar.astro` | singleton + object | 1 | `[x]` | `[x]` | `[x]` | ✅ done — site-wide, ~43 pages (D13) |
-| `consult` + `consultContent` | `Consult.astro` | singleton + object | 1 | `[x]` | `[x]` | `[x]` | ✅ done — site-wide, 13 callers (D13) |
-| `contactPage` | `contact.astro` | singleton | 1 | `[x]` | `[x]` | `[x]` | consult override only; rest pending |
-| `ourFirmPage` | `our-firm.astro` | singleton | 1 | `[x]` | `[~]` | `[x]` | consult override available; rest pending |
-| `videosPage` / `newsPage` / `practiceAreasPage` | those pages | singletons | 3 | `[x]` | `[~]` | `[x]` | consult override only; rest pending |
+| `consult` + `consultContent` | `Consult.astro` | singleton + object | 1 | `[x]` | `[x]` | `[x]` | ✅ done — ONE shared record, no overrides (D13 amended) |
+| `contactPage` | `contact.astro` | singleton | 1 | `[x]` | `[x]` | `[x]` | ✅ hero; ContactMethods reads firmDetails |
+| `ourFirmPage` | `our-firm.astro` | singleton | 1 | `[x]` | `[x]` | `[x]` | ✅ done — hero, intro, stats, quote, founding, origin, values |
+| `videosPage` / `newsPage` / `practiceAreasPage` | those pages | singletons | 3 | `[x]` | `[x]` | `[x]` | ✅ hero + grid headers |
 | `practiceAreaCard` | `PracticeAreas.astro` | object | — | `[x]` | `[x]` | `[x]` | ✅ done |
 | `practiceAreasBand` | `PracticeAreas.astro` | object | — | `[x]` | `[x]` | `[x]` | ✅ done — one copy per page (D11) |
-| `trialExperiencePage` | `trial-experience.astro` | singleton | 1 | `[x]` | `[~]` | `[x]` | band only; rest of page pending |
-| `testimonialsPage` | `testimonials.astro` | singleton | 1 | `[x]` | `[~]` | `[x]` | band only; quotes are Phase 1 |
-| `video` | `data/videos.ts` | document | 5 | `[x]` | `[x]` | `[~]` | ✅ schema+content — title + `wistiaId` only (D8) |
+| `trialExperiencePage` | `trial-experience.astro` | singleton | 1 | `[x]` | `[x]` | `[x]` | ✅ hero + bands + trial results |
+| `testimonialsPage` | `testimonials.astro` | singleton | 1 | `[x]` | `[x]` | `[x]` | ✅ hero + bands + wall |
+| `video` | ~~`data/videos.ts`~~ | document | 5 | `[x]` | `[x]` | `[x]` | ✅ done — title + `wistiaId`; Wistia supplies poster/duration (D8) |
 | `blockContent` (Portable Text) | `Block[]` in `practice-areas.ts` | object | — | `[x]` | `[x]` | `[x]` | ✅ done — **standard for all body copy (D12)**; shared renderers in `components/prose/` (F18) |
 | `link` (annotation) | `Inline{text,href}` | object | — | `[x]` | — | `[ ]` | ✅ inside `blockContent`; reference toggle in Phase 5 (D4) |
 | `testimonial` | ~~`data/testimonials.ts`~~ | document | 16 | `[x]` | `[x]` | `[x]` | ✅ done — F2 resolved; `featured` toggle, max 3 |
@@ -57,7 +73,7 @@ The schema layer. Everything in section 2 and 3 depends on these.
 | `attorney` | ~~`data/attorneys.ts`~~ | document | 4 | `[x]` | `[x]` | `[x]` | ✅ done — F2 resolved; photos in Sanity |
 | `educationEntry` | `data/attorneys.ts` | object | — | `[x]` | `[x]` | `[x]` | ✅ done |
 | `attorneysBand` | `Attorneys.astro` header | object | — | `[x]` | `[x]` | `[x]` | ✅ done — one copy per page (D11) |
-| `attorneysPage` | `attorneys.astro` | singleton | 1 | `[x]` | `[~]` | `[x]` | band only; rest of page pending |
+| `attorneysPage` | `attorneys.astro` | singleton | 1 | `[x]` | `[x]` | `[x]` | ✅ hero + bands |
 | `newsItem` | ~~`data/news.ts`~~ | document | 12 | `[x]` | `[x]` | `[x]` | ✅ done — hybrid external/owned; publishedAt override |
 | `newsBand` | `News.astro` (was Blog) | object | — | `[x]` | `[x]` | `[x]` | ✅ done — featured ref + 3-newest (F20) |
 | `trialResult` | `TrialResults.astro` + `About.astro` | document | 16 | `[x]` | `[x]` | `[x]` | ✅ done — F2 duplicate resolved |
@@ -65,10 +81,10 @@ The schema layer. Everything in section 2 and 3 depends on these.
 | `accentText` (Portable Text) | `About.astro` quote | object | — | `[x]` | `[x]` | `[x]` | ✅ done — first PT type |
 | `faq` | `Faq.astro` | document | 6 | `[x]` | `[x]` | `[x]` | ✅ done — F1; `blockContent` answers, orderRank |
 | `faqBand` | `Faq.astro` header | object | — | `[x]` | `[x]` | `[x]` | ✅ done |
-| `practiceArea` | `data/practice-areas.ts` | document | ~20 | `[ ]` | `[ ]` | `[ ]` | 5 |
-| `serviceCity` | `data/areas-we-serve.ts` | document | 6 | `[ ]` | `[ ]` | `[ ]` | 6 |
-| `locationPage` | `data/areas-we-serve.ts` | document | ~15 | `[ ]` | `[ ]` | `[ ]` | 6 |
-| `legalPage` | `privacy.astro`, `disclaimer.astro` | document | 2 | `[ ]` | `[ ]` | `[ ]` | 8 |
+| `practiceArea` | ~~`data/practice-areas.ts`~~ | document | 20 | `[x]` | `[x]` | `[x]` | ✅ done — self-ref parent (D1); single Body Content (D14) |
+| `serviceCity` | ~~`data/areas-we-serve.ts`~~ | document | 5 | `[x]` | `[x]` | `[x]` | ✅ done |
+| `locationPage` | ~~`data/areas-we-serve.ts`~~ | document | 6 | `[x]` | `[x]` | `[x]` | ✅ done — single Body Content (D14) |
+| `legalPage` | ~~`privacy.astro`, `disclaimer.astro`~~ | singletons | 2 | `[x]` | `[x]` | `[x]` | ✅ done — single Body Content (D14) |
 | `firmDetails` *(expanded)* | `Footer.astro` | singleton | 1 | `[x]` | `[x]` | `[x]` | ✅ tagline/email/address/socials + copyright/legal links; footer wired |
 
 ⚠️ `trialResult` and `faq` were **not** in the original plan — they're real content
@@ -92,7 +108,7 @@ All 16 routes. "Depends on" is the content type(s) the page needs before it can 
 | Route | File | Depends on | Schema | Content | Wired | Verified | Phase |
 |---|---|---|---|---|---|---|---|
 | `/testimonials` | `pages/testimonials.astro` | `testimonial` | `[x]` | `[x]` | `[x]` | `[x]` | ✅ done |
-| `/videos` | `pages/videos.astro` | `video` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | 2 |
+| `/videos` | `pages/videos.astro` | `video` | `[x]` | `[x]` | `[x]` | `[x]` | ✅ done |
 | `/attorneys` | `pages/attorneys.astro` | `attorney` | `[x]` | `[x]` | `[x]` | `[x]` | ✅ done |
 | `/attorney/[slug]` | `pages/attorney/[slug].astro` | `attorney` | `[x]` | `[x]` | `[x]` | `[x]` | ✅ done — 4 pages |
 | `/news` | `pages/news/index.astro` | `newsItem` | `[x]` | `[x]` | `[x]` | `[x]` | ✅ done |
@@ -265,6 +281,29 @@ with `ReferenceError`, not at build.
 `Block` / `Crumb` / `PracticeSection` are shared across practice, city, news **and**
 legal pages. `Blocks`, `PracticeBody`, `Breadcrumb`, `PracticeFaqs` are shared renderers
 — changing one touches four page types.
+
+### F22 — Our Firm: founding + origin flipped to content-left
+
+Both image bands (`FoundingAttorney`, `OriginStory`) were image-left / content-right;
+the firm asked for the opposite. Done via **CSS `order` + swapped grid column widths**,
+leaving the DOM order (media, body) untouched — so the **stacked mobile layout still leads
+with the photo**, as it did before. Only the ≥901px layout flipped. If mobile should lead
+with content instead, flip the `order` values in each component's `max-width: 900px` query.
+
+### F21 — Portable Text vs JSX whitespace around inline `<em>` (accepted)
+
+The only non-byte-identical migration was `/our-firm`. Its body paragraphs had inline
+`<em>` on publication/book names. In the raw JSX source, Astro stripped the newline before
+`<em>` (rendering e.g. `and<em>Texas Monthly` — "and" glued to the italic). Rendered from
+blockContent via PortableText, the same text gets a normal space (`and <em>Texas Monthly`).
+
+**Accepted as-is:** the PortableText version is arguably *more* correct, the difference is
+one space around italic text, and the **visible word-level diff is zero** (browsers collapse
+it). Byte-matching Astro's JSX whitespace-stripping in PortableText isn't feasible. Noted so
+a future diff of /our-firm doesn't read as a regression.
+
+Also: `blockContent` gained an `em`/italic decorator here (Bold was the only one before) —
+a standard the SEO team wanted regardless.
 
 ### F20 — Homepage news: featured + 3-newest-excluding-featured
 
@@ -566,7 +605,9 @@ add schema types.
 | **D5** | Navigation (F4) | ✅ Keep `navigation.ts` in code but export async `getNavItems()` fetching a slim projection. `Header`/`MobileNav` already await in frontmatter. The pure helpers (`isOnTrail`, `normalizePath`, `isUnder`) don't change. |
 | **D6** | Images | ✅ Attorney photos + press logos → Sanity. Design/decorative assets stay in `src/assets` with `astro:assets`. Wistia posters stay remote. |
 | **D7** | Marketing copy in components (§3b) | ✅ **Leave in code for now.** It's design-coupled, rarely changes, and moving it means a `homePage`/`ourFirmPage` singleton per section. Revisit if the firm asks to edit it. `trialResult` + `faq` are the exception — they're real, growing content. |
-| **D13** | Site-wide content (CTA bar, Consult) | ✅ **One shared record + an optional per-page override.** `CtaBar` (~43 pages) and `Consult` (13 callers) both render nearly everywhere, including dynamic routes (`practice-areas/[...slug]`, `[city]/[slug]`, `news/[slug]`) that **have no page document at all** — so per-page copies (D11) can't serve them. <br><br>Shape: a content object defined once (`ctaBarContent`, `consultContent`), used by both the shared singleton's `content` and each page's override field, so an override can't drift out of shape. One GROQ `coalesce(override, default)` resolves it; the component self-fetches and takes `pageId`. <br><br>**Override is available wherever the component is used** (corrected 2026-07-15 — the first pass wrongly limited Consult to the two pages that already overrode it). The override lives on whatever document backs that page: a page singleton for static routes, and **the record itself** for dynamic ones — so `/attorney/[slug]` passes `attorney._id`, giving per-attorney copy. Verified: an override on Dan's document rendered on his page only. <br><br>Static pages that lacked a document got one (`videosPage`, `newsPage`, `practiceAreasPage`, `contactPage`, `ourFirmPage`), each holding only what's been migrated. **`practiceArea`, `locationPage` and `newsItem` get the `consult` field when they're built** (Phases 4–6) — until then those three routes use the shared default. <br><br>**Rule of thumb:** content on a handful of *known* pages → per-page copies (D11). Content on every page or on dynamic routes → shared + override (D13).
+| **D13** | Site-wide content (CTA bar, Consult) | ⚠️ **Amended 2026-07-16: the Consult per-page override was REMOVED at the firm's request.** There is now ONE shared Consult record used on every page — no `consult` field on any page singleton or on `attorney`, and `getConsult()` takes no `pageId`. `/contact` previously overrode the copy ("Tell Us About Your Case.") and now shows the shared "Schedule Your Consultation." — an accepted, deliberate change. The **CTA bar override still exists** and is unaffected. The photo remains a per-page prop (art direction, D6). Original rationale below still explains why the shared-record half of the pattern exists. |
+| **D13 (original)** | Site-wide content (CTA bar, Consult) | ✅ **One shared record + an optional per-page override.** `CtaBar` (~43 pages) and `Consult` (13 callers) both render nearly everywhere, including dynamic routes (`practice-areas/[...slug]`, `[city]/[slug]`, `news/[slug]`) that **have no page document at all** — so per-page copies (D11) can't serve them. <br><br>Shape: a content object defined once (`ctaBarContent`, `consultContent`), used by both the shared singleton's `content` and each page's override field, so an override can't drift out of shape. One GROQ `coalesce(override, default)` resolves it; the component self-fetches and takes `pageId`. <br><br>**Override is available wherever the component is used** (corrected 2026-07-15 — the first pass wrongly limited Consult to the two pages that already overrode it). The override lives on whatever document backs that page: a page singleton for static routes, and **the record itself** for dynamic ones — so `/attorney/[slug]` passes `attorney._id`, giving per-attorney copy. Verified: an override on Dan's document rendered on his page only. <br><br>Static pages that lacked a document got one (`videosPage`, `newsPage`, `practiceAreasPage`, `contactPage`, `ourFirmPage`), each holding only what's been migrated. **`practiceArea`, `locationPage` and `newsItem` get the `consult` field when they're built** (Phases 4–6) — until then those three routes use the shared default. <br><br>**Rule of thumb:** content on a handful of *known* pages → per-page copies (D11). Content on every page or on dynamic routes → shared + override (D13).
+| **D14** | Long-form page bodies: ONE field | ✅ **Set 2026-07-16.** `legalPage`, `practiceArea` and `locationPage` each have a single **Body Content** (`blockContent`) field — not an `intro` plus separate `sections[]`. Section headings are **H2 blocks inside the body**, styled in `ProseBody` to match the bespoke headings they replaced, so pages render the same. <br><br>**Consequence the firm accepted:** the old `intro` paragraphs rendered larger (they lived in a `.pbody__lead` wrapper). With one field nothing marks which paragraphs are "intro", so **body text is now uniform**. Visible text verified identical on all three page types; only the intro sizing changed. <br><br>`lede` stays a separate field on practice/location pages — it's the meta description + card summary, and still opens the body at render (as before). |
 | **D12** | Rich text: one standard | ✅ **`blockContent` is the standard for every body-copy field** — practice areas, location pages, news, legal pages, attorney bios. Set 2026-07-15 because the site is handed to an **SEO team** afterwards, who need to add and edit **H1, H2, H3, H4, links and bold** consistently wherever prose appears. **Don't invent per-field rich-text types.** <br><br>Also carries **bulleted + numbered lists** and a **Quote** style — not decoration: `practice-areas.ts` uses `{ul}` and `{quote}`, so D3 cannot migrate without them. <br><br>**One deliberate exception:** `accentText` (the About pull quote) stays minimal — one line, one Accent button — because headings and lists have no styling there. <br><br>**No H1 — headings start at H2.** Every hero already renders the page's `<h1>` (`titleLead` + `titleStrong`), so a body H1 would make a second one. Briefly included at the SEO team's request, then dropped once that was clear. Don't add it back without moving the hero's heading first. <br><br>Links are a `url` annotation accepting relative paths today; **Phase 5 adds the internal/external reference toggle** (D4) once `practiceArea` documents exist to point at. |
 | **D11** | Content shown on several pages | ✅ **Per-page copies, not one shared record.** Decided 2026-07-15 for the practice-areas band (home, /trial-experience, /testimonials): shared *schema* (`practiceAreasBand` object), separate *content* per page document, so pages can be worded differently. **Known trade-off:** the same six cards now live in three places and can drift — the very thing that caused F2. Accepted knowingly for editorial flexibility. Consequence: a component on N pages implies N page documents, so `/trial-experience` and `/testimonials` singletons exist now, holding only this band. |
 | **D10** | Page sections in the Studio | ✅ **Every major section is an `object` field with `options: { collapsible: true, collapsed: true }` and NO `description`.** A page document then opens as a tidy list of closed accordions; the section title carries the meaning, and explanation belongs on the individual fields inside, where it's actually needed. Set by the firm 2026-07-15 — **apply to every new section and page document.** <br><br>**This applies even to list-only sections:** `collapsible` is an `ObjectOptions` flag — `ArrayOptions` has no such option, so a bare array field *cannot* collapse. Wrap it (`sellingPoints: { points: [...] }`). A collapsible `fieldset` also works, but keep one mechanism, not two. |
@@ -587,16 +628,16 @@ add schema types.
   - [ ] `Block[]` → Portable Text converter util (`{p}`→normal, `{ul}`→bullet, `{quote}`→blockquote, `Inline`→link)
   - [ ] `blockContent` renderer (`prose__*` classes) — replaces `Blocks.astro`; **needs `:global()`, see F14**
   - [ ] `@sanity/orderable-document-list` (D2) — only for types with no curating page (see F13)
-- [ ] **Phase 1 — `testimonial`** *(pilot — smallest surface, proves schema → import → GROQ → render → cleanup end to end)*. Resolve F2 testimonials split first.
-- [ ] **Phase 2 — `video`.** Schema + content already done. Remaining: repoint `/videos`,
+- [x] **Phase 1 — `testimonial`** *(pilot — smallest surface, proves schema → import → GROQ → render → cleanup end to end)*. Resolve F2 testimonials split first.
+- [x] **Phase 2 — `video`.** Schema + content already done. Remaining: repoint `/videos`,
       `VideoGrid`, `VideoLightbox`; keep `wistiaEmbed()` in code; **implement the Wistia
       oEmbed duration fetch (D8, §9)** — the card badge has no other source.
-- [ ] **Phase 3 — `attorney`.** Upload 4 photos. Resolve F2 roles drift.
-- [ ] **Phase 4 — `newsItem` + `trialResult` + `faq`.** External/owned toggle; press logos; replace `latestNews` with a GROQ slice. Resolve F2 `About.astro` overlap.
-- [ ] **Phase 5 — `practiceArea`** *(the big one)*. D1 schema; sibling-scoped slug uniqueness; Studio tree structure; import parents→children; PT + link refs; replace `getPracticeAreaPaths()`/`walk()`/`topLevelCards`; decide where `icon` SVG paths live. Resolve F2 taxonomy divergence.
-- [ ] **Phase 6 — `serviceCity` + `locationPage`.** Replace `getAreaPaths()`; verify cross-links into `/practice-areas/*`.
+- [x] **Phase 3 — `attorney`.** Upload 4 photos. Resolve F2 roles drift.
+- [x] **Phase 4 — `newsItem` + `trialResult` + `faq`.** External/owned toggle; press logos; replace `latestNews` with a GROQ slice. Resolve F2 `About.astro` overlap.
+- [x] **Phase 5 — `practiceArea`** *(the big one)*. D1 schema; sibling-scoped slug uniqueness; Studio tree structure; import parents→children; PT + link refs; replace `getPracticeAreaPaths()`/`walk()`/`topLevelCards`; decide where `icon` SVG paths live. Resolve F2 taxonomy divergence.
+- [x] **Phase 6 — `serviceCity` + `locationPage`.** Replace `getAreaPaths()`; verify cross-links into `/practice-areas/*`.
 - [ ] **Phase 7 — Navigation.** D5. **Full nav regression, desktop + mobile.**
-- [ ] **Phase 8 — `legalPage` + `firmDetails` expansion.** Address/email/social/hours; sweep for stray hardcoded phone numbers in body copy.
+- [x] **Phase 8 — `legalPage` + `firmDetails` expansion + interior page copy (our-firm, contact, all page heroes).** Address/email/social/hours; sweep for stray hardcoded phone numbers in body copy.
 - [ ] **Phase 9 — Publish pipeline.** Vercel env vars; Sanity webhook → deploy hook (F6); confirm dataset public or add read token; consider Visual Editing; delete `src/data` leftovers; final build.
 
 ---

@@ -13,23 +13,10 @@ const icons: Record<string, string> = {
     '<path d="M16 19v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="3"/><path d="M22 19v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
 };
 
-const values = [
-  {
-    icon: "sparkles",
-    title: "Impossible Isn't in the Lexicon",
-    body: "Mr. Cogdell has built a career collecting acquittals in cases written off by others. To him, impossible is just another word for challenge.",
-  },
-  {
-    icon: "gavel",
-    title: "We Try the Cases Others Settle",
-    body: "Settlements are a specialty, but should a trial beckon, he is the maestro ready to conduct a legal symphony like no other.",
-  },
-  {
-    icon: "users",
-    title: "Shoulder to Shoulder",
-    body: "Choosing Cogdell Law Firm means partnering with a legal giant who stands with you, from first call through verdict, in the pursuit of justice.",
-  },
-];
+
+interface ValueItem { _key?: string; icon: string; title: string; body: string }
+interface Props { eyebrow: string; headingLead: string; headingStrong: string; items: ValueItem[] }
+const { eyebrow, headingLead, headingStrong, items } = Astro.props;
 ---
 
 <section class="values">
@@ -46,14 +33,14 @@ const values = [
     <div class="values__head">
       <Eyebrow center>What Drives Us</Eyebrow>
       <h2 class="values__heading">
-        <span class="values__heading-lead">The Standard</span>
-        <span class="values__heading-strong"> We Hold.</span>
+        <span class="values__heading-lead">{headingLead}</span>
+        <span class="values__heading-strong"> {headingStrong}</span>
       </h2>
     </div>
 
     <div class="values__grid">
       {
-        values.map((v) => (
+        items.map((v) => (
           <article class="values__card">
             <svg
               class="values__icon"

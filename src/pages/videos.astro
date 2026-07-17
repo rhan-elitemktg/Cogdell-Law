@@ -1,11 +1,28 @@
 ---
+import { getPageHero } from "../sanity/lib/pageHero";
 import Layout from "../layouts/Layout.astro";
 import PageHero from "../components/PageHero.astro";
 import VideoGrid from "../components/video/VideoGrid.astro";
 import CtaBar from "../components/CtaBar.astro";
 import Consult from "../components/Consult.astro";
-import { videos } from "../data/videos";
+import { getVideos, getVideoGridHeader } from "../sanity/lib/videos";
 import heroImage from "../assets/firm-steps.jpg";
+
+const videos = await getVideos();
+const gridHeader = await getVideoGridHeader();
+
+if (!videos.length || !gridHeader) {
+  throw new Error(
+    "No videos or grid header found in Sanity.\n" +
+      "Seed with: npx sanity exec scripts/seed-hero.ts --with-user-token\n" +
+      "           npx sanity exec scripts/seed-videos-page.ts --with-user-token",
+  );
+}
+
+const hero = await getPageHero("videosPage");
+if (!hero) {
+  throw new Error("No hero found for videosPage. Seed: npx sanity exec scripts/seed-page-heroes.ts --with-user-token");
+}
 ---
 
 <Layout
@@ -14,11 +31,11 @@ import heroImage from "../assets/firm-steps.jpg";
   videoEmbed
 >
   <PageHero
-    eyebrow="Videos"
-    titleLead="The Firm,"
-    titleStrong="On the Record."
+    eyebrow={hero.eyebrow}
+    titleLead={hero.titleLead}
+    titleStrong={hero.titleStrong}
     image={heroImage}
-    lede="A closer look at Dan Cogdell and the firm — the work, the landmark cases, and four decades of courtroom experience, in their own words."
+    lede={hero.lede ?? ""}
   >
     <a href="#contact" class="btn btn--primary">
       Schedule a Consultation
@@ -32,11 +49,11 @@ import heroImage from "../assets/firm-steps.jpg";
 
   <VideoGrid
     items={videos}
-    eyebrow="Watch"
-    headingLead="From the"
-    headingStrong="Firm."
+    eyebrow={gridHeader.eyebrow}
+    headingLead={gridHeader.headingLead}
+    headingStrong={gridHeader.headingStrong}
   />
 
   <CtaBar />
-  <Consult pageId="videosPage" />
+  <Consult />
 </Layout>

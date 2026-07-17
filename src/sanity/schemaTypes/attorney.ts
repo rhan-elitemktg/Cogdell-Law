@@ -123,14 +123,6 @@ export const attorney = defineType({
     stringList("associations", "Associations", "Optional."),
     stringList("pastPositions", "Past positions", "Optional."),
     stringList("representativeCases", "Representative cases", "Optional."),
-    defineField({
-      name: "consult",
-      title: "Consult override",
-      type: "consultContent",
-      description:
-        "Optional. Leave empty to use the site-wide Consult; fill this in only to give this page its own wording.",
-      options: { collapsible: true, collapsed: true },
-    }),
   ],
   preview: {
     select: { title: "name", subtitle: "role", media: "photo" },

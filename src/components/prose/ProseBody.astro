@@ -1,0 +1,65 @@
+---
+// Long-form content body: an optional title, then one Portable Text body.
+//
+// The body is a SINGLE blockContent field (the firm chose one "Body Content"
+// field over a separate intro + sections). Section headings are H2 blocks inside
+// it, styled here to match the bespoke section headings this replaced.
+import { PortableText } from "astro-portabletext";
+import { proseBodyComponents } from "./bodyComponents";
+
+interface Props {
+  title?: string;
+  body?: unknown; // blockContent
+}
+const { title, body } = Astro.props;
+const hasBody = Array.isArray(body) && body.length > 0;
+---
+
+<section class="pbody">
+  <div class="container pbody__inner">
+    {title && <h1 class="pbody__title">{title}</h1>}
+
+    {hasBody && (
+      <div class="pbody__content">
+        <PortableText value={body} components={proseBodyComponents} />
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  .pbody {
+    background-color: var(--cog-paper);
+  }
+  .pbody__inner {
+    max-width: 800px;
+    padding-block: var(--space-section);
+  }
+  .pbody__title {
+    margin: 0 0 var(--space-8);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: clamp(2.25rem, 4vw, 3.25rem);
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+    color: var(--cog-ink);
+  }
+
+  /* Section headings come from the body's H2 blocks (a Portable Text renderer,
+     so no scoping attribute — hence :global, see F14). Sized to match the
+     section headings that the intro/sections split used to render. */
+  .pbody__content :global(.prose__h2) {
+    margin: var(--space-14) 0 var(--space-6);
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: clamp(1.625rem, 2.4vw, 2.25rem);
+    line-height: 1.15;
+    color: var(--cog-ink);
+    text-transform: none;
+    letter-spacing: normal;
+  }
+  /* A heading that opens the body shouldn't push off the top. */
+  .pbody__content :global(.prose__h2:first-child) {
+    margin-top: 0;
+  }
+</style>
