@@ -9,7 +9,7 @@ import CtaBar from "../../components/CtaBar.astro";
 import Consult from "../../components/Consult.astro";
 import { proseComponents } from "../../components/prose/components";
 import { getNewsItem, getOwnedNewsSlugs } from "../../sanity/lib/news";
-import type { Crumb } from "../../data/practice-areas";
+import type { Crumb } from "../../lib/breadcrumb";
 
 export async function getStaticPaths() {
   const slugs = await getOwnedNewsSlugs();

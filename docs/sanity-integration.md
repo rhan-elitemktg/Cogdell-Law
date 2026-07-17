@@ -6,23 +6,31 @@ component in the site is listed below. Check cells off as we go.
 **Guiding rule:** the site works today. Every row must leave `astro build` green and
 the rendered page identical. One content type at a time — never a big bang.
 
-## Status — navigation async, only publish pipeline remains (2026-07-17)
+## Status — migration complete (2026-07-17)
 
-**Everything except the publish pipeline (Phase 9) is on Sanity.** Homepage, all interior
+**The site is fully on Sanity and the publish pipeline is live.** Homepage, all interior
 pages, both legal pages, the full practice-area tree (20 pages), all location pages,
-videos, news, Firm Details, and — as of 2026-07-17 — **navigation** (Phase 7 / D5). Every
-migrated page verified byte-identical (or, for /our-firm, identical in visible output —
-see F21). Safe revert tag: `pre-interior-migration`.
+videos, news, Firm Details, navigation (Phase 7 / D5), and the Sanity → Vercel deploy
+webhook (Phase 9) are all done. Publishing in the Studio now auto-rebuilds and deploys the
+live site. Every migrated page verified byte-identical (or, for /our-firm, identical in
+visible output — see F21). Safe revert tag: `pre-interior-migration`.
+
+**Only optional follow-up left:** Visual Editing (click-to-edit from the live site) — still
+an open question for the firm (§7), deferred.
 
 **Still in code by design:** `data/navigation.ts` (structure only — now async via
 `getNavItems()`, taxonomy branches fetched from Sanity), `data/us-states.ts` (SVG map
-geometry). The practice-areas and areas-we-serve data files are no longer imported for
-their *values* by any runtime page, but `data/practice-areas.ts` still exports the `Crumb`
-**type** used by `Breadcrumb.astro` / `news/[slug].astro`, and both files are still read by
-the seed scripts — so their deletion is Phase 9 cleanup.
+geometry). ✅ **2026-07-17 — the `src/data` leftovers are gone:** `practice-areas.ts`,
+`areas-we-serve.ts` and `videos.ts` were deleted along with their three seed scripts
+(`seed-practice-areas-tree`, `seed-areas-we-serve`, `seed-hero`). The one live dependency,
+the `Crumb` type, was relocated to `src/lib/breadcrumb.ts` (used by `Breadcrumb.astro` /
+`news/[slug].astro`). `scripts/lib/blockToPortableText.ts` stays — it's self-contained and
+still used by `seed-legal-pages`.
 
-**Remaining:** Phase 9 (Sanity → Vercel deploy hook, plus deleting the `src/data`
-leftovers) — explicitly deferred.
+**Remaining:** Phase 9 **deploy pipeline only** — Vercel env vars + build settings, Sanity
+CORS origin for the production domain, and the Sanity publish → Vercel deploy-hook webhook
+(F6). Dataset `jk9lqisp/production` is **public** (anonymous read verified), so no read
+token or client change is needed. Visual Editing deferred (firm's open question).
 
 ## Legend
 
@@ -605,7 +613,7 @@ add schema types.
 | **D2** | Ordering (F3) | ✅ **Landed 2026-07-15 via `@sanity/orderable-document-list`** (attorneys were the first type to need it). Adds `orderRankField` + `orderRankOrdering` to the type, an `orderableDocumentListDeskItem` in `structure.ts`, and `| order(orderRank)` in the query — the Studio list becomes drag-to-reorder and a new document lands last. Ranks are `lexorank` strings (`0\|hzzzzz:`); backfill pre-existing docs with a script using the same lib (see `scripts/backfill-attorney-order.ts`) or their order is arbitrary. <br><br>**Use this for every type with no curating page** — testimonials, news, practice areas. Types ordered by a page's reference array (trial results, D11/F13) don't need it.
 | **D3** | `Block` → Portable Text | ✅ Maps **1:1**. `{p}`→normal, `{ul}`→bullet listItem, `{quote}`→blockquote, `Inline`→link mark. Source is already structured, so it's an in-memory transform — no HTML parsing, no JSDOM. `Blocks.astro` → `<PortableText>` emitting the same `prose__*` classes, so CSS is untouched. |
 | **D4** | Internal links in rich text | ✅ A `link` annotation toggling internal (`reference`) / external (`url`); internal resolves to a path at query time. Kills link rot when slugs change. Alt: keep raw `href` strings. |
-| **D5** | Navigation (F4) | ✅ **Landed 2026-07-17.** `navigation.ts` stays in code but exports async `getNavItems()`; the three taxonomy branches — **Attorneys, Practice Areas, Areas We Serve** — come from slim `order(orderRank)` projections (attorney / practiceArea / serviceCity+locationPage). The pure helpers (`isOnTrail`, `normalizePath`, `isUnder`) are unchanged, so `MenuList` needed no edit. `Header` fetches once via `await getNavItems()` and passes `items` to `MobileNav` (was a second static import). Nav output verified **byte-identical** on home, a nested practice-area page, and a location page — desktop bar + mobile drawer. <br><br>**Note:** the static-import *values* are now gone from all runtime `src/`; only the seed scripts still import them. But `data/practice-areas.ts` can't be deleted yet — its `Crumb` **type** is still imported by `Breadcrumb.astro` and `news/[slug].astro`. Relocating `Crumb` + deleting the data files is Phase 9 ("delete `src/data` leftovers"). |
+| **D5** | Navigation (F4) | ✅ **Landed 2026-07-17.** `navigation.ts` stays in code but exports async `getNavItems()`; the three taxonomy branches — **Attorneys, Practice Areas, Areas We Serve** — come from slim `order(orderRank)` projections (attorney / practiceArea / serviceCity+locationPage). The pure helpers (`isOnTrail`, `normalizePath`, `isUnder`) are unchanged, so `MenuList` needed no edit. `Header` fetches once via `await getNavItems()` and passes `items` to `MobileNav` (was a second static import). Nav output verified **byte-identical** on home, a nested practice-area page, and a location page — desktop bar + mobile drawer. <br><br>**Note:** ✅ the data files were deleted in Phase 9 (2026-07-17); `Crumb` moved to `src/lib/breadcrumb.ts`. |
 | **D6** | Images | ✅ Attorney photos + press logos → Sanity. Design/decorative assets stay in `src/assets` with `astro:assets`. Wistia posters stay remote. |
 | **D7** | Marketing copy in components (§3b) | ✅ **Leave in code for now.** It's design-coupled, rarely changes, and moving it means a `homePage`/`ourFirmPage` singleton per section. Revisit if the firm asks to edit it. `trialResult` + `faq` are the exception — they're real, growing content. |
 | **D13** | Site-wide content (CTA bar, Consult) | ⚠️ **Amended 2026-07-16: the Consult per-page override was REMOVED at the firm's request.** There is now ONE shared Consult record used on every page — no `consult` field on any page singleton or on `attorney`, and `getConsult()` takes no `pageId`. `/contact` previously overrode the copy ("Tell Us About Your Case.") and now shows the shared "Schedule Your Consultation." — an accepted, deliberate change. The **CTA bar override still exists** and is unaffected. The photo remains a per-page prop (art direction, D6). Original rationale below still explains why the shared-record half of the pattern exists. |
@@ -641,7 +649,13 @@ add schema types.
 - [x] **Phase 6 — `serviceCity` + `locationPage`.** Replace `getAreaPaths()`; verify cross-links into `/practice-areas/*`.
 - [x] **Phase 7 — Navigation.** D5. Nav is async off Sanity; full desktop + mobile regression verified byte-identical (home, nested practice area, location page). 2026-07-17.
 - [x] **Phase 8 — `legalPage` + `firmDetails` expansion + interior page copy (our-firm, contact, all page heroes).** Address/email/social/hours; sweep for stray hardcoded phone numbers in body copy.
-- [ ] **Phase 9 — Publish pipeline.** Vercel env vars; Sanity webhook → deploy hook (F6); confirm dataset public or add read token; consider Visual Editing; delete `src/data` leftovers; final build.
+- [x] **Phase 9 — Publish pipeline.** ✅ Complete 2026-07-17.
+  - [x] Delete `src/data` leftovers (data files + their 3 seed scripts); relocate `Crumb` → `src/lib/breadcrumb.ts`.
+  - [x] Confirm dataset read access — `jk9lqisp/production` is **public**, anonymous read verified; no token needed.
+  - [x] Vercel: project linked, `PUBLIC_SANITY_PROJECT_ID` / `PUBLIC_SANITY_DATASET` set, Astro preset + `dist` output confirmed.
+  - [x] Sanity: production domain added to **CORS origins** so the deployed Studio at `/admin` can authenticate.
+  - [x] Webhook: Vercel Deploy Hook (`prj_dr1YCtqb…`, branch `master`) ← Sanity webhook "Sanity Publish" on `production`, Create/Update/Delete, **drafts toggle off** so only publishes rebuild (F6 resolved). Verified: a test publish triggered a Deploy Hook build. Note: each publish = full rebuild, which also re-fetches Wistia (retry-guarded).
+  - [ ] Visual Editing — **deferred** (firm's open question, §7). Only remaining nice-to-have.
 
 ---
 
