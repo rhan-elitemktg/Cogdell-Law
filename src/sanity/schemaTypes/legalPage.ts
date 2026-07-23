@@ -29,6 +29,12 @@ export const legalPage = defineType({
         "The whole page body — paragraphs, headings, lists, links. Use Heading 2 for section titles.",
       validation: (rule) => rule.required().min(1),
     }),
+    defineField({
+      name: "seo",
+      title: "SEO",
+      type: "seo",
+      options: { collapsible: true, collapsed: true },
+    }),
   ],
   preview: {
     select: { title: "title" },

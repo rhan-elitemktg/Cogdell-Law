@@ -3,18 +3,37 @@ import Font from "astro/components/Font.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import VideoLightbox from "../components/video/VideoLightbox.astro";
+import JsonLd from "../components/seo/JsonLd.astro";
+import { getFirmDetails } from "../sanity/lib/firmDetails";
+import { urlFor } from "../sanity/lib/image";
+import { resolveSeo, SITE_NAME, type SeoInput } from "../lib/seo";
+import { legalServiceSchema } from "../lib/schema";
 import "../styles/global.css";
 
 interface Props {
   title: string;
   description?: string;
+  /** The page's Sanity `seo` block. Every field optional; blank → title/description above. */
+  seo?: SeoInput | null;
   videoEmbed?: boolean; // pages with a Wistia video → warm up the connections
 }
 
-const { title, description, videoEmbed = false } = Astro.props;
+const { title, description, seo, videoEmbed = false } = Astro.props;
 
-const SITE_NAME = "Cogdell Law";
-const fullTitle = title === SITE_NAME ? title : `${title} | ${SITE_NAME}`;
+const firm = await getFirmDetails();
+
+const meta = resolveSeo(seo, {
+  fallbackTitle: title,
+  fallbackDescription: description,
+  pageUrl: Astro.url,
+  defaultOgImage: firm?.defaultOgImage,
+});
+
+// `Astro.site` is set in astro.config.mjs; the fallback keeps a bare `astro dev`
+// (which can run without it) from throwing on a template literal.
+const siteUrl = (Astro.site?.href ?? "https://www.cogdell-law.com/").replace(/\/+$/, "");
+const logoUrl = firm?.logo ? urlFor(firm.logo).width(600).auto("format").url() : undefined;
+const organization = legalServiceSchema(firm, siteUrl, logoUrl);
 ---
 
 <!doctype html>
@@ -40,8 +59,24 @@ const fullTitle = title === SITE_NAME ? title : `${title} | ${SITE_NAME}`;
     }
     <Font cssVariable="--font-cormorant" preload />
     <Font cssVariable="--font-instrument" preload />
-    <title>{fullTitle}</title>
-    {description && <meta name="description" content={description} />}
+    <title>{meta.title}</title>
+    {meta.description && <meta name="description" content={meta.description} />}
+    <link rel="canonical" href={meta.canonical} />
+    {meta.noIndex && <meta name="robots" content="noindex,nofollow" />}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:title" content={meta.title} />
+    {meta.description && <meta property="og:description" content={meta.description} />}
+    <meta property="og:url" content={meta.canonical} />
+    {meta.ogImage && <meta property="og:image" content={meta.ogImage} />}
+
+    <meta name="twitter:card" content={meta.ogImage ? "summary_large_image" : "summary"} />
+    <meta name="twitter:title" content={meta.title} />
+    {meta.description && <meta name="twitter:description" content={meta.description} />}
+    {meta.ogImage && <meta name="twitter:image" content={meta.ogImage} />}
+
+    {organization && <JsonLd data={organization} />}
   </head>
   <body>
     <Header />

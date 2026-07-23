@@ -18,6 +18,11 @@ visible output — see F21). Safe revert tag: `pre-interior-migration`.
 **Only optional follow-up left:** Visual Editing (click-to-edit from the live site) — still
 an open question for the firm (§7), deferred.
 
+**2026-07-23 — SEO fields added (D15, §6b).** Every routed document now carries an editable
+SEO group (meta title/description, canonical, noindex, share image), and the site ships
+`sitemap.xml`, `robots.txt` and Schema.org markup. All fields fall back to today's copy, so the
+rendered titles and descriptions are byte-identical until someone edits something.
+
 **Still in code by design:** `data/navigation.ts` (structure only — now async via
 `getNavItems()`, taxonomy branches fetched from Sanity), `data/us-states.ts` (SVG map
 geometry). ✅ **2026-07-17 — the `src/data` leftovers are gone:** `practice-areas.ts`,
@@ -618,6 +623,7 @@ add schema types.
 | **D7** | Marketing copy in components (§3b) | ✅ **Leave in code for now.** It's design-coupled, rarely changes, and moving it means a `homePage`/`ourFirmPage` singleton per section. Revisit if the firm asks to edit it. `trialResult` + `faq` are the exception — they're real, growing content. |
 | **D13** | Site-wide content (CTA bar, Consult) | ⚠️ **Amended 2026-07-16: the Consult per-page override was REMOVED at the firm's request.** There is now ONE shared Consult record used on every page — no `consult` field on any page singleton or on `attorney`, and `getConsult()` takes no `pageId`. `/contact` previously overrode the copy ("Tell Us About Your Case.") and now shows the shared "Schedule Your Consultation." — an accepted, deliberate change. The **CTA bar override still exists** and is unaffected. The photo remains a per-page prop (art direction, D6). Original rationale below still explains why the shared-record half of the pattern exists. |
 | **D13 (original)** | Site-wide content (CTA bar, Consult) | ✅ **One shared record + an optional per-page override.** `CtaBar` (~43 pages) and `Consult` (13 callers) both render nearly everywhere, including dynamic routes (`practice-areas/[...slug]`, `[city]/[slug]`, `news/[slug]`) that **have no page document at all** — so per-page copies (D11) can't serve them. <br><br>Shape: a content object defined once (`ctaBarContent`, `consultContent`), used by both the shared singleton's `content` and each page's override field, so an override can't drift out of shape. One GROQ `coalesce(override, default)` resolves it; the component self-fetches and takes `pageId`. <br><br>**Override is available wherever the component is used** (corrected 2026-07-15 — the first pass wrongly limited Consult to the two pages that already overrode it). The override lives on whatever document backs that page: a page singleton for static routes, and **the record itself** for dynamic ones — so `/attorney/[slug]` passes `attorney._id`, giving per-attorney copy. Verified: an override on Dan's document rendered on his page only. <br><br>Static pages that lacked a document got one (`videosPage`, `newsPage`, `practiceAreasPage`, `contactPage`, `ourFirmPage`), each holding only what's been migrated. **`practiceArea`, `locationPage` and `newsItem` get the `consult` field when they're built** (Phases 4–6) — until then those three routes use the shared default. <br><br>**Rule of thumb:** content on a handful of *known* pages → per-page copies (D11). Content on every page or on dynamic routes → shared + override (D13).
+| **D15** | Per-page SEO fields | ✅ **Set 2026-07-23.** One shared `seo` object (`schemaTypes/seo.ts`) attached to all 14 routed documents — the 9 page singletons plus `practiceArea`, `locationPage`, `legalPage`, `newsItem`, `attorney`. Five fields: **`metaTitle`, `metaDescription`, `canonicalUrl`, `noIndex`, `ogImage`**. No keywords field (Google ignores the tag) and no separate og title/description (they'd double the field count for a case that rarely differs). <br><br>**Every field is optional and falls back to what the page already rendered** — the resolution lives in `src/lib/seo.ts` (`resolveSeo`), so adding the field to a document is a no-op until an editor fills it in. Verified: with the dataset untouched, all 45 pages' `<title>` and `<meta name="description">` are **byte-identical** to the pre-change build. <br><br>`metaTitle` replaces the page name only — **`\| Cogdell Law` is always appended**, so the SEO team never types the brand. The homepage's bare "Cogdell Law" survives when it has no `metaTitle`. <br><br>Length rules are **`.warning()`, never `.error()`**: publishing fires the Vercel deploy hook, so a blocking validation error over a 62-character title would stop the whole site rebuilding. <br><br>`/site-map` and `/404` have no backing document and keep code-level metadata; `/404` is hardcoded `noIndex`. |
 | **D14** | Long-form page bodies: ONE field | ✅ **Set 2026-07-16.** `legalPage`, `practiceArea` and `locationPage` each have a single **Body Content** (`blockContent`) field — not an `intro` plus separate `sections[]`. Section headings are **H2 blocks inside the body**, styled in `ProseBody` to match the bespoke headings they replaced, so pages render the same. <br><br>**Consequence the firm accepted:** the old `intro` paragraphs rendered larger (they lived in a `.pbody__lead` wrapper). With one field nothing marks which paragraphs are "intro", so **body text is now uniform**. Visible text verified identical on all three page types; only the intro sizing changed. <br><br>`lede` stays a separate field on practice/location pages — it's the meta description + card summary, and still opens the body at render (as before). |
 | **D12** | Rich text: one standard | ✅ **`blockContent` is the standard for every body-copy field** — practice areas, location pages, news, legal pages, attorney bios. Set 2026-07-15 because the site is handed to an **SEO team** afterwards, who need to add and edit **H1, H2, H3, H4, links and bold** consistently wherever prose appears. **Don't invent per-field rich-text types.** <br><br>Also carries **bulleted + numbered lists** and a **Quote** style — not decoration: `practice-areas.ts` uses `{ul}` and `{quote}`, so D3 cannot migrate without them. <br><br>**One deliberate exception:** `accentText` (the About pull quote) stays minimal — one line, one Accent button — because headings and lists have no styling there. <br><br>**No H1 — headings start at H2.** Every hero already renders the page's `<h1>` (`titleLead` + `titleStrong`), so a body H1 would make a second one. Briefly included at the SEO team's request, then dropped once that was clear. Don't add it back without moving the hero's heading first. <br><br>Links are a `url` annotation accepting relative paths today; **Phase 5 adds the internal/external reference toggle** (D4) once `practiceArea` documents exist to point at. |
 | **D11** | Content shown on several pages | ✅ **Per-page copies, not one shared record.** Decided 2026-07-15 for the practice-areas band (home, /trial-experience, /testimonials): shared *schema* (`practiceAreasBand` object), separate *content* per page document, so pages can be worded differently. **Known trade-off:** the same six cards now live in three places and can drift — the very thing that caused F2. Accepted knowingly for editorial flexibility. Consequence: a component on N pages implies N page documents, so `/trial-experience` and `/testimonials` singletons exist now, holding only this band. |
@@ -658,6 +664,46 @@ add schema types.
   - [ ] Visual Editing — **deferred** (firm's open question, §7). Only remaining nice-to-have.
 
 ---
+
+## 6b. SEO handoff (D15) — 2026-07-23
+
+Everything the SEO team needs to work without a developer.
+
+**Editable per page** — an "SEO" accordion at the bottom of every page document and every
+practice area / location page / news item / attorney / legal page. All five fields optional:
+meta title, meta description, canonical URL, "hide from search engines", social share image.
+A site-wide fallback share image lives on **Firm Details → Default social share image**
+(currently empty — **upload one**, or shared links render with no card image).
+
+**Rendered in `<head>`** by `Layout.astro` from `resolveSeo()` (`src/lib/seo.ts`): title,
+description, canonical, robots, `og:*` and `twitter:*`.
+
+**Structured data** — three JSON-LD blocks, all derived from existing content, **no fields to
+fill**: `LegalService` sitewide from Firm Details (address parsed out of `cityStateZip`, socials
+→ `sameAs`), `BreadcrumbList` from the trail `Breadcrumb.astro` already renders (with Home
+prepended as position 1 — the visible crumbs deliberately omit it), and `FAQPage` from
+`PracticeFaqs.astro`. Built: 44 LegalService, 28 BreadcrumbList, 5 FAQPage; all parse, and no
+page carries two FAQPages (`PracticeFaqs` and the homepage's `Faq.astro` never co-occur).
+
+**`sitemap.xml`** — a **hand-rolled endpoint** (`src/pages/sitemap.xml.ts`), not
+`@astrojs/sitemap`. That integration's `filter` is synchronous and can't see the per-page
+`noIndex` flag, which would leave flagged pages in the submitted sitemap and make the toggle a
+half-feature. The endpoint reuses `getPracticeAreaPaths()` / `getAreaPaths()` /
+`getAttorneySlugs()` / `getOwnedNewsSlugs()`, so it can't drift from the routes that actually
+build. Verified: 43 URLs = every built route except `/admin`, with `/404` excluded by design.
+⚠️ `DOCUMENT_BACKED` / `CODE_ONLY` in that file are the one hand-maintained list — **add new
+static routes there**.
+
+**`site` is now set** in `astro.config.mjs` (`https://www.cogdell-law.com`) — canonical tags,
+`og:url` and the sitemap all build from it.
+
+⚠️ **Launch dependency:** Vercel must serve **www** as the primary domain with the apex
+redirecting to it, or every canonical points at a redirect. The old WordPress URLs in
+`vercel.json` are written apex-style, so confirm this at DNS cutover.
+
+**Not verified against the live dataset:** the override and noIndex paths were proven through
+the real render path with a throwaway page and a temporary flag, not by publishing test content
+to `production` (that would have triggered a deploy). Worth one real Studio edit as a smoke test.
 
 ## 7. Open questions for the firm
 

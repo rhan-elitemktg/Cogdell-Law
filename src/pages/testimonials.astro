@@ -1,6 +1,7 @@
 ---
 import { getPageHero } from "../sanity/lib/pageHero";
 import Layout from "../layouts/Layout.astro";
+import { getSeo } from "../sanity/lib/seo";
 import PageHero from "../components/PageHero.astro";
 import TestimonialsWall from "../components/TestimonialsWall.astro";
 import PracticeAreas from "../components/PracticeAreas.astro";
@@ -24,9 +25,12 @@ const hero = await getPageHero("testimonialsPage");
 if (!hero) {
   throw new Error("No hero found for testimonialsPage. Seed: npx sanity exec scripts/seed-page-heroes.ts --with-user-token");
 }
+
+const seo = await getSeo("testimonialsPage");
 ---
 
 <Layout
+  seo={seo}
   title="Testimonials"
   description="Our clients have shared what representation at the highest level meant to them. Read testimonials from those Dan Cogdell and the Cogdell Law Firm have defended."
 >

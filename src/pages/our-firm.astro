@@ -1,5 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import { getSeo } from "../sanity/lib/seo";
 import PageHero from "../components/PageHero.astro";
 import AboutIntro from "../components/about/AboutIntro.astro";
 import SellingPoints from "../components/SellingPoints.astro";
@@ -19,9 +20,12 @@ if (!page?.hero) {
       "Seed it with: npx sanity exec scripts/seed-our-firm.ts --with-user-token",
   );
 }
+
+const seo = await getSeo("ourFirmPage");
 ---
 
 <Layout
+  seo={seo}
   title="About the Firm"
   description="For more than four decades, Cogdell Law Firm has defended the cases others call unwinnable. Learn about founding attorney Dan Cogdell and our trial team."
 >

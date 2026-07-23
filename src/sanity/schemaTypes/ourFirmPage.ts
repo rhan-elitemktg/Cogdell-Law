@@ -135,6 +135,12 @@ export const ourFirmPage = defineType({
         }),
       ],
     }),
+    defineField({
+      name: "seo",
+      title: "SEO",
+      type: "seo",
+      options: { collapsible: true, collapsed: true },
+    }),
   ],
   preview: {
     prepare: () => ({ title: "Our Firm Page" }),

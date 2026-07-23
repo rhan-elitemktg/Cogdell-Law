@@ -40,6 +40,12 @@ export const attorneysPage = defineType({
       options: { collapsible: true, collapsed: true },
     }),
     // No `ctaBar` override here: /attorneys doesn't render the CTA bar.
+    defineField({
+      name: "seo",
+      title: "SEO",
+      type: "seo",
+      options: { collapsible: true, collapsed: true },
+    }),
   ],
   preview: {
     prepare: () => ({ title: "Attorneys Page" }),

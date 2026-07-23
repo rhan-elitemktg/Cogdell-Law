@@ -39,6 +39,7 @@ import { ctaBarContent } from "./ctaBarContent";
 import { consultContent } from "./consultContent";
 import { educationEntry } from "./educationEntry";
 import { trialResultList } from "./trialResultList";
+import { seo } from "./seo";
 import { accentText } from "./accentText";
 import { blockContent } from "./blockContent";
 
@@ -86,6 +87,7 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   consultContent,
   educationEntry,
   trialResultList,
+  seo, // per-page search metadata — attached to every routed document (D15)
   // Rich text
   blockContent, // the standard for body copy — use this by default
   accentText, // deliberate exception: the About pull quote only

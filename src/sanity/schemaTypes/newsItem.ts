@@ -139,6 +139,13 @@ export const newsItem = defineType({
           return true;
         }),
     }),
+    defineField({
+      name: "seo",
+      title: "SEO",
+      type: "seo",
+      group: "meta",
+      options: { collapsible: true, collapsed: true },
+    }),
   ],
   orderings: [
     {

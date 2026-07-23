@@ -11,7 +11,15 @@ const PATHS_QUERY = defineQuery(`*[_type == "locationPage"] | order(orderRank){
   faqs[]{ _key, question, answer },
   "slug": slug.current,
   "cityName": city->city,
-  "citySlug": city->citySlug.current
+  "citySlug": city->citySlug.current,
+  _updatedAt,
+  seo{
+    metaTitle,
+    metaDescription,
+    canonicalUrl,
+    noIndex,
+    ogImage
+  }
 }`);
 
 /** { params:{city,slug}, props } for every location page — getStaticPaths. */

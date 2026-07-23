@@ -19,8 +19,10 @@ export async function getAttorneyCards() {
   return (await sanityClient.fetch(ATTORNEY_CARDS_QUERY)) ?? [];
 }
 
+// `_updatedAt` and the noIndex flag ride along for sitemap.xml, which lists
+// every bio page and has to skip the ones flagged hidden (D15).
 const ATTORNEY_SLUGS_QUERY = defineQuery(
-  `*[_type == "attorney" && defined(slug.current)]{"slug": slug.current}`,
+  `*[_type == "attorney" && defined(slug.current)]{"slug": slug.current, _updatedAt, "noIndex": seo.noIndex}`,
 );
 
 /** Every attorney slug — for getStaticPaths. */
@@ -52,7 +54,15 @@ const ATTORNEY_QUERY = defineQuery(`*[_type == "attorney" && slug.current == $sl
   associations,
   pastPositions,
   representativeCases,
-  "slug": slug.current
+  "slug": slug.current,
+  _updatedAt,
+  seo{
+    metaTitle,
+    metaDescription,
+    canonicalUrl,
+    noIndex,
+    ogImage
+  }
 }`);
 
 /** One attorney's full record, for /attorney/[slug]. */

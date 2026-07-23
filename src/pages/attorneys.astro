@@ -1,6 +1,7 @@
 ---
 import { getPageHero } from "../sanity/lib/pageHero";
 import Layout from "../layouts/Layout.astro";
+import { getSeo } from "../sanity/lib/seo";
 import PageHero from "../components/PageHero.astro";
 import Attorneys from "../components/Attorneys.astro";
 import Testimonials from "../components/Testimonials.astro";
@@ -42,9 +43,12 @@ const hero = await getPageHero("attorneysPage");
 if (!hero) {
   throw new Error("No hero found for attorneysPage. Seed: npx sanity exec scripts/seed-page-heroes.ts --with-user-token");
 }
+
+const seo = await getSeo("attorneysPage");
 ---
 
 <Layout
+  seo={seo}
   title="Our Attorneys"
   description="Since 1988, Cogdell Law Firm's trial lawyers have brought 40+ years of experience to federal criminal charges and serious allegations across Houston, East Texas, North Texas, and the state."
 >

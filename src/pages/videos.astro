@@ -1,6 +1,7 @@
 ---
 import { getPageHero } from "../sanity/lib/pageHero";
 import Layout from "../layouts/Layout.astro";
+import { getSeo } from "../sanity/lib/seo";
 import PageHero from "../components/PageHero.astro";
 import VideoGrid from "../components/video/VideoGrid.astro";
 import CtaBar from "../components/CtaBar.astro";
@@ -23,9 +24,12 @@ const hero = await getPageHero("videosPage");
 if (!hero) {
   throw new Error("No hero found for videosPage. Seed: npx sanity exec scripts/seed-page-heroes.ts --with-user-token");
 }
+
+const seo = await getSeo("videosPage");
 ---
 
 <Layout
+  seo={seo}
   title="Videos"
   description="Watch Dan Cogdell and the Cogdell Law Firm — the firm film, landmark cases, and perspective from four decades in the courtroom."
   videoEmbed

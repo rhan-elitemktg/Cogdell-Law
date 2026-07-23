@@ -1,0 +1,17 @@
+---
+// Emits one Schema.org JSON-LD block. No visible markup, no styles.
+//
+// `set:html` is correct here rather than a text interpolation: Astro would
+// HTML-escape the quotes in the JSON and Google would fail to parse it. The
+// value is our own JSON.stringify output, never raw user input — and the "</"
+// escape below closes the one hole that leaves (a "</script>" inside a string
+// would otherwise end the tag early).
+interface Props {
+  data: Record<string, unknown>;
+}
+
+const { data } = Astro.props;
+const json = JSON.stringify(data).replace(/</g, "\\u003c");
+---
+
+<script type="application/ld+json" is:inline set:html={json} />

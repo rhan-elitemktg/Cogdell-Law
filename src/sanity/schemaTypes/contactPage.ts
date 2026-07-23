@@ -20,6 +20,12 @@ export const contactPage = defineType({
       type: "pageHero",
       options: { collapsible: true, collapsed: true },
     }),
+    defineField({
+      name: "seo",
+      title: "SEO",
+      type: "seo",
+      options: { collapsible: true, collapsed: true },
+    }),
   ],
   preview: {
     prepare: () => ({ title: "Contact Page" }),
