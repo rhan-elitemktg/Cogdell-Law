@@ -123,6 +123,12 @@ export const attorney = defineType({
     stringList("associations", "Associations", "Optional."),
     stringList("pastPositions", "Past positions", "Optional."),
     stringList("representativeCases", "Representative cases", "Optional."),
+    defineField({
+      name: "seo",
+      title: "SEO",
+      type: "seo",
+      options: { collapsible: true, collapsed: true },
+    }),
   ],
   preview: {
     select: { title: "name", subtitle: "role", media: "photo" },

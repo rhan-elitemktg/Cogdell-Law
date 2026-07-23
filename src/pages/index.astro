@@ -1,5 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import { getSeo } from "../sanity/lib/seo";
 import Hero from "../components/Hero.astro";
 import SellingPoints from "../components/SellingPoints.astro";
 import PracticeAreas from "../components/PracticeAreas.astro";
@@ -65,9 +66,11 @@ if (!practiceAreas) {
       "  npx sanity exec scripts/seed-practice-areas.ts --with-user-token",
   );
 }
+
+const seo = await getSeo("homePage");
 ---
 
-<Layout title="Cogdell Law" videoEmbed>
+<Layout title="Cogdell Law" videoEmbed seo={seo}>
   <Hero />
   <SellingPoints points={sellingPoints} />
   <PracticeAreas band={practiceAreas} />

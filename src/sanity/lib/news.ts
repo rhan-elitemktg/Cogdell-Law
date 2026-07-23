@@ -55,7 +55,15 @@ const NEWS_ITEM_QUERY = defineQuery(`*[_type == "newsItem" && slug.current == $s
   outlet,
   summary,
   body,
-  "slug": slug.current
+  "slug": slug.current,
+  _updatedAt,
+  seo{
+    metaTitle,
+    metaDescription,
+    canonicalUrl,
+    noIndex,
+    ogImage
+  }
 }`);
 
 /** One owned article, for /news/[slug]. */
@@ -63,8 +71,9 @@ export async function getNewsItem(slug: string) {
   return await sanityClient.fetch(NEWS_ITEM_QUERY, { slug });
 }
 
+// `_updatedAt` and the noIndex flag ride along for sitemap.xml (D15).
 const OWNED_NEWS_SLUGS_QUERY = defineQuery(
-  `*[_type == "newsItem" && linkType == "article" && defined(slug.current)]{"slug": slug.current}`,
+  `*[_type == "newsItem" && linkType == "article" && defined(slug.current)]{"slug": slug.current, _updatedAt, "noIndex": seo.noIndex}`,
 );
 
 /** Slugs of owned articles only — external mentions have no detail page. */

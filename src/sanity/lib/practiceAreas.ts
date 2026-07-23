@@ -12,7 +12,15 @@ const ALL_QUERY = defineQuery(`*[_type == "practiceArea"] | order(orderRank){
   body,
   faqs[]{ _key, question, answer },
   "slug": slug.current,
-  "parentId": parent._ref
+  "parentId": parent._ref,
+  _updatedAt,
+  seo{
+    metaTitle,
+    metaDescription,
+    canonicalUrl,
+    noIndex,
+    ogImage
+  }
 }`);
 
 export type PracticeAreaDoc = Awaited<ReturnType<typeof getAllPracticeAreas>>[number];

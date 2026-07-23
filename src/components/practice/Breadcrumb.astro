@@ -2,13 +2,22 @@
 // Breadcrumb trail for nested pages. Practice Areas / … — no Home crumb; Home
 // is always one click away in the header nav.
 import type { Crumb } from "../../lib/breadcrumb";
+import JsonLd from "../seo/JsonLd.astro";
+import { breadcrumbSchema } from "../../lib/schema";
 
 interface Props {
   trail: Crumb[];
 }
 
 const { trail } = Astro.props;
+
+// BreadcrumbList markup comes from the same trail the crumbs render, so every
+// page that shows breadcrumbs gets it with no change of its own (D15).
+const siteUrl = (Astro.site?.href ?? "https://www.cogdell-law.com/").replace(/\/+$/, "");
+const schema = breadcrumbSchema(trail, siteUrl);
 ---
+
+{schema && <JsonLd data={schema} />}
 
 <nav class="crumbs" aria-label="Breadcrumb">
   <div class="container crumbs__inner">

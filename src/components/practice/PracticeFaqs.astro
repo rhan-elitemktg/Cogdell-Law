@@ -4,6 +4,8 @@
 import Eyebrow from "../Eyebrow.astro";
 import { PortableText } from "astro-portabletext";
 import { proseBodyComponents } from "../prose/bodyComponents";
+import JsonLd from "../seo/JsonLd.astro";
+import { faqSchema } from "../../lib/schema";
 
 interface PracticeFaqItem { _key?: string; question: string; answer: unknown }
 
@@ -20,7 +22,14 @@ const {
   headingLead = "Frequently Asked",
   headingStrong = "Questions.",
 } = Astro.props;
+
+// FAQPage markup from the same list the accordion renders — no page changes.
+// Only this component emits it, and no page renders it alongside the homepage's
+// Faq.astro band, so a page can never declare two FAQPages (D15).
+const schema = faqSchema(faqs);
 ---
+
+{schema && <JsonLd data={schema} />}
 
 <section class="pfaq">
   <div class="container pfaq__inner">

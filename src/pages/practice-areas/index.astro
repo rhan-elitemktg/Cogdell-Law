@@ -1,6 +1,7 @@
 ---
 import { getPageHero } from "../../sanity/lib/pageHero";
 import Layout from "../../layouts/Layout.astro";
+import { getSeo } from "../../sanity/lib/seo";
 import PageHero from "../../components/PageHero.astro";
 import PracticeGrid from "../../components/practice/PracticeGrid.astro";
 import CtaBar from "../../components/CtaBar.astro";
@@ -39,9 +40,12 @@ const hero = await getPageHero("practiceAreasPage");
 if (!hero) {
   throw new Error("No hero found for practiceAreasPage. Seed: npx sanity exec scripts/seed-page-heroes.ts --with-user-token");
 }
+
+const seo = await getSeo("practiceAreasPage");
 ---
 
 <Layout
+  seo={seo}
   title="Practice Areas"
   description="Health care fraud, federal criminal defense, white collar crimes, and appeals. For four decades, Cogdell Law Firm has tried the high-stakes cases other firms turn away."
 >

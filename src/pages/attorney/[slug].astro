@@ -4,6 +4,7 @@ import AttorneyHero from "../../components/attorney/AttorneyHero.astro";
 import AttorneyBio from "../../components/attorney/AttorneyBio.astro";
 import Consult from "../../components/Consult.astro";
 import { getAttorney, getAttorneySlugs } from "../../sanity/lib/attorneys";
+import { toPlainText } from "../../lib/portableText";
 
 // Astro hoists getStaticPaths into its own module scope, so it can't reach
 // module-scope consts in this frontmatter — everything it needs is imported (F7).
@@ -20,19 +21,15 @@ if (!attorney) {
 }
 
 // The meta description opens with the first line of the biography. `bio` is
-// Portable Text now, so pull the plain text out of its first block rather than
-// indexing a string array.
-const firstBioLine = attorney.bio?.[0]?.children
-  ?.map((child) => child.text ?? "")
-  .join("")
-  .trim();
+// Portable Text, so flatten its first block rather than indexing a string array.
+const firstBioLine = toPlainText(attorney.bio?.slice(0, 1));
 
 const description = `${attorney.name}, ${attorney.role} at Cogdell Law Firm.${
   firstBioLine ? ` ${firstBioLine}` : ""
 }`;
 ---
 
-<Layout title={attorney.name} description={description}>
+<Layout title={attorney.name} description={description} seo={attorney.seo}>
   <AttorneyHero attorney={attorney} />
   <AttorneyBio attorney={attorney} />
   <Consult />

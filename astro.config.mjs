@@ -10,6 +10,11 @@ const { PUBLIC_SANITY_PROJECT_ID, PUBLIC_SANITY_DATASET } = loadEnv(
 );
 
 export default defineConfig({
+  // The canonical origin. Every canonical tag, og:url and sitemap.xml entry is
+  // built from this, so it must match the domain Vercel serves as primary —
+  // www, with the apex redirecting to it.
+  site: "https://www.cogdell-law.com",
+
   // Self-hosted Google Fonts via Astro's Fonts API (downloaded & served at build time).
   fonts: [
     {

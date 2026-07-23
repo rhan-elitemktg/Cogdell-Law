@@ -47,6 +47,12 @@ export const locationPage = defineType({
         preview: { select: { title: "question" } },
       })],
     }),
+    defineField({
+      name: "seo",
+      title: "SEO",
+      type: "seo",
+      options: { collapsible: true, collapsed: true },
+    }),
   ],
   preview: {
     select: { title: "title", city: "city.city" },

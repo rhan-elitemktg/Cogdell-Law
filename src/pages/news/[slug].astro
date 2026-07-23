@@ -27,7 +27,7 @@ const trail: Crumb[] = [{ title: "News", href: "/news" }, { title: item.title }]
 const description = item.summary ?? `${item.title} — Cogdell Law Firm.`;
 ---
 
-<Layout title={item.title} description={description}>
+<Layout title={item.title} description={description} seo={item.seo}>
   <Breadcrumb trail={trail} />
 
   <PageHero

@@ -95,6 +95,12 @@ export const practiceArea = defineType({
         }),
       ],
     }),
+    defineField({
+      name: "seo",
+      title: "SEO",
+      type: "seo",
+      options: { collapsible: true, collapsed: true },
+    }),
   ],
   preview: {
     select: { title: "title", parent: "parent.title" },

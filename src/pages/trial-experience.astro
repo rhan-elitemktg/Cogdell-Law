@@ -1,6 +1,7 @@
 ---
 import { getPageHero } from "../sanity/lib/pageHero";
 import Layout from "../layouts/Layout.astro";
+import { getSeo } from "../sanity/lib/seo";
 import PageHero from "../components/PageHero.astro";
 import TrialResults from "../components/TrialResults.astro";
 import PracticeAreas from "../components/PracticeAreas.astro";
@@ -24,9 +25,12 @@ const hero = await getPageHero("trialExperiencePage");
 if (!hero) {
   throw new Error("No hero found for trialExperiencePage. Seed: npx sanity exec scripts/seed-page-heroes.ts --with-user-token");
 }
+
+const seo = await getSeo("trialExperiencePage");
 ---
 
 <Layout
+  seo={seo}
   title="Trial Experience"
   description="From Enron to the Branch Davidian trial to the Texas Attorney General, Dan Cogdell has defended and won the cases the nation was watching. Not settlements. Verdicts."
 >

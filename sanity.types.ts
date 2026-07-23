@@ -49,6 +49,28 @@ export type BlockContent = Array<{
   _key: string;
 }>;
 
+export type SanityImageAssetReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+};
+
+export type Seo = {
+  _type: "seo";
+  metaTitle?: string;
+  metaDescription?: string;
+  canonicalUrl?: string;
+  noIndex?: boolean;
+  ogImage?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+};
+
 export type TrialResultReference = {
   _ref: string;
   _type: "reference";
@@ -133,13 +155,6 @@ export type PageHero = {
   titleLead?: string;
   titleStrong: string;
   lede?: string;
-};
-
-export type SanityImageAssetReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
 };
 
 export type PressLogo = {
@@ -261,6 +276,7 @@ export type LocationPage = {
     _type: "practiceFaq";
     _key: string;
   }>;
+  seo?: Seo;
 };
 
 export type Slug = {
@@ -308,6 +324,7 @@ export type PracticeArea = {
     _type: "practiceFaq";
     _key: string;
   }>;
+  seo?: Seo;
 };
 
 export type LegalPage = {
@@ -318,6 +335,7 @@ export type LegalPage = {
   _rev: string;
   title: string;
   body: BlockContent;
+  seo?: Seo;
 };
 
 export type NewsItem = {
@@ -343,6 +361,7 @@ export type NewsItem = {
   externalUrl?: string;
   ctaLabel?: string;
   body?: BlockContent;
+  seo?: Seo;
 };
 
 export type SanityImageCrop = {
@@ -420,6 +439,7 @@ export type Attorney = {
   associations?: Array<string>;
   pastPositions?: Array<string>;
   representativeCases?: Array<string>;
+  seo?: Seo;
 };
 
 export type TrialResult = {
@@ -470,6 +490,7 @@ export type PracticeAreasPage = {
   _updatedAt: string;
   _rev: string;
   hero?: PageHero;
+  seo?: Seo;
 };
 
 export type NewsPage = {
@@ -484,6 +505,7 @@ export type NewsPage = {
     headingLead: string;
     headingStrong: string;
   };
+  seo?: Seo;
 };
 
 export type VideosPage = {
@@ -498,6 +520,7 @@ export type VideosPage = {
     headingLead: string;
     headingStrong: string;
   };
+  seo?: Seo;
 };
 
 export type OurFirmPage = {
@@ -561,6 +584,7 @@ export type OurFirmPage = {
       _key: string;
     }>;
   };
+  seo?: Seo;
 };
 
 export type ContactPage = {
@@ -570,6 +594,7 @@ export type ContactPage = {
   _updatedAt: string;
   _rev: string;
   hero?: PageHero;
+  seo?: Seo;
 };
 
 export type AttorneysPage = {
@@ -582,6 +607,7 @@ export type AttorneysPage = {
   attorneys?: AttorneysBand;
   testimonials?: TestimonialsBand;
   whyChoose?: WhyChooseBand;
+  seo?: Seo;
 };
 
 export type TestimonialsPage = {
@@ -594,6 +620,7 @@ export type TestimonialsPage = {
   testimonialsWall?: TestimonialsWallBand;
   practiceAreas?: PracticeAreasBand;
   ctaBar?: CtaBarContent;
+  seo?: Seo;
 };
 
 export type TrialExperiencePage = {
@@ -606,6 +633,7 @@ export type TrialExperiencePage = {
   trialResults?: TrialResultList;
   practiceAreas?: PracticeAreasBand;
   ctaBar?: CtaBarContent;
+  seo?: Seo;
 };
 
 export type VideoReference = {
@@ -697,6 +725,7 @@ export type HomePage = {
   };
   faq?: FaqBand;
   news?: NewsBand;
+  seo?: Seo;
 };
 
 export type Video = {
@@ -731,6 +760,13 @@ export type FirmDetails = {
     _key: string;
   }>;
   logo?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+  defaultOgImage?: {
     asset?: SanityImageAssetReference;
     media?: unknown;
     hotspot?: SanityImageHotspot;
@@ -846,6 +882,8 @@ export type Geopoint = {
 export type AllSanitySchemaTypes =
   | AccentText
   | BlockContent
+  | SanityImageAssetReference
+  | Seo
   | TrialResultReference
   | TrialResultList
   | EducationEntry
@@ -856,7 +894,6 @@ export type AllSanitySchemaTypes =
   | FaqReference
   | FaqBand
   | PageHero
-  | SanityImageAssetReference
   | PressLogo
   | PracticeReachStat
   | WhyChooseBand
@@ -937,7 +974,7 @@ export type AREAS_WE_SERVE_NAV_QUERY_RESULT = Array<{
 
 // Source: src/sanity/lib/areasWeServe.ts
 // Variable: PATHS_QUERY
-// Query: *[_type == "locationPage"] | order(orderRank){  _id,  title,  navLabel,  heroTitle,  lede,  body,  faqs[]{ _key, question, answer },  "slug": slug.current,  "cityName": city->city,  "citySlug": city->citySlug.current}
+// Query: *[_type == "locationPage"] | order(orderRank){  _id,  title,  navLabel,  heroTitle,  lede,  body,  faqs[]{ _key, question, answer },  "slug": slug.current,  "cityName": city->city,  "citySlug": city->citySlug.current,  _updatedAt,  seo{    metaTitle,    metaDescription,    canonicalUrl,    noIndex,    ogImage  }}
 export type PATHS_QUERY_RESULT = Array<{
   _id: string;
   title: string;
@@ -953,6 +990,20 @@ export type PATHS_QUERY_RESULT = Array<{
   slug: string;
   cityName: string;
   citySlug: string;
+  _updatedAt: string;
+  seo: {
+    metaTitle: string | null;
+    metaDescription: string | null;
+    canonicalUrl: string | null;
+    noIndex: boolean | null;
+    ogImage: {
+      asset?: SanityImageAssetReference;
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      _type: "image";
+    } | null;
+  } | null;
 }>;
 
 // Source: src/sanity/lib/attorneys.ts
@@ -976,14 +1027,16 @@ export type ATTORNEY_CARDS_QUERY_RESULT = Array<{
 
 // Source: src/sanity/lib/attorneys.ts
 // Variable: ATTORNEY_SLUGS_QUERY
-// Query: *[_type == "attorney" && defined(slug.current)]{"slug": slug.current}
+// Query: *[_type == "attorney" && defined(slug.current)]{"slug": slug.current, _updatedAt, "noIndex": seo.noIndex}
 export type ATTORNEY_SLUGS_QUERY_RESULT = Array<{
   slug: string;
+  _updatedAt: string;
+  noIndex: boolean | null;
 }>;
 
 // Source: src/sanity/lib/attorneys.ts
 // Variable: ATTORNEY_QUERY
-// Query: *[_type == "attorney" && slug.current == $slug][0]{  _id,  name,  role,  credential,  photo,  photoAlt,  phone,  email,  practiceTags,  bio,  education[]{    _key,    school,    location,    lines  },  barAdmissions,  honors,  classesSeminars,  publishedWorks,  associations,  pastPositions,  representativeCases,  "slug": slug.current}
+// Query: *[_type == "attorney" && slug.current == $slug][0]{  _id,  name,  role,  credential,  photo,  photoAlt,  phone,  email,  practiceTags,  bio,  education[]{    _key,    school,    location,    lines  },  barAdmissions,  honors,  classesSeminars,  publishedWorks,  associations,  pastPositions,  representativeCases,  "slug": slug.current,  _updatedAt,  seo{    metaTitle,    metaDescription,    canonicalUrl,    noIndex,    ogImage  }}
 export type ATTORNEY_QUERY_RESULT = {
   _id: string;
   name: string;
@@ -1015,6 +1068,20 @@ export type ATTORNEY_QUERY_RESULT = {
   pastPositions: Array<string> | null;
   representativeCases: Array<string> | null;
   slug: string;
+  _updatedAt: string;
+  seo: {
+    metaTitle: string | null;
+    metaDescription: string | null;
+    canonicalUrl: string | null;
+    noIndex: boolean | null;
+    ogImage: {
+      asset?: SanityImageAssetReference;
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      _type: "image";
+    } | null;
+  } | null;
 } | null;
 
 // Source: src/sanity/lib/attorneys.ts
@@ -1098,7 +1165,7 @@ export type FAQ_BAND_QUERY_RESULT = {
 
 // Source: src/sanity/lib/firmDetails.ts
 // Variable: FIRM_DETAILS_QUERY
-// Query: *[_id == "firmDetails"][0]{  title,  tagline,  phone,  email,  address,  socials[]{    platform,    url  },  copyrightNotice,  legalLinks[]{    label,    href  },  logo{    ...,    "dimensions": asset->metadata.dimensions  }}
+// Query: *[_id == "firmDetails"][0]{  title,  tagline,  phone,  email,  address,  socials[]{    platform,    url  },  defaultOgImage,  copyrightNotice,  legalLinks[]{    label,    href  },  logo{    ...,    "dimensions": asset->metadata.dimensions  }}
 export type FIRM_DETAILS_QUERY_RESULT =
   | {
       title: null;
@@ -1107,6 +1174,7 @@ export type FIRM_DETAILS_QUERY_RESULT =
       email: null;
       address: null;
       socials: null;
+      defaultOgImage: null;
       copyrightNotice: null;
       legalLinks: null;
       logo: null;
@@ -1118,6 +1186,7 @@ export type FIRM_DETAILS_QUERY_RESULT =
       email: null;
       address: null;
       socials: null;
+      defaultOgImage: null;
       copyrightNotice: null;
       legalLinks: null;
       logo: null;
@@ -1129,6 +1198,7 @@ export type FIRM_DETAILS_QUERY_RESULT =
       email: null;
       address: null;
       socials: null;
+      defaultOgImage: null;
       copyrightNotice: null;
       legalLinks: null;
       logo: null;
@@ -1140,6 +1210,7 @@ export type FIRM_DETAILS_QUERY_RESULT =
       email: string | null;
       address: null;
       socials: null;
+      defaultOgImage: null;
       copyrightNotice: null;
       legalLinks: null;
       logo: null;
@@ -1157,6 +1228,13 @@ export type FIRM_DETAILS_QUERY_RESULT =
         platform: "facebook" | "instagram" | "linkedin" | "x" | "youtube";
         url: string;
       }> | null;
+      defaultOgImage: {
+        asset?: SanityImageAssetReference;
+        media?: unknown;
+        hotspot?: SanityImageHotspot;
+        crop?: SanityImageCrop;
+        _type: "image";
+      } | null;
       copyrightNotice: string;
       legalLinks: Array<{
         label: string;
@@ -1294,27 +1372,79 @@ export type HOME_PRESS_QUERY_RESULT = Array<{
 
 // Source: src/sanity/lib/legalPages.ts
 // Variable: LEGAL_PAGE_QUERY
-// Query: *[_id == $id][0]{  title,  body}
+// Query: *[_id == $id][0]{  title,  body,  _updatedAt,  seo{    metaTitle,    metaDescription,    canonicalUrl,    noIndex,    ogImage  }}
 export type LEGAL_PAGE_QUERY_RESULT =
   | {
       title: string;
       body: BlockContent;
+      _updatedAt: string;
+      seo: {
+        metaTitle: string | null;
+        metaDescription: string | null;
+        canonicalUrl: string | null;
+        noIndex: boolean | null;
+        ogImage: {
+          asset?: SanityImageAssetReference;
+          media?: unknown;
+          hotspot?: SanityImageHotspot;
+          crop?: SanityImageCrop;
+          _type: "image";
+        } | null;
+      } | null;
     }
   | {
       title: null;
       body: null;
+      _updatedAt: string;
+      seo: null;
     }
   | {
       title: string;
       body: null;
+      _updatedAt: string;
+      seo: null;
     }
   | {
       title: string | null;
       body: null;
+      _updatedAt: string;
+      seo: null;
+    }
+  | {
+      title: null;
+      body: null;
+      _updatedAt: string;
+      seo: {
+        metaTitle: string | null;
+        metaDescription: string | null;
+        canonicalUrl: string | null;
+        noIndex: boolean | null;
+        ogImage: {
+          asset?: SanityImageAssetReference;
+          media?: unknown;
+          hotspot?: SanityImageHotspot;
+          crop?: SanityImageCrop;
+          _type: "image";
+        } | null;
+      } | null;
     }
   | {
       title: string;
       body: BlockContent | null;
+      _updatedAt: string;
+      seo: {
+        metaTitle: string | null;
+        metaDescription: string | null;
+        canonicalUrl: string | null;
+        noIndex: boolean | null;
+        ogImage: {
+          asset?: SanityImageAssetReference;
+          media?: unknown;
+          hotspot?: SanityImageHotspot;
+          crop?: SanityImageCrop;
+          _type: "image";
+        } | null;
+      } | null;
     }
   | null;
 
@@ -1373,7 +1503,7 @@ export type NEWS_BAND_QUERY_RESULT = {
 
 // Source: src/sanity/lib/news.ts
 // Variable: NEWS_ITEM_QUERY
-// Query: *[_type == "newsItem" && slug.current == $slug][0]{  _id,  title,  outlet,  summary,  body,  "slug": slug.current}
+// Query: *[_type == "newsItem" && slug.current == $slug][0]{  _id,  title,  outlet,  summary,  body,  "slug": slug.current,  _updatedAt,  seo{    metaTitle,    metaDescription,    canonicalUrl,    noIndex,    ogImage  }}
 export type NEWS_ITEM_QUERY_RESULT = {
   _id: string;
   title: string;
@@ -1381,13 +1511,29 @@ export type NEWS_ITEM_QUERY_RESULT = {
   summary: string;
   body: BlockContent | null;
   slug: string;
+  _updatedAt: string;
+  seo: {
+    metaTitle: string | null;
+    metaDescription: string | null;
+    canonicalUrl: string | null;
+    noIndex: boolean | null;
+    ogImage: {
+      asset?: SanityImageAssetReference;
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      _type: "image";
+    } | null;
+  } | null;
 } | null;
 
 // Source: src/sanity/lib/news.ts
 // Variable: OWNED_NEWS_SLUGS_QUERY
-// Query: *[_type == "newsItem" && linkType == "article" && defined(slug.current)]{"slug": slug.current}
+// Query: *[_type == "newsItem" && linkType == "article" && defined(slug.current)]{"slug": slug.current, _updatedAt, "noIndex": seo.noIndex}
 export type OWNED_NEWS_SLUGS_QUERY_RESULT = Array<{
   slug: string;
+  _updatedAt: string;
+  noIndex: boolean | null;
 }>;
 
 // Source: src/sanity/lib/news.ts
@@ -1529,7 +1675,7 @@ export type PAGE_HERO_QUERY_RESULT =
 
 // Source: src/sanity/lib/practiceAreas.ts
 // Variable: ALL_QUERY
-// Query: *[_type == "practiceArea"] | order(orderRank){  _id,  title,  heroTitle,  lede,  cardSummary,  icon,  body,  faqs[]{ _key, question, answer },  "slug": slug.current,  "parentId": parent._ref}
+// Query: *[_type == "practiceArea"] | order(orderRank){  _id,  title,  heroTitle,  lede,  cardSummary,  icon,  body,  faqs[]{ _key, question, answer },  "slug": slug.current,  "parentId": parent._ref,  _updatedAt,  seo{    metaTitle,    metaDescription,    canonicalUrl,    noIndex,    ogImage  }}
 export type ALL_QUERY_RESULT = Array<{
   _id: string;
   title: string;
@@ -1545,6 +1691,20 @@ export type ALL_QUERY_RESULT = Array<{
   }> | null;
   slug: string;
   parentId: string | null;
+  _updatedAt: string;
+  seo: {
+    metaTitle: string | null;
+    metaDescription: string | null;
+    canonicalUrl: string | null;
+    noIndex: boolean | null;
+    ogImage: {
+      asset?: SanityImageAssetReference;
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      _type: "image";
+    } | null;
+  } | null;
 }>;
 
 // Source: src/sanity/lib/practiceAreasBand.ts
@@ -1562,6 +1722,39 @@ export type PRACTICE_AREAS_BAND_QUERY_RESULT = {
     desc: string;
   }>;
 } | null;
+
+// Source: src/sanity/lib/seo.ts
+// Variable: PAGE_SEO_QUERY
+// Query: *[_id == $pageId][0].seo{  metaTitle,  metaDescription,  canonicalUrl,  noIndex,  ogImage}
+export type PAGE_SEO_QUERY_RESULT = {
+  metaTitle: string | null;
+  metaDescription: string | null;
+  canonicalUrl: string | null;
+  noIndex: boolean | null;
+  ogImage: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  } | null;
+} | null;
+
+// Source: src/sanity/lib/seo.ts
+// Variable: STATIC_PAGE_SEO_QUERY
+// Query: *[_id in $ids]{  _id,  _updatedAt,  "noIndex": seo.noIndex}
+export type STATIC_PAGE_SEO_QUERY_RESULT = Array<
+  | {
+      _id: string;
+      _updatedAt: string;
+      noIndex: null;
+    }
+  | {
+      _id: string;
+      _updatedAt: string;
+      noIndex: boolean | null;
+    }
+>;
 
 // Source: src/sanity/lib/testimonials.ts
 // Variable: FEATURED_TESTIMONIALS_QUERY
@@ -1658,16 +1851,16 @@ declare module "@sanity/client" {
     '*[_type == "attorney"] | order(orderRank){\n  "label": name,\n  "slug": slug.current\n}': ATTORNEYS_NAV_QUERY_RESULT;
     '*[_type == "practiceArea"] | order(orderRank){\n  _id,\n  title,\n  "slug": slug.current,\n  "parentId": parent._ref\n}': PRACTICE_AREAS_NAV_QUERY_RESULT;
     '*[_type == "serviceCity"] | order(orderRank){\n  "city": city,\n  "citySlug": citySlug.current,\n  "pages": *[_type == "locationPage" && references(^._id)] | order(orderRank){\n    "navLabel": navLabel,\n    "slug": slug.current\n  }\n}': AREAS_WE_SERVE_NAV_QUERY_RESULT;
-    '*[_type == "locationPage"] | order(orderRank){\n  _id,\n  title,\n  navLabel,\n  heroTitle,\n  lede,\n  body,\n  faqs[]{ _key, question, answer },\n  "slug": slug.current,\n  "cityName": city->city,\n  "citySlug": city->citySlug.current\n}': PATHS_QUERY_RESULT;
+    '*[_type == "locationPage"] | order(orderRank){\n  _id,\n  title,\n  navLabel,\n  heroTitle,\n  lede,\n  body,\n  faqs[]{ _key, question, answer },\n  "slug": slug.current,\n  "cityName": city->city,\n  "citySlug": city->citySlug.current,\n  _updatedAt,\n  seo{\n    metaTitle,\n    metaDescription,\n    canonicalUrl,\n    noIndex,\n    ogImage\n  }\n}': PATHS_QUERY_RESULT;
     '*[_type == "attorney"] | order(orderRank){\n  _id,\n  name,\n  role,\n  credential,\n  photo,\n  photoAlt,\n  "slug": slug.current\n}': ATTORNEY_CARDS_QUERY_RESULT;
-    '*[_type == "attorney" && defined(slug.current)]{"slug": slug.current}': ATTORNEY_SLUGS_QUERY_RESULT;
-    '*[_type == "attorney" && slug.current == $slug][0]{\n  _id,\n  name,\n  role,\n  credential,\n  photo,\n  photoAlt,\n  phone,\n  email,\n  practiceTags,\n  bio,\n  education[]{\n    _key,\n    school,\n    location,\n    lines\n  },\n  barAdmissions,\n  honors,\n  classesSeminars,\n  publishedWorks,\n  associations,\n  pastPositions,\n  representativeCases,\n  "slug": slug.current\n}': ATTORNEY_QUERY_RESULT;
+    '*[_type == "attorney" && defined(slug.current)]{"slug": slug.current, _updatedAt, "noIndex": seo.noIndex}': ATTORNEY_SLUGS_QUERY_RESULT;
+    '*[_type == "attorney" && slug.current == $slug][0]{\n  _id,\n  name,\n  role,\n  credential,\n  photo,\n  photoAlt,\n  phone,\n  email,\n  practiceTags,\n  bio,\n  education[]{\n    _key,\n    school,\n    location,\n    lines\n  },\n  barAdmissions,\n  honors,\n  classesSeminars,\n  publishedWorks,\n  associations,\n  pastPositions,\n  representativeCases,\n  "slug": slug.current,\n  _updatedAt,\n  seo{\n    metaTitle,\n    metaDescription,\n    canonicalUrl,\n    noIndex,\n    ogImage\n  }\n}': ATTORNEY_QUERY_RESULT;
     "*[_id == $pageId][0].attorneys{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  lede\n}": ATTORNEYS_BAND_QUERY_RESULT;
     '*[_id == "consult"][0].content{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  body,\n  fineprint,\n  thankYou\n}': CONSULT_QUERY_RESULT;
     'coalesce(\n  *[_id == $pageId][0].ctaBar,\n  *[_id == "ctaBar"][0].content\n){\n  eyebrow,\n  headingLead,\n  headingRest,\n  body,\n  cta{\n    label,\n    href\n  }\n}': CTA_BAR_QUERY_RESULT;
     '*[_type == "faq"] | order(orderRank){\n  _id,\n  question,\n  answer\n}': FAQS_QUERY_RESULT;
     '*[_id == "homePage"][0].faq{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  lede,\n  questions[]->{\n    _id,\n    question,\n    answer\n  }\n}': FAQ_BAND_QUERY_RESULT;
-    '*[_id == "firmDetails"][0]{\n  title,\n  tagline,\n  phone,\n  email,\n  address,\n  socials[]{\n    platform,\n    url\n  },\n  copyrightNotice,\n  legalLinks[]{\n    label,\n    href\n  },\n  logo{\n    ...,\n    "dimensions": asset->metadata.dimensions\n  }\n}': FIRM_DETAILS_QUERY_RESULT;
+    '*[_id == "firmDetails"][0]{\n  title,\n  tagline,\n  phone,\n  email,\n  address,\n  socials[]{\n    platform,\n    url\n  },\n  defaultOgImage,\n  copyrightNotice,\n  legalLinks[]{\n    label,\n    href\n  },\n  logo{\n    ...,\n    "dimensions": asset->metadata.dimensions\n  }\n}': FIRM_DETAILS_QUERY_RESULT;
     '*[_id == "homePage"][0].hero{\n  eyebrow,\n  titleAccent,\n  titleSecond,\n  lead,\n  ctas[]{\n    _key,\n    label,\n    href\n  },\n  caption{\n    name,\n    role,\n    watchLabel,\n    video->{\n      wistiaId\n    }\n  }\n}': HOME_HERO_QUERY_RESULT;
     '*[_id == "homePage"][0].sellingPoints.points[]{\n  _key,\n  value,\n  label\n}': HOME_SELLING_POINTS_QUERY_RESULT;
     '*[_id == "homePage"][0].about{\n  eyebrow,\n  titleLead,\n  titleStrong,\n  body,\n  resultsEyebrow,\n  quote,\n  featured[]->{\n    _id,\n    "outcome": coalesce(teaser.outcome, outcome),\n    "caseName": coalesce(teaser.title, name),\n    "note": coalesce(teaser.note, note)\n  }\n}': HOME_ABOUT_QUERY_RESULT;
@@ -1675,16 +1868,18 @@ declare module "@sanity/client" {
     '*[_id == "homePage"][0].firmStory{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  body,\n  cta{\n    label,\n    href\n  }\n}': HOME_FIRM_STORY_QUERY_RESULT;
     '*[_id == "homePage"][0].practiceReach{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  lede,\n  stats[]{\n    _key,\n    label,\n    value\n  }\n}': HOME_PRACTICE_REACH_QUERY_RESULT;
     '*[_id == "homePage"][0].press.logos[]{\n  _key,\n  alt,\n  image,\n  "dimensions": image.asset->metadata.dimensions\n}': HOME_PRESS_QUERY_RESULT;
-    "*[_id == $id][0]{\n  title,\n  body\n}": LEGAL_PAGE_QUERY_RESULT;
+    "*[_id == $id][0]{\n  title,\n  body,\n  _updatedAt,\n  seo{\n    metaTitle,\n    metaDescription,\n    canonicalUrl,\n    noIndex,\n    ogImage\n  }\n}": LEGAL_PAGE_QUERY_RESULT;
     '*[_type == "newsItem"] | order(coalesce(publishedAt, _createdAt) desc){\n  _id,\n  title,\n  outlet,\n  media,\n  summary,\n  ctaLabel,\n  linkType,\n  externalUrl,\n  "slug": slug.current,\n  "date": coalesce(publishedAt, _createdAt),\n  outletLogo\n}': ALL_NEWS_QUERY_RESULT;
     '*[_id == "homePage"][0].news{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  lede,\n  "featured": featured->{\n  _id,\n  title,\n  outlet,\n  media,\n  summary,\n  ctaLabel,\n  linkType,\n  externalUrl,\n  "slug": slug.current,\n  "date": coalesce(publishedAt, _createdAt),\n  outletLogo\n},\n  "featuredId": featured._ref\n}': NEWS_BAND_QUERY_RESULT;
-    '*[_type == "newsItem" && slug.current == $slug][0]{\n  _id,\n  title,\n  outlet,\n  summary,\n  body,\n  "slug": slug.current\n}': NEWS_ITEM_QUERY_RESULT;
-    '*[_type == "newsItem" && linkType == "article" && defined(slug.current)]{"slug": slug.current}': OWNED_NEWS_SLUGS_QUERY_RESULT;
+    '*[_type == "newsItem" && slug.current == $slug][0]{\n  _id,\n  title,\n  outlet,\n  summary,\n  body,\n  "slug": slug.current,\n  _updatedAt,\n  seo{\n    metaTitle,\n    metaDescription,\n    canonicalUrl,\n    noIndex,\n    ogImage\n  }\n}': NEWS_ITEM_QUERY_RESULT;
+    '*[_type == "newsItem" && linkType == "article" && defined(slug.current)]{"slug": slug.current, _updatedAt, "noIndex": seo.noIndex}': OWNED_NEWS_SLUGS_QUERY_RESULT;
     '*[_id == "newsPage"][0].grid{\n  eyebrow,\n  headingLead,\n  headingStrong\n}': NEWS_GRID_HEADER_QUERY_RESULT;
     '*[_id == "ourFirmPage"][0]{\n  hero,\n  intro{ eyebrow, headingLead, headingStrong, body },\n  stats{ items[]{ _key, value, label } },\n  quote{ lead, accent, attribution },\n  foundingAttorney{ eyebrow, headingLead, headingStrong, body },\n  originStory{ eyebrow, headingLead, headingStrong, body, milestones[]{ _key, key, title, desc } },\n  values{ eyebrow, headingLead, headingStrong, items[]{ _key, icon, title, body } }\n}': OUR_FIRM_QUERY_RESULT;
     "*[_id == $pageId][0].hero{\n  eyebrow,\n  titleLead,\n  titleStrong,\n  lede\n}": PAGE_HERO_QUERY_RESULT;
-    '*[_type == "practiceArea"] | order(orderRank){\n  _id,\n  title,\n  heroTitle,\n  lede,\n  cardSummary,\n  icon,\n  body,\n  faqs[]{ _key, question, answer },\n  "slug": slug.current,\n  "parentId": parent._ref\n}': ALL_QUERY_RESULT;
+    '*[_type == "practiceArea"] | order(orderRank){\n  _id,\n  title,\n  heroTitle,\n  lede,\n  cardSummary,\n  icon,\n  body,\n  faqs[]{ _key, question, answer },\n  "slug": slug.current,\n  "parentId": parent._ref,\n  _updatedAt,\n  seo{\n    metaTitle,\n    metaDescription,\n    canonicalUrl,\n    noIndex,\n    ogImage\n  }\n}': ALL_QUERY_RESULT;
     "*[_id == $pageId][0].practiceAreas{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  description,\n  cards[]{\n    _key,\n    icon,\n    title,\n    desc\n  }\n}": PRACTICE_AREAS_BAND_QUERY_RESULT;
+    "*[_id == $pageId][0].seo{\n  metaTitle,\n  metaDescription,\n  canonicalUrl,\n  noIndex,\n  ogImage\n}": PAGE_SEO_QUERY_RESULT;
+    '*[_id in $ids]{\n  _id,\n  _updatedAt,\n  "noIndex": seo.noIndex\n}': STATIC_PAGE_SEO_QUERY_RESULT;
     '*[\n  _type == "testimonial" && featured == true\n] | order(orderRank) [0...3]{\n  _id,\n  quote,\n  author,\n  tag\n}': FEATURED_TESTIMONIALS_QUERY_RESULT;
     '*[_type == "testimonial"] | order(orderRank){\n  _id,\n  quote,\n  author\n}': ALL_TESTIMONIALS_QUERY_RESULT;
     "*[_id == $pageId][0].testimonials{\n  eyebrow,\n  headingLead,\n  headingStrong\n}": TESTIMONIALS_BAND_QUERY_RESULT;

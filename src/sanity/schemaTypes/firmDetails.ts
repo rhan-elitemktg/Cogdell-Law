@@ -113,6 +113,14 @@ export const firmDetails = defineType({
       options: { hotspot: false },
     }),
     defineField({
+      name: "defaultOgImage",
+      title: "Default social share image",
+      type: "image",
+      description:
+        "Used when a page shared on Facebook, LinkedIn or X has no share image of its own. 1200×630 works best.",
+      options: { hotspot: true },
+    }),
+    defineField({
       name: "copyrightNotice",
       title: "Copyright notice",
       type: "string",

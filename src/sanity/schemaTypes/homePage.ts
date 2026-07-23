@@ -379,6 +379,12 @@ export const homePage = defineType({
       type: "newsBand",
       options: { collapsible: true, collapsed: true },
     }),
+    defineField({
+      name: "seo",
+      title: "SEO",
+      type: "seo",
+      options: { collapsible: true, collapsed: true },
+    }),
   ],
   preview: {
     select: { subtitle: "hero.eyebrow" },

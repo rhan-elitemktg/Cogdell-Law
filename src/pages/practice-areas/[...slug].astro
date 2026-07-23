@@ -34,7 +34,7 @@ const ledeBlock = node.lede
 const bodyValue = [...ledeBlock, ...(node.body ?? [])];
 ---
 
-<Layout title={node.title} description={description}>
+<Layout title={node.title} description={description} seo={node.seo}>
   <Breadcrumb trail={trail} />
 
   <PageHero
