@@ -55,7 +55,8 @@ export function resolveTitle(seo: SeoInput | null | undefined, fallback: string)
  * Everything Layout needs for the <head>.
  *
  * `pageUrl` is the page's own absolute URL (`Astro.url`), used as the canonical
- * unless the page overrides it. `defaultOgImage` comes from Firm Details.
+ * unless the page overrides it. `defaultOgImage` is the site-wide fallback share
+ * image from the Global SEO Setting singleton.
  */
 export function resolveSeo(
   seo: SeoInput | null | undefined,

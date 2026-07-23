@@ -5,6 +5,7 @@ import Footer from "../components/Footer.astro";
 import VideoLightbox from "../components/video/VideoLightbox.astro";
 import JsonLd from "../components/seo/JsonLd.astro";
 import { getFirmDetails } from "../sanity/lib/firmDetails";
+import { getGlobalSeo } from "../sanity/lib/seo";
 import { urlFor } from "../sanity/lib/image";
 import { resolveSeo, SITE_NAME, type SeoInput } from "../lib/seo";
 import { legalServiceSchema } from "../lib/schema";
@@ -21,13 +22,20 @@ interface Props {
 const { title, description, seo, videoEmbed = false } = Astro.props;
 
 const firm = await getFirmDetails();
+const globalSeo = await getGlobalSeo();
 
 const meta = resolveSeo(seo, {
   fallbackTitle: title,
   fallbackDescription: description,
   pageUrl: Astro.url,
-  defaultOgImage: firm?.defaultOgImage,
+  // Site-wide fallback share image lives on the Global SEO Setting singleton.
+  defaultOgImage: globalSeo?.defaultOgImage,
 });
+
+// The site-wide "discourage crawling" switch (Global SEO Settings) forces
+// noindex on every page, over-riding the per-page flag — used to keep the site
+// off Google while it's on its temporary address.
+const robotsNoIndex = meta.noIndex || globalSeo?.discourageCrawling === true;
 
 // `Astro.site` is set in astro.config.mjs; the fallback keeps a bare `astro dev`
 // (which can run without it) from throwing on a template literal.
@@ -62,7 +70,7 @@ const organization = legalServiceSchema(firm, siteUrl, logoUrl);
     <title>{meta.title}</title>
     {meta.description && <meta name="description" content={meta.description} />}
     <link rel="canonical" href={meta.canonical} />
-    {meta.noIndex && <meta name="robots" content="noindex,nofollow" />}
+    {robotsNoIndex && <meta name="robots" content="noindex,nofollow" />}
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={SITE_NAME} />

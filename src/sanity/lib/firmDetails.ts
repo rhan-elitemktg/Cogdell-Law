@@ -11,7 +11,6 @@ const FIRM_DETAILS_QUERY = defineQuery(`*[_id == "firmDetails"][0]{
     platform,
     url
   },
-  defaultOgImage,
   copyrightNotice,
   legalLinks[]{
     label,

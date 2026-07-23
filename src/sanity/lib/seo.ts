@@ -38,3 +38,15 @@ const STATIC_PAGE_SEO_QUERY = defineQuery(`*[_id in $ids]{
 export async function getStaticPageSeo(ids: string[]) {
   return (await sanityClient.fetch(STATIC_PAGE_SEO_QUERY, { ids })) ?? [];
 }
+
+// Site-wide SEO fallbacks — the "Global SEO Setting" singleton (D15). Kept apart
+// from Firm Details, which holds firm identity for the Organization JSON-LD.
+const GLOBAL_SEO_QUERY = defineQuery(`*[_id == "globalSeo"][0]{
+  discourageCrawling,
+  defaultOgImage
+}`);
+
+/** The site-wide SEO fallbacks (e.g. the default social share image). */
+export async function getGlobalSeo() {
+  return await sanityClient.fetch(GLOBAL_SEO_QUERY);
+}

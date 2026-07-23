@@ -1,5 +1,6 @@
 import type { SchemaTypeDefinition } from "sanity";
 import { firmDetails } from "./firmDetails";
+import { globalSeo } from "./globalSeo";
 import { homePage } from "./homePage";
 import { trialExperiencePage } from "./trialExperiencePage";
 import { testimonialsPage } from "./testimonialsPage";
@@ -46,6 +47,7 @@ import { blockContent } from "./blockContent";
 export const schemaTypes: SchemaTypeDefinition[] = [
   // Singletons
   firmDetails,
+  globalSeo,
   homePage,
   trialExperiencePage,
   testimonialsPage,

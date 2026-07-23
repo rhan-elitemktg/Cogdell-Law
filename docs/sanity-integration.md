@@ -672,8 +672,24 @@ Everything the SEO team needs to work without a developer.
 **Editable per page** — an "SEO" accordion at the bottom of every page document and every
 practice area / location page / news item / attorney / legal page. All five fields optional:
 meta title, meta description, canonical URL, "hide from search engines", social share image.
-A site-wide fallback share image lives on **Firm Details → Default social share image**
-(currently empty — **upload one**, or shared links render with no card image).
+
+**Site-wide settings** live in the **Global SEO Settings** singleton (a dedicated sidebar item,
+kept separate from Firm Details so firm identity and SEO knobs don't mix):
+
+- **Discourage this site from being crawled** — a WordPress-style master switch. ON → every page
+  gets a `noindex` meta tag (over-riding the per-page flag) **and** `robots.txt` becomes
+  `Disallow: /`. Built to keep the site off Google while it's on the temporary
+  `cogdell-law.vercel.app` address; **must be turned OFF at launch** or the real site never gets
+  indexed. Defaults OFF. Because publishing rebuilds+deploys, toggling it takes effect on the
+  next build.
+- **Default social share image** — the `og:image` fallback (currently empty — **upload one**, or
+  shared links render with no card image).
+
+The Organization/`LegalService` JSON-LD still reads Firm Details — that's identity, not an SEO
+setting, so it stayed put.
+
+**`robots.txt` is now a dynamic endpoint** (`src/pages/robots.txt.ts`), not a static file, so the
+crawl switch has somewhere to act. Off → allow-all + sitemap reference; on → `Disallow: /`.
 
 **Rendered in `<head>`** by `Layout.astro` from `resolveSeo()` (`src/lib/seo.ts`): title,
 description, canonical, robots, `og:*` and `twitter:*`.

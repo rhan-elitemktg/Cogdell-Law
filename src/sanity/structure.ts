@@ -7,6 +7,7 @@ import { orderableDocumentListDeskItem } from "@sanity/orderable-document-list";
 // in sanity.config.ts, so keep this list as the single source of truth.
 export const SINGLETONS = [
   "firmDetails",
+  "globalSeo",
   "ctaBar",
   "homePage",
   "trialExperiencePage",
@@ -57,6 +58,7 @@ export const structure: StructureResolver = (S, context) =>
       page(S, "ctaBar", "CTA Bar", icons.bell),
       page(S, "consult", "Consult", icons.envelope),
       page(S, "firmDetails", "Firm Details", icons.cog),
+      page(S, "globalSeo", "Global SEO Settings", icons.search),
       S.divider(),
       // Drag-to-reorder list — the card order on / and /attorneys comes from this.
       orderableDocumentListDeskItem({

@@ -739,6 +739,22 @@ export type Video = {
   wistiaId: string;
 };
 
+export type GlobalSeo = {
+  _id: string;
+  _type: "globalSeo";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  discourageCrawling?: boolean;
+  defaultOgImage?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+};
+
 export type FirmDetails = {
   _id: string;
   _type: "firmDetails";
@@ -760,13 +776,6 @@ export type FirmDetails = {
     _key: string;
   }>;
   logo?: {
-    asset?: SanityImageAssetReference;
-    media?: unknown;
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    _type: "image";
-  };
-  defaultOgImage?: {
     asset?: SanityImageAssetReference;
     media?: unknown;
     hotspot?: SanityImageHotspot;
@@ -932,6 +941,7 @@ export type AllSanitySchemaTypes =
   | VideoReference
   | HomePage
   | Video
+  | GlobalSeo
   | FirmDetails
   | SanityImagePaletteSwatch
   | SanityImagePalette
@@ -1165,7 +1175,7 @@ export type FAQ_BAND_QUERY_RESULT = {
 
 // Source: src/sanity/lib/firmDetails.ts
 // Variable: FIRM_DETAILS_QUERY
-// Query: *[_id == "firmDetails"][0]{  title,  tagline,  phone,  email,  address,  socials[]{    platform,    url  },  defaultOgImage,  copyrightNotice,  legalLinks[]{    label,    href  },  logo{    ...,    "dimensions": asset->metadata.dimensions  }}
+// Query: *[_id == "firmDetails"][0]{  title,  tagline,  phone,  email,  address,  socials[]{    platform,    url  },  copyrightNotice,  legalLinks[]{    label,    href  },  logo{    ...,    "dimensions": asset->metadata.dimensions  }}
 export type FIRM_DETAILS_QUERY_RESULT =
   | {
       title: null;
@@ -1174,7 +1184,6 @@ export type FIRM_DETAILS_QUERY_RESULT =
       email: null;
       address: null;
       socials: null;
-      defaultOgImage: null;
       copyrightNotice: null;
       legalLinks: null;
       logo: null;
@@ -1186,7 +1195,6 @@ export type FIRM_DETAILS_QUERY_RESULT =
       email: null;
       address: null;
       socials: null;
-      defaultOgImage: null;
       copyrightNotice: null;
       legalLinks: null;
       logo: null;
@@ -1198,7 +1206,6 @@ export type FIRM_DETAILS_QUERY_RESULT =
       email: null;
       address: null;
       socials: null;
-      defaultOgImage: null;
       copyrightNotice: null;
       legalLinks: null;
       logo: null;
@@ -1210,7 +1217,6 @@ export type FIRM_DETAILS_QUERY_RESULT =
       email: string | null;
       address: null;
       socials: null;
-      defaultOgImage: null;
       copyrightNotice: null;
       legalLinks: null;
       logo: null;
@@ -1228,13 +1234,6 @@ export type FIRM_DETAILS_QUERY_RESULT =
         platform: "facebook" | "instagram" | "linkedin" | "x" | "youtube";
         url: string;
       }> | null;
-      defaultOgImage: {
-        asset?: SanityImageAssetReference;
-        media?: unknown;
-        hotspot?: SanityImageHotspot;
-        crop?: SanityImageCrop;
-        _type: "image";
-      } | null;
       copyrightNotice: string;
       legalLinks: Array<{
         label: string;
@@ -1756,6 +1755,26 @@ export type STATIC_PAGE_SEO_QUERY_RESULT = Array<
     }
 >;
 
+// Source: src/sanity/lib/seo.ts
+// Variable: GLOBAL_SEO_QUERY
+// Query: *[_id == "globalSeo"][0]{  discourageCrawling,  defaultOgImage}
+export type GLOBAL_SEO_QUERY_RESULT =
+  | {
+      discourageCrawling: null;
+      defaultOgImage: null;
+    }
+  | {
+      discourageCrawling: boolean | null;
+      defaultOgImage: {
+        asset?: SanityImageAssetReference;
+        media?: unknown;
+        hotspot?: SanityImageHotspot;
+        crop?: SanityImageCrop;
+        _type: "image";
+      } | null;
+    }
+  | null;
+
 // Source: src/sanity/lib/testimonials.ts
 // Variable: FEATURED_TESTIMONIALS_QUERY
 // Query: *[  _type == "testimonial" && featured == true] | order(orderRank) [0...3]{  _id,  quote,  author,  tag}
@@ -1860,7 +1879,7 @@ declare module "@sanity/client" {
     'coalesce(\n  *[_id == $pageId][0].ctaBar,\n  *[_id == "ctaBar"][0].content\n){\n  eyebrow,\n  headingLead,\n  headingRest,\n  body,\n  cta{\n    label,\n    href\n  }\n}': CTA_BAR_QUERY_RESULT;
     '*[_type == "faq"] | order(orderRank){\n  _id,\n  question,\n  answer\n}': FAQS_QUERY_RESULT;
     '*[_id == "homePage"][0].faq{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  lede,\n  questions[]->{\n    _id,\n    question,\n    answer\n  }\n}': FAQ_BAND_QUERY_RESULT;
-    '*[_id == "firmDetails"][0]{\n  title,\n  tagline,\n  phone,\n  email,\n  address,\n  socials[]{\n    platform,\n    url\n  },\n  defaultOgImage,\n  copyrightNotice,\n  legalLinks[]{\n    label,\n    href\n  },\n  logo{\n    ...,\n    "dimensions": asset->metadata.dimensions\n  }\n}': FIRM_DETAILS_QUERY_RESULT;
+    '*[_id == "firmDetails"][0]{\n  title,\n  tagline,\n  phone,\n  email,\n  address,\n  socials[]{\n    platform,\n    url\n  },\n  copyrightNotice,\n  legalLinks[]{\n    label,\n    href\n  },\n  logo{\n    ...,\n    "dimensions": asset->metadata.dimensions\n  }\n}': FIRM_DETAILS_QUERY_RESULT;
     '*[_id == "homePage"][0].hero{\n  eyebrow,\n  titleAccent,\n  titleSecond,\n  lead,\n  ctas[]{\n    _key,\n    label,\n    href\n  },\n  caption{\n    name,\n    role,\n    watchLabel,\n    video->{\n      wistiaId\n    }\n  }\n}': HOME_HERO_QUERY_RESULT;
     '*[_id == "homePage"][0].sellingPoints.points[]{\n  _key,\n  value,\n  label\n}': HOME_SELLING_POINTS_QUERY_RESULT;
     '*[_id == "homePage"][0].about{\n  eyebrow,\n  titleLead,\n  titleStrong,\n  body,\n  resultsEyebrow,\n  quote,\n  featured[]->{\n    _id,\n    "outcome": coalesce(teaser.outcome, outcome),\n    "caseName": coalesce(teaser.title, name),\n    "note": coalesce(teaser.note, note)\n  }\n}': HOME_ABOUT_QUERY_RESULT;
@@ -1880,6 +1899,7 @@ declare module "@sanity/client" {
     "*[_id == $pageId][0].practiceAreas{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  description,\n  cards[]{\n    _key,\n    icon,\n    title,\n    desc\n  }\n}": PRACTICE_AREAS_BAND_QUERY_RESULT;
     "*[_id == $pageId][0].seo{\n  metaTitle,\n  metaDescription,\n  canonicalUrl,\n  noIndex,\n  ogImage\n}": PAGE_SEO_QUERY_RESULT;
     '*[_id in $ids]{\n  _id,\n  _updatedAt,\n  "noIndex": seo.noIndex\n}': STATIC_PAGE_SEO_QUERY_RESULT;
+    '*[_id == "globalSeo"][0]{\n  discourageCrawling,\n  defaultOgImage\n}': GLOBAL_SEO_QUERY_RESULT;
     '*[\n  _type == "testimonial" && featured == true\n] | order(orderRank) [0...3]{\n  _id,\n  quote,\n  author,\n  tag\n}': FEATURED_TESTIMONIALS_QUERY_RESULT;
     '*[_type == "testimonial"] | order(orderRank){\n  _id,\n  quote,\n  author\n}': ALL_TESTIMONIALS_QUERY_RESULT;
     "*[_id == $pageId][0].testimonials{\n  eyebrow,\n  headingLead,\n  headingStrong\n}": TESTIMONIALS_BAND_QUERY_RESULT;
