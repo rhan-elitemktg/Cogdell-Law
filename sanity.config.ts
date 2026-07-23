@@ -1,7 +1,7 @@
 import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
 import { schemaTypes } from "./src/sanity/schemaTypes/index";
-import { structure, SINGLETONS } from "./src/sanity/structure";
+import { structure, NON_CREATABLE } from "./src/sanity/structure";
 
 // This file is loaded from two very different places:
 //   - the browser Studio, bundled by Astro/Vite → import.meta.env.PUBLIC_* exists
@@ -25,10 +25,11 @@ export default defineConfig({
     types: schemaTypes,
   },
   document: {
-    // Keep singletons out of the global "＋ Create" menu.
+    // Keep singletons — and legalPage, which is managed as two fixed docs — out
+    // of the global "＋ Create" menu, so none can be duplicated into an orphan.
     newDocumentOptions: (prev, { creationContext }) =>
       creationContext.type === "global"
-        ? prev.filter((item) => !SINGLETONS.includes(item.templateId ?? ""))
+        ? prev.filter((item) => !NON_CREATABLE.includes(item.templateId ?? ""))
         : prev,
   },
 });

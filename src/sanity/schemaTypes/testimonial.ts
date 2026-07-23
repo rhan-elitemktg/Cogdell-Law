@@ -21,7 +21,7 @@ export const testimonial = defineType({
   name: "testimonial",
   title: "Testimonials",
   type: "document",
-  icon: icons.blockquote,
+  icon: icons["double-quote"],
   // Drag-to-reorder (D2) — sets the order of the wall on /testimonials.
   orderings: [orderRankOrdering],
   fields: [

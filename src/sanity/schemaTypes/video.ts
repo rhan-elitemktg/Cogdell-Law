@@ -18,7 +18,7 @@ export const video = defineType({
   name: "video",
   title: "Videos",
   type: "document",
-  icon: icons.play,
+  icon: icons.video,
   // Drag-to-reorder in the Studio (D2) — sets the order on /videos.
   orderings: [orderRankOrdering],
   fields: [

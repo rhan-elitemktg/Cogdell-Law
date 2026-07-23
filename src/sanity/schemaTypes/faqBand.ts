@@ -16,21 +16,24 @@ export const faqBand = defineType({
       name: "eyebrow",
       title: "Eyebrow",
       type: "string",
-      validation: (rule) => rule.required(),
+      validation: (rule) =>
+        rule.required().max(40).warning("Eyebrows read best kept under ~40 characters."),
     }),
     defineField({
       name: "headingLead",
       title: "Heading — italic",
       type: "string",
       description: 'The italic first line — e.g. "Answers to the Questions".',
-      validation: (rule) => rule.required(),
+      validation: (rule) =>
+        rule.required().max(60).warning("Heading lines read best kept short (~60 characters)."),
     }),
     defineField({
       name: "headingStrong",
       title: "Heading — bold",
       type: "string",
       description: 'The bold second line — e.g. "That Matter Most.".',
-      validation: (rule) => rule.required(),
+      validation: (rule) =>
+        rule.required().max(60).warning("Heading lines read best kept short (~60 characters)."),
     }),
     defineField({
       name: "lede",

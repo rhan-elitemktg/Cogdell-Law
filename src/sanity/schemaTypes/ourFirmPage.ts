@@ -17,7 +17,7 @@ export const ourFirmPage = defineType({
   name: "ourFirmPage",
   title: "Our Firm Page",
   type: "document",
-  icon: icons.users,
+  icon: icons.book,
   fields: [
     defineField({
       name: "hero",
@@ -129,7 +129,7 @@ export const ourFirmPage = defineType({
               defineField({ name: "title", title: "Title", type: "string", validation: (r) => r.required() }),
               defineField({ name: "body", title: "Body", type: "text", rows: 3, validation: (r) => r.required() }),
             ],
-            preview: { select: { title: "title", subtitle: "icon" } },
+            preview: { select: { title: "title", subtitle: "body" } },
           })],
           validation: (r) => r.required().min(1),
         }),

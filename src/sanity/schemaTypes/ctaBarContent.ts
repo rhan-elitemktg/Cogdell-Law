@@ -18,21 +18,24 @@ export const ctaBarContent = defineType({
       name: "eyebrow",
       title: "Eyebrow",
       type: "string",
-      validation: (rule) => rule.required(),
+      validation: (rule) =>
+        rule.required().max(40).warning("Eyebrows read best kept under ~40 characters."),
     }),
     defineField({
       name: "headingLead",
       title: "Heading — italic",
       type: "string",
       description: 'The italic opening word — e.g. "Call".',
-      validation: (rule) => rule.required(),
+      validation: (rule) =>
+        rule.required().max(60).warning("Heading lines read best kept short (~60 characters)."),
     }),
     defineField({
       name: "headingRest",
       title: "Heading — rest",
       type: "string",
       description: 'The rest of the heading — e.g. "Cogdell Law Firm.".',
-      validation: (rule) => rule.required(),
+      validation: (rule) =>
+        rule.required().max(60).warning("Heading lines read best kept short (~60 characters)."),
     }),
     defineField({
       name: "body",

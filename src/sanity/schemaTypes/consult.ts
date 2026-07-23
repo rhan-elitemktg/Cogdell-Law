@@ -17,7 +17,7 @@ export const consult = defineType({
   name: "consult",
   title: "Consult",
   type: "document",
-  icon: icons.envelope,
+  icon: icons.calendar,
   fields: [
     defineField({
       name: "content",

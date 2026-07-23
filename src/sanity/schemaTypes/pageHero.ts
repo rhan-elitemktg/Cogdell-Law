@@ -10,9 +10,9 @@ export const pageHero = defineType({
   title: "Hero",
   type: "object",
   fields: [
-    defineField({ name: "eyebrow", title: "Eyebrow", type: "string", validation: (r) => r.required() }),
-    defineField({ name: "titleLead", title: "Title — lead", type: "string" }),
-    defineField({ name: "titleStrong", title: "Title — emphasis", type: "string", validation: (r) => r.required() }),
+    defineField({ name: "eyebrow", title: "Eyebrow", type: "string", validation: (r) => r.required().max(40).warning("Eyebrows read best kept under ~40 characters.") }),
+    defineField({ name: "titleLead", title: "Title — lead", type: "string", validation: (r) => r.max(60).warning("Heading lines read best kept short (~60 characters).") }),
+    defineField({ name: "titleStrong", title: "Title — emphasis", type: "string", validation: (r) => r.required().max(60).warning("Heading lines read best kept short (~60 characters).") }),
     defineField({ name: "lede", title: "Lede", type: "text", rows: 3 }),
   ],
   preview: {

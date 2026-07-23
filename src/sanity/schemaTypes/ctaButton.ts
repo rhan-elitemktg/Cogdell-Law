@@ -16,7 +16,11 @@ export const ctaButton = defineType({
       name: "label",
       title: "Label",
       type: "string",
-      validation: (rule) => rule.required(),
+      validation: (rule) =>
+        rule
+          .required()
+          .max(30)
+          .warning("Button labels read best kept under ~30 characters."),
     }),
     defineField({
       name: "href",
