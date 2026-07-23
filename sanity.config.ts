@@ -2,6 +2,8 @@ import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
 import { schemaTypes } from "./src/sanity/schemaTypes/index";
 import { structure, NON_CREATABLE } from "./src/sanity/structure";
+import { eliteTheme } from "./src/sanity/theme";
+import { EliteMark } from "./src/sanity/components/EliteMark";
 
 // This file is loaded from two very different places:
 //   - the browser Studio, bundled by Astro/Vite → import.meta.env.PUBLIC_* exists
@@ -18,6 +20,14 @@ const projectId =
 const dataset = viteEnv?.PUBLIC_SANITY_DATASET ?? nodeEnv?.PUBLIC_SANITY_DATASET;
 
 export default defineConfig({
+  // Studio title — the name beside the emblem, in the browser tab, and in the
+  // workspace menu.
+  title: "Elite Legal Marketing",
+  // The ELITE emblem in the navbar chip. This is the SUPPORTED way to brand the
+  // nav — `studio.components.logo` is deprecated and a no-op in Studio 6.4.
+  icon: EliteMark,
+  // Elite brand palette (light scheme, teal accent, gold highlights).
+  theme: eliteTheme,
   projectId,
   dataset,
   plugins: [structureTool({ structure })],
