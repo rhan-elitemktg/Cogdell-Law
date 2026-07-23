@@ -1,4 +1,5 @@
 import { defineType, defineField, defineArrayMember } from "sanity";
+import { icons } from "@sanity/icons";
 
 /**
  * Firm Details singleton — the firm's identity and contact info, reused across
@@ -14,6 +15,7 @@ export const firmDetails = defineType({
   name: "firmDetails",
   title: "Firm Details",
   type: "document",
+  icon: icons.cog,
   fields: [
     defineField({
       name: "title",
@@ -73,6 +75,18 @@ export const firmDetails = defineType({
       type: "array",
       description:
         "Shown as icons in the footer. The icon comes from the platform; only the URL is editable.",
+      validation: (rule) =>
+        rule.custom((value) => {
+          const rows = (value as { platform?: string }[] | undefined) ?? [];
+          const seen = new Set<string>();
+          for (const row of rows) {
+            const p = row?.platform;
+            if (!p) continue;
+            if (seen.has(p)) return "Each platform can only be added once.";
+            seen.add(p);
+          }
+          return true;
+        }),
       of: [
         defineArrayMember({
           type: "object",
@@ -142,7 +156,14 @@ export const firmDetails = defineType({
               title: "Link",
               type: "string",
               description: 'A path, e.g. "/privacy".',
-              validation: (rule) => rule.required(),
+              validation: (rule) =>
+                rule
+                  .required()
+                  .custom((value) =>
+                    !value || /^(\/|https?:\/\/)/.test(value as string)
+                      ? true
+                      : 'Use a path like "/privacy" or a full https:// URL.',
+                  ),
             }),
           ],
           preview: { select: { title: "label", subtitle: "href" } },

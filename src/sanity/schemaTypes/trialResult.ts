@@ -38,7 +38,7 @@ export const trialResult = defineType({
   name: "trialResult",
   title: "Trial Results",
   type: "document",
-  icon: icons.case,
+  icon: icons.star,
   fields: [
     defineField({
       name: "name",

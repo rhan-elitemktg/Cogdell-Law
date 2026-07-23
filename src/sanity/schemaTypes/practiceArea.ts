@@ -17,7 +17,7 @@ export const practiceArea = defineType({
   name: "practiceArea",
   title: "Practice Areas",
   type: "document",
-  icon: icons.case,
+  icon: icons.tag,
   orderings: [orderRankOrdering],
   fields: [
     orderRankField({ type: "practiceArea" }),

@@ -11,7 +11,7 @@ export const practiceAreasPage = defineType({
   name: "practiceAreasPage",
   title: "Practice Areas Page",
   type: "document",
-  icon: icons.case,
+  icon: icons["th-large"],
   fields: [
     defineField({
       name: "hero",

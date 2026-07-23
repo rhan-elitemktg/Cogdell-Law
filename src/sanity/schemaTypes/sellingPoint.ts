@@ -14,7 +14,11 @@ export const sellingPoint = defineType({
       title: "Value",
       type: "string",
       description: 'The large line — e.g. "40+", "Nationwide", "Elite".',
-      validation: (rule) => rule.required(),
+      validation: (rule) =>
+        rule
+          .required()
+          .max(24)
+          .warning("The large stat line is built to be short — keep it under ~24 characters."),
     }),
     defineField({
       name: "label",
@@ -22,7 +26,11 @@ export const sellingPoint = defineType({
       type: "string",
       description:
         'The small line beneath — e.g. "Years of Trial Experience". Rendered in caps.',
-      validation: (rule) => rule.required(),
+      validation: (rule) =>
+        rule
+          .required()
+          .max(48)
+          .warning("The caption reads best kept under ~48 characters."),
     }),
   ],
   preview: {

@@ -27,7 +27,11 @@ export const whyChooseFeature = defineType({
       name: "title",
       title: "Title",
       type: "string",
-      validation: (rule) => rule.required(),
+      validation: (rule) =>
+        rule
+          .required()
+          .max(60)
+          .warning("Card titles read best kept under ~60 characters."),
     }),
     defineField({
       name: "body",
@@ -45,5 +49,5 @@ export const whyChooseFeature = defineType({
       validation: (rule) => rule.required(),
     }),
   ],
-  preview: { select: { title: "title", subtitle: "icon" } },
+  preview: { select: { title: "title", subtitle: "body" } },
 });

@@ -17,21 +17,24 @@ export const practiceAreasBand = defineType({
       title: "Eyebrow",
       type: "string",
       description: "Small accented label above the heading.",
-      validation: (rule) => rule.required(),
+      validation: (rule) =>
+        rule.required().max(40).warning("Eyebrows read best kept under ~40 characters."),
     }),
     defineField({
       name: "headingLead",
       title: "Heading — lead",
       type: "string",
       description: 'First part of the heading, in lighter weight — e.g. "What We".',
-      validation: (rule) => rule.required(),
+      validation: (rule) =>
+        rule.required().max(60).warning("Heading lines read best kept short (~60 characters)."),
     }),
     defineField({
       name: "headingStrong",
       title: "Heading — emphasis",
       type: "string",
       description: 'The bold tail of the heading — e.g. "Try.". A space is added before it.',
-      validation: (rule) => rule.required(),
+      validation: (rule) =>
+        rule.required().max(60).warning("Heading lines read best kept short (~60 characters)."),
     }),
     defineField({
       name: "description",

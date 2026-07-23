@@ -155,11 +155,20 @@ export const newsItem = defineType({
     },
   ],
   preview: {
-    select: { title: "title", outlet: "outlet", media: "media", link: "linkType" },
-    prepare({ title, outlet, media, link }) {
+    select: {
+      title: "title",
+      outlet: "outlet",
+      mediaType: "media",
+      link: "linkType",
+      logo: "outletLogo",
+    },
+    prepare({ title, outlet, mediaType, link, logo }) {
       return {
         title,
-        subtitle: [outlet, media, link === "article" ? "owned" : "external"].filter(Boolean).join(" · "),
+        subtitle: [outlet, mediaType, link === "article" ? "owned" : "external"]
+          .filter(Boolean)
+          .join(" · "),
+        media: logo ?? icons["document-text"],
       };
     },
   },

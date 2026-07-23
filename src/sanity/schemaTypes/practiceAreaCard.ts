@@ -30,7 +30,11 @@ export const practiceAreaCard = defineType({
       name: "title",
       title: "Title",
       type: "string",
-      validation: (rule) => rule.required(),
+      validation: (rule) =>
+        rule
+          .required()
+          .max(60)
+          .warning("Card titles read best kept under ~60 characters."),
     }),
     defineField({
       name: "desc",
@@ -51,6 +55,6 @@ export const practiceAreaCard = defineType({
     }),
   ],
   preview: {
-    select: { title: "title", subtitle: "icon" },
+    select: { title: "title", subtitle: "desc" },
   },
 });

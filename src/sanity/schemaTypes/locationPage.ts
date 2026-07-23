@@ -10,13 +10,13 @@ export const locationPage = defineType({
   name: "locationPage",
   title: "Location Pages",
   type: "document",
-  icon: icons.document,
+  icon: icons.marker,
   orderings: [orderRankOrdering],
   fields: [
     orderRankField({ type: "locationPage" }),
     defineField({ name: "city", title: "City", type: "reference", to: [{ type: "serviceCity" }], validation: (rule) => rule.required() }),
     defineField({ name: "title", title: "Title", type: "string", description: "<title> / meta label.", validation: (rule) => rule.required() }),
-    defineField({ name: "navLabel", title: "Nav / breadcrumb label", type: "string", validation: (rule) => rule.required() }),
+    defineField({ name: "navLabel", title: "Nav / breadcrumb label", type: "string", description: "The short name shown in the nav menu and breadcrumb — often just the city, where Title is the longer page/meta name.", validation: (rule) => rule.required() }),
     defineField({
       name: "slug",
       title: "Slug",
