@@ -14,29 +14,37 @@ export const attorneysPage = defineType({
   title: "Attorneys Page",
   type: "document",
   icon: icons.users,
+  groups: [
+    { name: "content", title: "Content", default: true },
+    { name: "seo", title: "SEO" },
+  ],
   fields: [
     defineField({
       name: "hero",
       title: "Hero",
       type: "pageHero",
+      group: "content",
       options: { collapsible: true, collapsed: true },
     }),
     defineField({
       name: "attorneys",
       title: "Attorneys",
       type: "attorneysBand",
+      group: "content",
       options: { collapsible: true, collapsed: true },
     }),
     defineField({
       name: "testimonials",
       title: "Testimonials",
       type: "testimonialsBand",
+      group: "content",
       options: { collapsible: true, collapsed: true },
     }),
     defineField({
       name: "whyChoose",
       title: "Why Choose",
       type: "whyChooseBand",
+      group: "content",
       options: { collapsible: true, collapsed: true },
     }),
     // No `ctaBar` override here: /attorneys doesn't render the CTA bar.
@@ -44,7 +52,7 @@ export const attorneysPage = defineType({
       name: "seo",
       title: "SEO",
       type: "seo",
-      options: { collapsible: true, collapsed: true },
+      group: "seo",
     }),
   ],
   preview: {

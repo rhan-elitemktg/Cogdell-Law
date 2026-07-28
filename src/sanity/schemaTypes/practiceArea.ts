@@ -12,6 +12,11 @@ import { PRACTICE_AREA_ICON_KEYS } from "../../lib/practiceAreaIcons";
  * Body content is blockContent (D3). Internal links in the body are plain
  * relative-path URLs for now; the internal/external reference toggle (D4) is a
  * later refinement.
+ *
+ * Tabs (field groups): **Card** is how the area appears on someone else's page
+ * (the grid cell that links here), **Page** is the page itself, **SEO** is the
+ * search listing. Card is the default tab because Title drives everything else.
+ * Sanity always prepends its own "All fields" tab ahead of these.
  */
 export const practiceArea = defineType({
   name: "practiceArea",
@@ -19,6 +24,11 @@ export const practiceArea = defineType({
   type: "document",
   icon: icons.tag,
   orderings: [orderRankOrdering],
+  groups: [
+    { name: "card", title: "Card", default: true },
+    { name: "page", title: "Page" },
+    { name: "seo", title: "SEO" },
+  ],
   fields: [
     orderRankField({ type: "practiceArea" }),
     defineField({
@@ -26,6 +36,7 @@ export const practiceArea = defineType({
       title: "Title",
       type: "string",
       description: "Short label — nav, breadcrumb, cards, <title>.",
+      group: "card",
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -34,35 +45,44 @@ export const practiceArea = defineType({
       type: "slug",
       description: "A SINGLE path segment (e.g. stark-law). The full URL is built from ancestors.",
       options: { source: "title", maxLength: 96 },
+      group: "page",
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: "parent",
-      title: "Parent area",
+      title: "Parent Page",
       type: "reference",
       to: [{ type: "practiceArea" }],
       description: "Leave empty for a top-level area. Set it to nest this as a sub-topic.",
+      group: "page",
     }),
     defineField({
       name: "heroTitle",
       title: "Hero title",
       type: "string",
       description: "The full descriptive H1 shown in the page hero.",
+      group: "page",
       validation: (rule) => rule.required(),
     }),
     defineField({
-      name: "lede",
-      title: "Lede",
-      type: "text",
-      rows: 3,
-      description: "Opening line — leads the content body and the meta description.",
+      name: "heroImage",
+      title: "Hero image",
+      type: "image",
+      description:
+        "Optional. Leave empty and the page uses the default firm photo. The hotspot sets what stays in frame when the photo is cropped to the hero.",
+      options: { hotspot: true },
+      group: "page",
     }),
     defineField({
       name: "cardSummary",
       title: "Card summary",
       type: "text",
       rows: 2,
-      description: "Short blurb for the parent/index grid card.",
+      description:
+        "Short blurb for the parent/index grid card. Also the search-result summary, unless SEO → Meta description is filled in.",
+      group: "card",
+      validation: (rule) =>
+        rule.max(160).warning("Over ~160 characters gets truncated in search results."),
     }),
     defineField({
       name: "icon",
@@ -70,19 +90,22 @@ export const practiceArea = defineType({
       type: "string",
       description: "Grid-card icon. Only top-level areas show one.",
       options: { list: PRACTICE_AREA_ICON_KEYS.map((k) => ({ title: k, value: k })) },
+      group: "card",
     }),
-            defineField({
+    defineField({
       name: "body",
       title: "Body Content",
       type: "blockContent",
       description:
-        "The whole page body — paragraphs, headings, lists, links. Use Heading 2 for section titles.",
+        "The whole page body, opening paragraph included — paragraphs, headings, lists, links. Use Heading 2 for section titles.",
+      group: "page",
       validation: (rule) => rule.required().min(1),
     }),
     defineField({
       name: "faqs",
       title: "FAQs",
       type: "array",
+      group: "page",
       of: [
         defineArrayMember({
           type: "object",
@@ -95,11 +118,13 @@ export const practiceArea = defineType({
         }),
       ],
     }),
+    // On its own tab the collapsible wrapper is just an extra click — the tab
+    // already does the hiding.
     defineField({
       name: "seo",
       title: "SEO",
       type: "seo",
-      options: { collapsible: true, collapsed: true },
+      group: "seo",
     }),
   ],
   preview: {

@@ -13,12 +13,17 @@ export const podcastPage = defineType({
   title: "Podcast Page",
   type: "document",
   icon: icons.play,
+  groups: [
+    { name: "content", title: "Content", default: true },
+    { name: "seo", title: "SEO" },
+  ],
   fields: [
     defineField({
       name: "hero",
       title: "Hero",
       type: "object",
       options: { collapsible: true, collapsed: true },
+      group: "content",
       fields: [
         defineField({
           name: "eyebrow",
@@ -44,7 +49,7 @@ export const podcastPage = defineType({
       name: "seo",
       title: "SEO",
       type: "seo",
-      options: { collapsible: true, collapsed: true },
+      group: "seo",
     }),
   ],
   preview: {

@@ -24,11 +24,16 @@ export const podcast = defineType({
   title: "Podcast",
   type: "document",
   icon: icons.microphone,
+  groups: [
+    { name: "content", title: "Content", default: true },
+    { name: "seo", title: "SEO" },
+  ],
   fields: [
     defineField({
       name: "title",
       title: "Episode title",
       type: "string",
+      group: "content",
       description: 'No need to add "| Ep. N" — that\'s added automatically from the number below.',
       validation: (rule) => rule.required(),
     }),
@@ -36,6 +41,7 @@ export const podcast = defineType({
       name: "episodeNumber",
       title: "Episode number",
       type: "number",
+      group: "content",
       description: 'Printed on the artwork ("EPISODE 12") and after the title ("| Ep. 12").',
       validation: (rule) => rule.required().integer().positive(),
     }),
@@ -43,6 +49,7 @@ export const podcast = defineType({
       name: "slug",
       title: "Slug",
       type: "slug",
+      group: "content",
       description: "URL segment — /podcast/<slug>.",
       options: { source: "title", maxLength: 96 },
       validation: (rule) => rule.required(),
@@ -51,6 +58,7 @@ export const podcast = defineType({
       name: "tag",
       title: "Tag",
       type: "string",
+      group: "content",
       description: "The category badge on the card, and the filter button that reveals it on /podcast.",
       options: { list: PODCAST_TAGS.map((t) => ({ ...t })) },
       validation: (rule) => rule.required(),
@@ -59,6 +67,7 @@ export const podcast = defineType({
       name: "publishedAt",
       title: "Published date",
       type: "datetime",
+      group: "content",
       description:
         'Leave empty to use the date this episode was added. Set it to override — this is what "newest" sorts by.',
     }),
@@ -66,6 +75,7 @@ export const podcast = defineType({
       name: "coverImage",
       title: "Artwork background photo",
       type: "image",
+      group: "content",
       options: { hotspot: true },
       description:
         'The photo behind the "Cogdell Counsel" lockup on the card + episode page. Optional — leave empty to use the firm default; upload one to override it.',
@@ -74,6 +84,7 @@ export const podcast = defineType({
       name: "summary",
       title: "Summary",
       type: "text",
+      group: "content",
       rows: 3,
       description: "A short blurb — used for search/social metadata when no SEO description is set.",
       validation: (rule) => rule.required(),
@@ -82,6 +93,7 @@ export const podcast = defineType({
       name: "body",
       title: "Episode content",
       type: "blockContent",
+      group: "content",
       description: "The show notes / write-up shown on the episode page.",
       validation: (rule) => rule.required().min(1),
     }),
@@ -89,6 +101,7 @@ export const podcast = defineType({
       name: "spotifyUrl",
       title: "Spotify episode link",
       type: "url",
+      group: "content",
       description:
         "Paste the episode's Spotify URL (e.g. https://open.spotify.com/episode/…). The page embeds Spotify's player from this.",
       validation: (rule) => rule.uri({ scheme: ["https"] }),
@@ -97,6 +110,7 @@ export const podcast = defineType({
       name: "chapters",
       title: "Chapters",
       type: "text",
+      group: "content",
       rows: 8,
       description:
         'One chapter per line — timestamp, then title: "02:14 Meeting Dick DeGuerin". Shown under the player, and clicking one jumps the episode to that point. Paste the same block into Buzzsprout so Spotify shows the same chapters.',
@@ -123,7 +137,7 @@ export const podcast = defineType({
       name: "seo",
       title: "SEO",
       type: "seo",
-      options: { collapsible: true, collapsed: true },
+      group: "seo",
     }),
   ],
   orderings: [

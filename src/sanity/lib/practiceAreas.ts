@@ -6,7 +6,7 @@ const ALL_QUERY = defineQuery(`*[_type == "practiceArea"] | order(orderRank){
   _id,
   title,
   heroTitle,
-  lede,
+  heroImage,
   cardSummary,
   icon,
   body,
@@ -36,8 +36,30 @@ interface Node {
   children: Node[];
 }
 
+/**
+ * Built once per production build and reused; refetched every call in dev.
+ *
+ * Astro caches `getStaticPaths()` per route module for the dev server's whole
+ * lifetime (core/render/route-cache.js — it only re-runs when the route FILE
+ * changes), so a page whose data arrives via getStaticPaths props goes stale the
+ * moment someone edits content in the Studio, and only a restart clears it.
+ * Pages therefore look their own node up through `getPracticeAreaNode()` at
+ * render time instead of trusting props, and this cache keeps that free: in a
+ * production build every page shares the single fetch getStaticPaths already
+ * made, so the build does exactly as many queries as it did before.
+ */
+let treeCache: ReturnType<typeof buildTreeUncached> | null = null;
+
+function buildTree() {
+  if (import.meta.env.PROD) {
+    treeCache ??= buildTreeUncached();
+    return treeCache;
+  }
+  return buildTreeUncached();
+}
+
 /** Build the tree + every node's full path and breadcrumb trail. */
-async function buildTree() {
+async function buildTreeUncached() {
   const docs = await getAllPracticeAreas();
   const byId = new Map(docs.map((d) => [d._id, d]));
   const childrenOf = new Map<string | null, typeof docs>();
@@ -84,6 +106,28 @@ export async function getPracticeAreaPaths() {
       })),
     },
   }));
+}
+
+/**
+ * One node by its full path (e.g. "health-care-fraud-defense/stark-law"), ready
+ * to render. Pages call this with `Astro.params` rather than reading props, so
+ * Studio edits show up on the next dev refresh instead of the next restart.
+ */
+export async function getPracticeAreaNode(path: string) {
+  const { nodes } = await buildTree();
+  const node = nodes.get(path);
+  if (!node) return null;
+  return {
+    node: node.doc,
+    trail: node.trail,
+    path: node.path,
+    children: node.children.map((c) => ({
+      title: c.doc.title,
+      summary: c.doc.cardSummary,
+      href: `/practice-areas/${c.path}`,
+      icon: c.doc.icon,
+    })),
+  };
 }
 
 /** Top-level areas for the /practice-areas index grid. */

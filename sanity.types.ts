@@ -314,7 +314,13 @@ export type PracticeArea = {
   slug: Slug;
   parent?: PracticeAreaReference;
   heroTitle: string;
-  lede?: string;
+  heroImage?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
   cardSummary?: string;
   icon?: "health" | "federal" | "fraud" | "collar" | "appeals";
   body: BlockContent;
@@ -325,6 +331,22 @@ export type PracticeArea = {
     _key: string;
   }>;
   seo?: Seo;
+};
+
+export type SanityImageCrop = {
+  _type: "sanity.imageCrop";
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
+};
+
+export type SanityImageHotspot = {
+  _type: "sanity.imageHotspot";
+  x: number;
+  y: number;
+  height: number;
+  width: number;
 };
 
 export type LegalPage = {
@@ -369,22 +391,6 @@ export type Podcast = {
   spotifyUrl?: string;
   chapters?: string;
   seo?: Seo;
-};
-
-export type SanityImageCrop = {
-  _type: "sanity.imageCrop";
-  top: number;
-  bottom: number;
-  left: number;
-  right: number;
-};
-
-export type SanityImageHotspot = {
-  _type: "sanity.imageHotspot";
-  x: number;
-  y: number;
-  height: number;
-  width: number;
 };
 
 export type NewsItem = {
@@ -967,10 +973,10 @@ export type AllSanitySchemaTypes =
   | ServiceCity
   | PracticeAreaReference
   | PracticeArea
-  | LegalPage
-  | Podcast
   | SanityImageCrop
   | SanityImageHotspot
+  | LegalPage
+  | Podcast
   | NewsItem
   | Faq
   | Testimonial
@@ -1833,12 +1839,18 @@ export type PODCAST_HERO_QUERY_RESULT =
 
 // Source: src/sanity/lib/practiceAreas.ts
 // Variable: ALL_QUERY
-// Query: *[_type == "practiceArea"] | order(orderRank){  _id,  title,  heroTitle,  lede,  cardSummary,  icon,  body,  faqs[]{ _key, question, answer },  "slug": slug.current,  "parentId": parent._ref,  _updatedAt,  seo{    metaTitle,    metaDescription,    canonicalUrl,    noIndex,    ogImage  }}
+// Query: *[_type == "practiceArea"] | order(orderRank){  _id,  title,  heroTitle,  heroImage,  cardSummary,  icon,  body,  faqs[]{ _key, question, answer },  "slug": slug.current,  "parentId": parent._ref,  _updatedAt,  seo{    metaTitle,    metaDescription,    canonicalUrl,    noIndex,    ogImage  }}
 export type ALL_QUERY_RESULT = Array<{
   _id: string;
   title: string;
   heroTitle: string;
-  lede: string | null;
+  heroImage: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  } | null;
   cardSummary: string | null;
   icon: "appeals" | "collar" | "federal" | "fraud" | "health" | null;
   body: BlockContent;
@@ -2058,7 +2070,7 @@ declare module "@sanity/client" {
     '*[_type == "podcast" && slug.current == $slug][0]{\n  _id,\n  title,\n  episodeNumber,\n  tag,\n  summary,\n  "slug": slug.current,\n  "date": coalesce(publishedAt, _createdAt),\n  coverImage,\n  body,\n  spotifyUrl,\n  chapters,\n  _updatedAt,\n  seo{\n    metaTitle,\n    metaDescription,\n    canonicalUrl,\n    noIndex,\n    ogImage\n  }\n}': PODCAST_QUERY_RESULT;
     '*[_type == "podcast" && defined(slug.current)]{"slug": slug.current, _updatedAt, "noIndex": seo.noIndex}': PODCAST_SLUGS_QUERY_RESULT;
     '*[_id == "podcastPage"][0].hero{\n  eyebrow,\n  title,\n  subtitle\n}': PODCAST_HERO_QUERY_RESULT;
-    '*[_type == "practiceArea"] | order(orderRank){\n  _id,\n  title,\n  heroTitle,\n  lede,\n  cardSummary,\n  icon,\n  body,\n  faqs[]{ _key, question, answer },\n  "slug": slug.current,\n  "parentId": parent._ref,\n  _updatedAt,\n  seo{\n    metaTitle,\n    metaDescription,\n    canonicalUrl,\n    noIndex,\n    ogImage\n  }\n}': ALL_QUERY_RESULT;
+    '*[_type == "practiceArea"] | order(orderRank){\n  _id,\n  title,\n  heroTitle,\n  heroImage,\n  cardSummary,\n  icon,\n  body,\n  faqs[]{ _key, question, answer },\n  "slug": slug.current,\n  "parentId": parent._ref,\n  _updatedAt,\n  seo{\n    metaTitle,\n    metaDescription,\n    canonicalUrl,\n    noIndex,\n    ogImage\n  }\n}': ALL_QUERY_RESULT;
     "*[_id == $pageId][0].practiceAreas{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  description,\n  cards[]{\n    _key,\n    icon,\n    title,\n    desc\n  }\n}": PRACTICE_AREAS_BAND_QUERY_RESULT;
     "*[_id == $pageId][0].seo{\n  metaTitle,\n  metaDescription,\n  canonicalUrl,\n  noIndex,\n  ogImage\n}": PAGE_SEO_QUERY_RESULT;
     '*[_id in $ids]{\n  _id,\n  _updatedAt,\n  "noIndex": seo.noIndex\n}': STATIC_PAGE_SEO_QUERY_RESULT;

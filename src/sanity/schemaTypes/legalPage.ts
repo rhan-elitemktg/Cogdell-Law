@@ -13,27 +13,32 @@ export const legalPage = defineType({
   title: "Legal Page",
   type: "document",
   icon: icons.document,
+  groups: [
+    { name: "content", title: "Content", default: true },
+    { name: "seo", title: "SEO" },
+  ],
   fields: [
     defineField({
       name: "title",
       title: "Title",
       type: "string",
+      group: "content",
       validation: (rule) => rule.required(),
     }),
-            defineField({
+    defineField({
       name: "body",
       title: "Body Content",
       type: "blockContent",
-      
       description:
         "The whole page body — paragraphs, headings, lists, links. Use Heading 2 for section titles.",
+      group: "content",
       validation: (rule) => rule.required().min(1),
     }),
     defineField({
       name: "seo",
       title: "SEO",
       type: "seo",
-      options: { collapsible: true, collapsed: true },
+      group: "seo",
     }),
   ],
   preview: {

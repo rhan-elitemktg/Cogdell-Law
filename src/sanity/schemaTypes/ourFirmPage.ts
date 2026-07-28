@@ -18,11 +18,16 @@ export const ourFirmPage = defineType({
   title: "Our Firm Page",
   type: "document",
   icon: icons.book,
+  groups: [
+    { name: "content", title: "Content", default: true },
+    { name: "seo", title: "SEO" },
+  ],
   fields: [
     defineField({
       name: "hero",
       title: "Hero",
       type: "object",
+      group: "content",
       options: { collapsible: true, collapsed: true },
       fields: [
         defineField({ name: "eyebrow", title: "Eyebrow", type: "string", validation: (r) => r.required() }),
@@ -35,6 +40,7 @@ export const ourFirmPage = defineType({
       name: "intro",
       title: "Intro",
       type: "object",
+      group: "content",
       options: { collapsible: true, collapsed: true },
       fields: [
         defineField({ name: "eyebrow", title: "Eyebrow", type: "string", validation: (r) => r.required() }),
@@ -47,6 +53,7 @@ export const ourFirmPage = defineType({
       name: "stats",
       title: "Stats",
       type: "object",
+      group: "content",
       options: { collapsible: true, collapsed: true },
       fields: [
         defineField({
@@ -63,6 +70,7 @@ export const ourFirmPage = defineType({
       name: "quote",
       title: "Quote Band",
       type: "object",
+      group: "content",
       options: { collapsible: true, collapsed: true },
       fields: [
         defineField({ name: "lead", title: "Quote — lead", type: "string", description: "First line, before the accent.", validation: (r) => r.required() }),
@@ -74,6 +82,7 @@ export const ourFirmPage = defineType({
       name: "foundingAttorney",
       title: "Founding Attorney",
       type: "object",
+      group: "content",
       options: { collapsible: true, collapsed: true },
       fields: [
         defineField({ name: "eyebrow", title: "Eyebrow", type: "string", validation: (r) => r.required() }),
@@ -86,6 +95,7 @@ export const ourFirmPage = defineType({
       name: "originStory",
       title: "Origin Story",
       type: "object",
+      group: "content",
       options: { collapsible: true, collapsed: true },
       fields: [
         defineField({ name: "eyebrow", title: "Eyebrow", type: "string", validation: (r) => r.required() }),
@@ -113,6 +123,7 @@ export const ourFirmPage = defineType({
       name: "values",
       title: "Values",
       type: "object",
+      group: "content",
       options: { collapsible: true, collapsed: true },
       fields: [
         defineField({ name: "eyebrow", title: "Eyebrow", type: "string", validation: (r) => r.required() }),
@@ -139,7 +150,7 @@ export const ourFirmPage = defineType({
       name: "seo",
       title: "SEO",
       type: "seo",
-      options: { collapsible: true, collapsed: true },
+      group: "seo",
     }),
   ],
   preview: {

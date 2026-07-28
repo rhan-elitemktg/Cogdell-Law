@@ -48,13 +48,20 @@ const schema = breadcrumbSchema(trail, siteUrl);
   .crumbs {
     background-color: var(--cog-paper);
     border-bottom: 1px solid var(--cog-line-ink);
-    overflow-x: scroll;
   }
+  /* No overflow-x here: the trail wraps, so it never scrolls sideways. An
+     `overflow-x: scroll` reserves a scrollbar gutter whether or not there is
+     anything to scroll, which showed as a permanently empty track for anyone on
+     classic (non-overlay) scrollbars — i.e. Windows, and macOS set to "Show
+     scroll bars: Always". */
   .crumbs__inner {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     column-gap: var(--space-2);
+    /* Safety valve the scroller used to provide: an unbroken token longer than
+       the column breaks instead of pushing the row wide. */
+    overflow-wrap: anywhere;
     padding-block: var(--space-4);
     font-family: var(--font-body);
     font-size: var(--text-xs);

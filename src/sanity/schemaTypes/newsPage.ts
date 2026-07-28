@@ -12,17 +12,23 @@ export const newsPage = defineType({
   title: "News Page",
   type: "document",
   icon: icons.documents,
+  groups: [
+    { name: "content", title: "Content", default: true },
+    { name: "seo", title: "SEO" },
+  ],
   fields: [
     defineField({
       name: "hero",
       title: "Hero",
       type: "pageHero",
+      group: "content",
       options: { collapsible: true, collapsed: true },
     }),
     defineField({
       name: "grid",
       title: "News Grid",
       type: "object",
+      group: "content",
       options: { collapsible: true, collapsed: true },
       fields: [
         defineField({ name: "eyebrow", title: "Eyebrow", type: "string", validation: (rule) => rule.required() }),
@@ -34,7 +40,7 @@ export const newsPage = defineType({
       name: "seo",
       title: "SEO",
       type: "seo",
-      options: { collapsible: true, collapsed: true },
+      group: "seo",
     }),
   ],
   preview: {

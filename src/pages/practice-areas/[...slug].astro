@@ -7,14 +7,29 @@ import PracticeGrid from "../../components/practice/PracticeGrid.astro";
 import PracticeFaqs from "../../components/practice/PracticeFaqs.astro";
 import CtaBar from "../../components/CtaBar.astro";
 import Consult from "../../components/Consult.astro";
-import { getPracticeAreaPaths } from "../../sanity/lib/practiceAreas";
+import { getPracticeAreaPaths, getPracticeAreaNode } from "../../sanity/lib/practiceAreas";
 import { PRACTICE_AREA_ICONS } from "../../lib/practiceAreaIcons";
+import defaultHeroImage from "../../assets/firm-steps.jpg";
 
 export async function getStaticPaths() {
   return getPracticeAreaPaths();
 }
 
-const { node, trail, children } = Astro.props;
+// Looked up from `params`, NOT taken from getStaticPaths props: Astro caches
+// those per route module for the dev server's whole lifetime, so props go stale
+// the moment anyone edits content in the Studio and only a restart clears it.
+// In a production build this costs nothing — it reads the same tree
+// getStaticPaths already built and cached.
+const path = Astro.params.slug ?? "";
+const entry = await getPracticeAreaNode(path);
+if (!entry) {
+  throw new Error(
+    `No practice area at "${path}".\n` +
+      "In dev this usually means a slug or the parent tree changed in the Studio: " +
+      "Astro is still serving the route list it cached at startup. Restart the dev server.",
+  );
+}
+const { node, trail, children } = entry;
 
 const childItems = (children ?? []).map((c: any) => ({
   title: c.title,
@@ -23,15 +38,18 @@ const childItems = (children ?? []).map((c: any) => ({
   icon: c.icon ? PRACTICE_AREA_ICONS[c.icon] : undefined,
 }));
 
-const description = node.lede ?? `${node.title} — Cogdell Law Firm.`;
+// `body` is the whole page, opening paragraph included — the separate `lede`
+// field was folded into it (scripts/migrate-practice-lede-into-body.ts), so the
+// card summary is what stands in for a hand-written meta description.
+const description = node.cardSummary ?? `${node.title} — Cogdell Law Firm.`;
 
-// The opening line (lede) leads the content body, exactly as before.
-// The lede is its own field (meta description + card summary) and also opens the
-// body, exactly as before the intro/sections merge.
-const ledeBlock = node.lede
-  ? [{ _type: "block", _key: "lede", style: "normal", markDefs: [], children: [{ _type: "span", _key: "ledes", text: node.lede, marks: [] }] }]
-  : [];
-const bodyValue = [...ledeBlock, ...(node.body ?? [])];
+// Every area shares one firm photo unless an editor uploads its own (Page tab →
+// Hero image). A custom upload gets an empty alt: it's a backdrop behind the H1
+// and we have no idea what it depicts, so announcing it would be noise.
+const hasCustomHero = Boolean(node.heroImage);
+const heroImageAlt = hasCustomHero
+  ? ""
+  : "The attorneys of Cogdell Law Firm ascending the courthouse steps";
 ---
 
 <Layout title={node.title} description={description} seo={node.seo}>
@@ -42,6 +60,10 @@ const bodyValue = [...ledeBlock, ...(node.body ?? [])];
     titleStrong={node.heroTitle}
     align="center"
     contentMaxWidth="700px"
+    image={hasCustomHero ? undefined : defaultHeroImage}
+    sanityImage={node.heroImage}
+    imageAlt={heroImageAlt}
+    imagePosition="center 35%"
   >
     <a href="#contact" class="btn btn--primary">
       Schedule a Consultation
@@ -53,7 +75,7 @@ const bodyValue = [...ledeBlock, ...(node.body ?? [])];
     </a>
   </PageHero>
 
-  <ProseBody body={bodyValue} />
+  <ProseBody body={node.body} />
 
   {node.faqs && node.faqs.length > 0 && <PracticeFaqs faqs={node.faqs} />}
 
