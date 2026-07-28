@@ -95,8 +95,11 @@ async function getAttorneysNav(): Promise<NavItem> {
  * Practice Areas submenu — the flat `practiceArea` docs rebuilt into their
  * two-level tree via the self-referencing `parent` ref (D1). Order is preserved
  * because the query is already ranked and we filter it in place.
+ *
+ * Exported because the practice-area sidebar renders the same tree the header
+ * menu does — one source, so the rail can never drift from the nav.
  */
-async function getPracticeAreasNav(): Promise<NavItem> {
+export async function getPracticeAreasNav(): Promise<NavItem> {
   const areas = (await sanityClient.fetch(PRACTICE_AREAS_NAV_QUERY)) ?? [];
   const childrenOf = (parentId: string | null) =>
     areas.filter((a) => (a.parentId ?? null) === parentId);

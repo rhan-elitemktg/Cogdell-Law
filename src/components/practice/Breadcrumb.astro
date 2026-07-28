@@ -7,9 +7,14 @@ import { breadcrumbSchema } from "../../lib/schema";
 
 interface Props {
   trail: Crumb[];
+  /**
+   * Drop the paper band, `.container` and 800px cap and emit just the crumb row,
+   * so a page can place it inside its own content column at that column's width.
+   */
+  bare?: boolean;
 }
 
-const { trail } = Astro.props;
+const { trail, bare = false } = Astro.props;
 
 // BreadcrumbList markup comes from the same trail the crumbs render, so every
 // page that shows breadcrumbs gets it with no change of its own (D15).
@@ -19,8 +24,8 @@ const schema = breadcrumbSchema(trail, siteUrl);
 
 {schema && <JsonLd data={schema} />}
 
-<nav class="crumbs" aria-label="Breadcrumb">
-  <div class="container crumbs__inner">
+<nav class:list={["crumbs", bare && "crumbs--bare"]} aria-label="Breadcrumb">
+  <div class:list={[!bare && "container", "crumbs__inner", bare && "crumbs__inner--bare"]}>
     {
       trail.map((crumb, i) => (
         <Fragment>
@@ -82,5 +87,16 @@ const schema = breadcrumbSchema(trail, siteUrl);
   .crumbs__current {
     color: var(--cog-ink);
     font-weight: 600;
+  }
+
+  /* Bare: no band, no container, no width cap — the host column owns all three. */
+  .crumbs--bare {
+    background-color: transparent;
+    border-bottom: 0;
+  }
+  .crumbs__inner--bare {
+    max-width: none;
+    padding-inline: 0;
+    padding-block: 0 var(--space-6);
   }
 </style>

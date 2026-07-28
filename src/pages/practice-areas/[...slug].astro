@@ -8,8 +8,14 @@ import PracticeFaqs from "../../components/practice/PracticeFaqs.astro";
 import CtaBar from "../../components/CtaBar.astro";
 import Consult from "../../components/Consult.astro";
 import { getPracticeAreaPaths, getPracticeAreaNode } from "../../sanity/lib/practiceAreas";
+import PracticeSidebar from "../../components/practice/PracticeSidebar.astro";
 import { PRACTICE_AREA_ICONS } from "../../lib/practiceAreaIcons";
 import defaultHeroImage from "../../assets/firm-steps.jpg";
+
+// One width for the hero content, the breadcrumb and the body+sidebar grid, so
+// everything on the page shares a left and right edge. Passed to PageHero and
+// mirrored by `.pa-body__inner` below.
+const CONTENT_WIDTH = "1280px";
 
 export async function getStaticPaths() {
   return getPracticeAreaPaths();
@@ -53,19 +59,17 @@ const heroImageAlt = hasCustomHero
 ---
 
 <Layout title={node.title} description={description} seo={node.seo}>
-  <Breadcrumb trail={trail} />
-
   <PageHero
     eyebrow="Practice Areas"
     titleStrong={node.heroTitle}
     align="center"
-    contentMaxWidth="700px"
+    contentMaxWidth={CONTENT_WIDTH}
     image={hasCustomHero ? undefined : defaultHeroImage}
     sanityImage={node.heroImage}
     imageAlt={heroImageAlt}
     imagePosition="center 35%"
   >
-    <a href="#contact" class="btn btn--primary">
+    <a href="#case-evaluation" class="btn btn--primary">
       Schedule a Consultation
       <svg class="btn__icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
     </a>
@@ -75,9 +79,28 @@ const heroImageAlt = hasCustomHero
     </a>
   </PageHero>
 
-  <ProseBody body={node.body} />
+  <section class="pa-body">
+    <div class="container">
+      <div class="pa-body__inner">
+        <Breadcrumb trail={trail} bare />
 
-  {node.faqs && node.faqs.length > 0 && <PracticeFaqs faqs={node.faqs} />}
+        <div class="pa-body__grid">
+          {/* A plain div, not <main>: the layout has no main landmark today, and
+              adding one here would claim only the body column — sending "skip to
+              main content" past the hero. The <aside> rail is still a
+              complementary landmark, which is what a sidebar should be. */}
+          <div class="pa-body__main">
+            <ProseBody body={node.body} bare />
+            {node.faqs && node.faqs.length > 0 && (
+              <PracticeFaqs faqs={node.faqs} variant="card" />
+            )}
+          </div>
+
+          <PracticeSidebar pathname={Astro.url.pathname} />
+        </div>
+      </div>
+    </div>
+  </section>
 
   {
     childItems.length > 0 && (
@@ -86,6 +109,7 @@ const heroImageAlt = hasCustomHero
         eyebrow="Explore"
         headingLead="Topics We"
         headingStrong="Handle."
+        background="card"
       />
     )
   }
@@ -93,3 +117,36 @@ const heroImageAlt = hasCustomHero
   <CtaBar />
   <Consult />
 </Layout>
+
+<style define:vars={{ contentWidth: CONTENT_WIDTH }}>
+  .pa-body {
+    background-color: var(--cog-paper);
+  }
+  /* The width cap lives HERE, on an inner element, not on `.container`.
+     `.container` is border-box with padding-inline, so a max-width on it would
+     yield a content box of (width − 2×padding) — and that padding steps down at
+     1360px and 650px, so the column would drift out of alignment with the hero
+     at those widths. Capping the inner element gives a true `--contentWidth`
+     content block that tracks PageHero's `.page-hero__content` exactly. */
+  .pa-body__inner {
+    max-width: var(--contentWidth);
+    margin-inline: auto;
+    padding-block: var(--space-section);
+  }
+
+  .pa-body__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 414px; /* 360px + 15% */
+    gap: var(--space-16);
+    /* Required for the sidebar's `position: sticky` — the default `stretch`
+       would make the column full-height and sticky would never engage. */
+    align-items: start;
+  }
+
+  @media (max-width: 1024px) {
+    .pa-body__grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-12);
+    }
+  }
+</style>

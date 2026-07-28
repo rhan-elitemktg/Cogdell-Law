@@ -1,0 +1,274 @@
+---
+// Practice-areas tree for the sidebar rail — the SAME data the header menu
+// renders (getPracticeAreasNav), so the two can never drift apart.
+//
+// Each parent with sub-topics is a native <details>. Deliberately no shared
+// `name` attribute: unlike the FAQ accordion, opening one area shouldn't slam
+// another shut while someone is comparing them. The area containing the current
+// page opens on load.
+//
+// The parent label is a real link to the area's own page, sitting inside the
+// <summary> that toggles the sub-list — so there's no "Overview" row duplicating
+// it. A <summary> normally toggles on any click inside it, so the script at the
+// bottom stops the event at the anchor. Without JS the label still navigates,
+// which is the behaviour that matters; only the extra toggle leaks through.
+import { getPracticeAreasNav, isOnTrail, pathMatches, normalizePath } from "../../data/navigation";
+
+interface Props {
+  /** Current pathname, for the active trail. */
+  pathname: string;
+  heading?: string;
+}
+
+const { pathname, heading = "Practice Areas" } = Astro.props;
+
+const nav = await getPracticeAreasNav();
+const areas = nav.children ?? [];
+const current = normalizePath(pathname);
+---
+
+<nav class="pnav" aria-label={heading}>
+  <h2 class="pnav__heading">{heading}</h2>
+
+  <ul class="pnav__list">
+    {
+      areas.map((area) => {
+        const onTrail = isOnTrail(area, current);
+        const isCurrent = pathMatches(area.href, current);
+        const kids = area.children ?? [];
+
+        return (
+          <li class="pnav__item">
+            {kids.length > 0 ? (
+              <details class="pnav__details" open={onTrail}>
+                <summary class="pnav__summary">
+                  <a
+                    class:list={["pnav__label", onTrail && "is-active", isCurrent && "is-current"]}
+                    href={area.href}
+                    aria-current={isCurrent ? "page" : undefined}
+                  >
+                    {area.label}
+                  </a>
+                  <span class="pnav__icon" aria-hidden="true" />
+                </summary>
+                <ul class="pnav__sublist">
+                  {kids.map((kid) => {
+                    const kidCurrent = pathMatches(kid.href, current);
+                    return (
+                      <li>
+                        <a
+                          class:list={["pnav__sublink", kidCurrent && "is-current"]}
+                          href={kid.href}
+                          aria-current={kidCurrent ? "page" : undefined}
+                        >
+                          {kid.label}
+                        </a>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </details>
+            ) : (
+              <a
+                class:list={["pnav__link", isCurrent && "is-current"]}
+                href={area.href}
+                aria-current={isCurrent ? "page" : undefined}
+              >
+                <span class:list={["pnav__label", onTrail && "is-active"]}>{area.label}</span>
+                <span class="pnav__arrow" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12h14M13 6l6 6-6 6" />
+                  </svg>
+                </span>
+              </a>
+            )}
+          </li>
+        );
+      })
+    }
+  </ul>
+</nav>
+
+<style>
+  /* Panel chrome matches .prail__form: accent rule on top, same padding, so the
+     two rail blocks read as one system. */
+  .pnav {
+    background-color: var(--cog-paper-card);
+    border: 1px solid var(--cog-line-ink);
+    border-top: 3px solid var(--cog-accent);
+    padding: var(--space-8);
+  }
+  /* Same token, weight and metrics as .prail__heading. */
+  .pnav__heading {
+    margin: 0 0 var(--space-6);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: var(--text-3xl);
+    line-height: 1.06;
+    letter-spacing: -0.01em;
+    color: var(--cog-ink);
+  }
+
+  .pnav__list,
+  .pnav__sublist {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .pnav__item {
+    border-top: 1px solid var(--cog-line-ink);
+  }
+  .pnav__item:first-child {
+    border-top: 0;
+  }
+
+  /* ---- Parent row (both the <summary> and the link-only variant) ---- */
+  .pnav__summary,
+  .pnav__link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-4) 0;
+    cursor: pointer;
+    list-style: none;
+    text-decoration: none;
+  }
+  .pnav__summary::-webkit-details-marker {
+    display: none;
+  }
+  /* Sized to the rail form's inputs (--text-base); sub-topics drop to the body
+     copy's --text-sm, so the rail runs on one scale throughout. */
+  .pnav__label {
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--cog-ink);
+    text-decoration: none;
+    transition: color var(--transition);
+  }
+  .pnav__summary:hover .pnav__label,
+  .pnav__link:hover .pnav__label {
+    color: var(--cog-accent);
+  }
+  .pnav__label.is-active,
+  .pnav__label.is-current {
+    color: var(--cog-accent);
+  }
+  /* The label is a link inside the summary — give it its own focus ring so
+     keyboard users can tell it apart from the summary's toggle focus. */
+  .pnav__label:focus-visible {
+    outline: 2px solid var(--cog-accent);
+    outline-offset: 3px;
+  }
+  .pnav__arrow {
+    flex-shrink: 0;
+    color: var(--cog-accent);
+    transition: transform var(--transition);
+  }
+  .pnav__link:hover .pnav__arrow {
+    transform: translateX(4px);
+  }
+
+  /* Plus/minus toggle — same recipe as the FAQ accordion. */
+  .pnav__icon {
+    position: relative;
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+  }
+  .pnav__icon::before,
+  .pnav__icon::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    background-color: var(--cog-accent);
+    transform: translate(-50%, -50%);
+    transition: transform var(--transition);
+  }
+  .pnav__icon::before {
+    width: 100%;
+    height: 2px;
+  }
+  .pnav__icon::after {
+    width: 2px;
+    height: 100%;
+  }
+  .pnav__details[open] .pnav__icon::after {
+    transform: translate(-50%, -50%) scaleY(0);
+  }
+
+  /* ---- Sub-topics ---- */
+  .pnav__sublist {
+    padding: 0 0 var(--space-4);
+  }
+  .pnav__sublink {
+    display: block;
+    padding: var(--space-3) 0 var(--space-3) var(--space-4);
+    border-left: 2px solid var(--cog-line-ink);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    line-height: 1.5;
+    color: var(--cog-ink-body);
+    text-decoration: none;
+    transition:
+      color var(--transition),
+      border-color var(--transition);
+  }
+  .pnav__sublink:hover {
+    color: var(--cog-accent);
+    border-left-color: var(--cog-accent);
+  }
+  .pnav__sublink.is-current {
+    color: var(--cog-accent);
+    font-weight: 600;
+    border-left-color: var(--cog-accent);
+  }
+
+  /* Animated expand where supported (matches PracticeFaqs). */
+  @supports (interpolate-size: allow-keywords) {
+    .pnav__details::details-content {
+      block-size: 0;
+      overflow: hidden;
+      transition:
+        block-size var(--transition),
+        content-visibility var(--transition);
+      transition-behavior: allow-discrete;
+    }
+    .pnav__details[open]::details-content {
+      block-size: auto;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pnav__label,
+    .pnav__arrow,
+    .pnav__sublink,
+    .pnav__icon::before,
+    .pnav__icon::after {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  // A <summary> toggles on any click inside it, so without this the parent label
+  // would both navigate AND flip the accordion. Stopping the event at the anchor
+  // keeps the summary from ever seeing it: the label navigates, and everything
+  // else in the row (the icon, the empty space) still toggles.
+  //
+  // Progressive enhancement — with JS off the label still navigates, which is
+  // the part that matters; only the redundant toggle leaks through.
+  document.querySelectorAll<HTMLAnchorElement>(".pnav__summary .pnav__label").forEach((link) => {
+    link.addEventListener("click", (e) => e.stopPropagation());
+    // Enter on the focused link fires a click, so that path is covered too; but
+    // Space would scroll-or-toggle, so swallow it and follow the link instead.
+    link.addEventListener("keydown", (e) => {
+      if (e.key === " ") {
+        e.preventDefault();
+        link.click();
+      }
+    });
+  });
+</script>
