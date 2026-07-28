@@ -46,6 +46,7 @@ import { seo } from "./seo";
 import { accentText } from "./accentText";
 import { blockContent } from "./blockContent";
 import { bodyCta } from "./bodyCta";
+import { bodyPhoneBar } from "./bodyPhoneBar";
 import { pageBody } from "./pageBody";
 
 export const schemaTypes: SchemaTypeDefinition[] = [
@@ -79,6 +80,7 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   // Objects
   ctaButton,
   bodyCta, // a page-body block (D16) — wraps two ctaButtons
+  bodyPhoneBar, // a page-body block (D16)
   sellingPoint,
   practiceAreaCard,
   practiceAreasBand,

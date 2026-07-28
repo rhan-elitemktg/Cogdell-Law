@@ -1,0 +1,127 @@
+---
+// The `bodyPhoneBar` block of a `pageBody` field (D16) — the quiet "Get In
+// Touch" band, heading left, label + phone number right.
+//
+// Rendered through pageBodyComponents' `type` map, so it receives Portable Text
+// node props ({ node, index, isInline }) and never page props — which is why the
+// phone is fetched here rather than passed in.
+import Eyebrow from "../Eyebrow.astro";
+import { getFirmDetails } from "../../sanity/lib/firmDetails";
+
+interface BodyPhoneBarNode {
+  _type: "bodyPhoneBar";
+  _key: string;
+  heading?: string;
+  eyebrow?: string;
+  phone?: string;
+}
+
+interface Props {
+  node: BodyPhoneBarNode;
+  index?: number;
+  isInline?: boolean;
+}
+
+const { node } = Astro.props;
+
+// The override is for a location page with its own local line; empty means the
+// firm's main number, read fresh each build so it can never drift.
+const firm = await getFirmDetails();
+const phone = node.phone?.trim() || firm?.phone || "713-426-2244";
+const phoneHref = `tel:+1${phone.replace(/[^0-9]/g, "")}`; // matches Header/Footer
+const eyebrow = node.eyebrow?.trim() || "Confidential & Privileged";
+---
+
+<aside class="phonebar">
+  {/* A <p>, not a heading — same reasoning as BodyCta: this interrupts the
+      document, so it has no business in the page outline. */}
+  <p class="phonebar__heading">{node.heading}</p>
+
+  <div class="phonebar__contact">
+    {/* No rule: it's the house pattern for eyebrows that aren't left-aligned
+        (FirmStory, WhyChoose, PodcastHero all drop it), and a leading rule on a
+        right-aligned label would point away from the edge it sits against. */}
+    <Eyebrow tone="accent" rule={false} class="phonebar__eyebrow">{eyebrow}</Eyebrow>
+    <a class="phonebar__phone" href={phoneHref}>{phone}</a>
+  </div>
+</aside>
+
+<style>
+  /* Owns its own vertical rhythm, matching BodyCta so the two blocks sit in the
+     same column without arguing. See F14 — this markup is emitted by this
+     component, so plain scoped rules match it. */
+  .phonebar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: var(--space-8);
+    align-items: center;
+    margin-block: var(--space-12);
+    padding: var(--space-10) var(--space-8);
+    background-color: var(--cog-navy-deep);
+    border-top: 3px solid var(--cog-accent);
+    color: var(--cog-white);
+  }
+  .phonebar:first-child {
+    margin-top: 0;
+  }
+  .phonebar:last-child {
+    margin-bottom: 0;
+  }
+
+  .phonebar__heading {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: clamp(1.75rem, 2.8vw, 2.25rem); /* 28 → 36px */
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    color: var(--cog-white);
+  }
+
+  .phonebar__contact {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  /* Emitted by Eyebrow.astro, so it carries that component's scope, not this
+     one's — the scoped parent bounds the :global (F14). */
+  .phonebar__contact :global(.phonebar__eyebrow) {
+    justify-content: flex-end;
+  }
+
+  .phonebar__phone {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: clamp(1.375rem, 2vw, 1.75rem); /* 22 → 28px */
+    line-height: 1.1;
+    color: var(--cog-white);
+    text-decoration: none;
+    transition: color var(--transition);
+  }
+  .phonebar__phone:hover {
+    color: var(--cog-accent);
+  }
+
+  /* ---- Responsive ---- */
+  /* Stacks centred rather than keeping the number pinned right: once the two
+     columns become two rows, a right-aligned number under a left-aligned
+     heading reads as a mistake. Centring also matches BodyCta, so the two
+     blocks stay a family on narrow screens. */
+  @media (max-width: 650px) {
+    .phonebar {
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: var(--space-4);
+      padding: var(--space-6);
+      text-align: center;
+    }
+    .phonebar__contact {
+      align-items: center;
+      text-align: center;
+    }
+    .phonebar__contact :global(.phonebar__eyebrow) {
+      justify-content: center;
+    }
+  }
+</style>

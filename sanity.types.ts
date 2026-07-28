@@ -52,6 +52,9 @@ export type PageBody = Array<
   | ({
       _key: string;
     } & BodyCta)
+  | ({
+      _key: string;
+    } & BodyPhoneBar)
 >;
 
 export type BlockContent = Array<{
@@ -265,6 +268,13 @@ export type SellingPoint = {
   _type: "sellingPoint";
   value: string;
   label: string;
+};
+
+export type BodyPhoneBar = {
+  _type: "bodyPhoneBar";
+  heading: string;
+  eyebrow?: string;
+  phone?: string;
 };
 
 export type BodyCta = {
@@ -1006,6 +1016,7 @@ export type AllSanitySchemaTypes =
   | PracticeAreasBand
   | PracticeAreaCard
   | SellingPoint
+  | BodyPhoneBar
   | BodyCta
   | CtaButton
   | ServiceCityReference

@@ -17,8 +17,9 @@
  */
 import { proseBodyComponents } from "./bodyComponents";
 import BodyCta from "../body/BodyCta.astro";
+import BodyPhoneBar from "../body/BodyPhoneBar.astro";
 
 export const pageBodyComponents = {
   ...proseBodyComponents,
-  type: { bodyCta: BodyCta },
+  type: { bodyCta: BodyCta, bodyPhoneBar: BodyPhoneBar },
 };

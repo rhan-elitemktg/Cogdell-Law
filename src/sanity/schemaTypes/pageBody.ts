@@ -24,8 +24,8 @@ import { bodyBlockMember } from "./blockContent";
  * Give it an icon no other member uses — the Portable Text Insert menu
  * distinguishes block types by icon alone (F23), and `options.insertMenu` (the
  * views/groups config) is only read on the plain array input, not this one.
- * Reserved so they can't collide: `bulb-outline` (Key Takeaways),
- * `mobile-device` (phone bar), `user` (attorney card), `double-quote` (quote CTA).
+ * Reserved so they can't collide: `bulb-outline` (Key Takeaways), `user`
+ * (attorney card), `double-quote` (quote CTA).
  */
 export const pageBody = defineType({
   name: "pageBody",
@@ -34,6 +34,7 @@ export const pageBody = defineType({
   of: [
     bodyBlockMember(),
     defineArrayMember({ type: "bodyCta" }),
-    // Future (D16): bodyTakeaways, bodyPhoneBar, bodyAttorney, bodyQuoteCta.
+    defineArrayMember({ type: "bodyPhoneBar" }),
+    // Future (D16): bodyTakeaways, bodyAttorney, bodyQuoteCta.
   ],
 });
