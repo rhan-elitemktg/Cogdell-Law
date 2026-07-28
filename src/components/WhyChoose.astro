@@ -179,14 +179,14 @@ const icons: Record<string, string> = {
   }
 
   /* ---- Cards carousel ---- */
+  /* Stays inside the container: no negative margin bleeding past its padding.
+     The next card still peeks to signal the row scrolls, just within the
+     container's right edge rather than out toward the screen edge. */
   .why-choose__grid {
     display: flex;
     gap: var(--space-6);
     overflow-x: auto;
     scroll-snap-type: x mandatory;
-    /* Bleed to the right screen edge so the next card peeks off-screen. */
-    margin-inline-end: calc(-1 * var(--container-pad));
-    padding-inline-end: var(--container-pad);
     scrollbar-width: none;
     -ms-overflow-style: none;
   }
@@ -196,7 +196,11 @@ const icons: Record<string, string> = {
 
   .why-choose__card {
     display: flex;
-    flex: 0 0 30%;
+    /* Three across, filling the container exactly — 100% minus the two gaps
+       between them, thirded. There are four cards, so the fourth sits fully
+       off-screen and the arrows scroll to it; nothing is ever half-clipped at
+       the container edge. */
+    flex: 0 0 calc((100% - var(--space-6) * 2) / 3);
     flex-direction: column;
     gap: var(--space-4);
     scroll-snap-align: start;
@@ -227,20 +231,16 @@ const icons: Record<string, string> = {
     color: var(--cog-body);
   }
 
-  /* ---- Responsive ---- */
-  @media (max-width: 1360px) {
-    .why-choose__grid {
-      margin-inline-end: calc(-1 * var(--space-8));
-      padding-inline-end: var(--space-8);
-    }
+  /* Nothing to scroll once all four cards fit, so the arrows are hidden by the
+     script below rather than sitting there dead. */
+  .why-choose__controls[hidden] {
+    display: none;
   }
-  /* Tablet/mobile: whole cards (no bleed) so a partial card never peeks on the
-     left — the fractional peek only divides cleanly on desktop. */
+
+  /* ---- Responsive ---- */
+  /* Three across holds up further down than four did; below 900px drop to two
+     whole cards. */
   @media (max-width: 900px) {
-    .why-choose__grid {
-      margin-inline-end: 0;
-      padding-inline-end: 0;
-    }
     .why-choose__card {
       flex-basis: calc(50% - var(--space-3)); /* two whole cards */
     }
@@ -258,7 +258,10 @@ const icons: Record<string, string> = {
     if (!scroller) return;
     const step = () => {
       const card = scroller.querySelector<HTMLElement>(".why-choose__card");
-      return card ? card.offsetWidth + 24 : 320;
+      // Read the gap rather than hardcoding it, so changing the CSS gap can't
+      // silently leave the arrows scrolling by the wrong amount.
+      const gap = parseFloat(getComputedStyle(scroller).columnGap) || 0;
+      return card ? card.offsetWidth + gap : 320;
     };
     root
       .querySelector('[data-dir="prev"]')
@@ -270,5 +273,14 @@ const icons: Record<string, string> = {
       ?.addEventListener("click", () =>
         scroller.scrollBy({ left: step(), behavior: "smooth" })
       );
+
+    // All four cards fit on wide screens, so there is nothing to scroll and the
+    // arrows would do nothing. Hide them unless the row actually overflows.
+    const controls = root.querySelector<HTMLElement>(".why-choose__controls");
+    const syncControls = () => {
+      if (controls) controls.hidden = scroller.scrollWidth <= scroller.clientWidth + 1;
+    };
+    syncControls();
+    window.addEventListener("resize", syncControls);
   });
 </script>
