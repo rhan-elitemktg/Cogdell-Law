@@ -113,7 +113,7 @@ const current = normalizePath(pathname);
     margin: 0 0 var(--space-6);
     font-family: var(--font-heading);
     font-weight: 700;
-    font-size: var(--text-3xl);
+    font-size: var(--text-2xl);
     line-height: 1.06;
     letter-spacing: -0.01em;
     color: var(--cog-ink);
@@ -125,11 +125,11 @@ const current = normalizePath(pathname);
     margin: 0;
     padding: 0;
   }
+  /* Every row carries its own top hairline, the first one included — that first
+     border is what separates the heading from the list, so it uses the same
+     divider as the rows rather than a one-off rule under the heading. */
   .rnav__item {
     border-top: 1px solid var(--cog-line-ink);
-  }
-  .rnav__item:first-child {
-    border-top: 0;
   }
 
   /* ---- Parent row (both the <summary> and the link-only variant) ---- */
