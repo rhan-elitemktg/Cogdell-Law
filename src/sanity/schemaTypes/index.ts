@@ -45,6 +45,8 @@ import { trialResultList } from "./trialResultList";
 import { seo } from "./seo";
 import { accentText } from "./accentText";
 import { blockContent } from "./blockContent";
+import { bodyCta } from "./bodyCta";
+import { pageBody } from "./pageBody";
 
 export const schemaTypes: SchemaTypeDefinition[] = [
   // Singletons
@@ -76,6 +78,7 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   locationPage,
   // Objects
   ctaButton,
+  bodyCta, // a page-body block (D16) — wraps two ctaButtons
   sellingPoint,
   practiceAreaCard,
   practiceAreasBand,
@@ -96,5 +99,6 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   seo, // per-page search metadata — attached to every routed document (D15)
   // Rich text
   blockContent, // the standard for body copy — use this by default
+  pageBody, // blockContent + insertable layout blocks; practice areas + location pages only (D16)
   accentText, // deliberate exception: the About pull quote only
 ];

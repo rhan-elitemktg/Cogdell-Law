@@ -1,0 +1,141 @@
+---
+// The `bodyCta` block of a `pageBody` field (D16) — a navy CTA banner an editor
+// dropped between paragraphs on a practice-area or location page.
+//
+// Rendered through pageBodyComponents' `type` map, so it receives Portable Text
+// node props ({ node, index, isInline }) and never page props. That's also why
+// the phone is fetched here rather than passed in: astro-portabletext builds
+// those three props itself and has no extension point.
+import { getFirmDetails } from "../../sanity/lib/firmDetails";
+
+interface Button {
+  label?: string | null;
+  href?: string | null;
+}
+
+interface BodyCtaNode {
+  _type: "bodyCta";
+  _key: string;
+  heading?: string;
+  body?: string;
+  primaryCta?: Button;
+  secondaryCta?: Button;
+}
+
+interface Props {
+  node: BodyCtaNode;
+  index?: number;
+  isInline?: boolean;
+}
+
+const { node } = Astro.props;
+
+// Both buttons are optional in the schema and fall back to the house pair. The
+// number is read from Firm Details on every build, so it can never drift the way
+// an `initialValue` copy baked into each document would.
+const firm = await getFirmDetails();
+const phone = firm?.phone ?? "713-426-2244";
+const phoneHref = `tel:+1${phone.replace(/[^0-9]/g, "")}`; // matches Header/Footer
+
+// Tests both fields, not the object: an editor who types a label and then clears
+// it leaves a `{_type: "ctaButton"}` husk behind, which is truthy but unusable.
+const resolve = (button: Button | undefined, fallback: Required<Button>) =>
+  button?.label && button?.href
+    ? { label: button.label, href: button.href }
+    : fallback;
+
+const primary = resolve(node.primaryCta, {
+  label: "Schedule Consultation",
+  href: "/contact",
+});
+const secondary = resolve(node.secondaryCta, {
+  label: `Call Us ${phone}`,
+  href: phoneHref,
+});
+---
+
+<aside class="bodycta">
+  {/* A <p>, not a heading: this is an interruption, not a section of the
+      document. An <h2> here would inject a phantom entry into the page outline
+      between the body's real H2s. */}
+  <p class="bodycta__heading">{node.heading}</p>
+
+  {node.body && <p class="bodycta__body">{node.body}</p>}
+
+  <div class="bodycta__actions">
+    <a href={primary.href} class="btn btn--primary">
+      {primary.label}
+      <svg class="btn__icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+    </a>
+    <a href={secondary.href} class="btn btn--outline">
+      {secondary.label}
+      <svg class="btn__icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+    </a>
+  </div>
+</aside>
+
+<style>
+  /* The block owns its own vertical rhythm, here rather than in ProseBody: every
+     future body block would otherwise have to edit that shared file. This markup
+     is emitted by *this* component, so a plain scoped rule matches it — no
+     :global needed (F14).
+
+     A preceding .prose__p still carries its own 16px bottom margin, so the gap
+     above reads a little larger than the gap below. That's deliberate: it keeps
+     the banner attached to the passage it interrupts. */
+  .bodycta {
+    display: block;
+    margin-block: var(--space-12);
+    padding: var(--space-10) var(--space-8);
+    background-color: var(--cog-navy-deep);
+    border-top: 3px solid var(--cog-accent);
+    color: var(--cog-white);
+    text-align: center;
+  }
+  .bodycta:first-child {
+    margin-top: 0;
+  }
+  .bodycta:last-child {
+    margin-bottom: 0;
+  }
+
+  .bodycta__heading {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: clamp(1.5rem, 2.4vw, 2rem); /* 24 → 32px */
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+    color: var(--cog-white);
+    text-wrap: balance;
+  }
+
+  .bodycta__body {
+    max-width: 52ch;
+    margin: var(--space-4) auto 0;
+    font-size: var(--text-base);
+    line-height: 1.7;
+    color: var(--cog-body);
+  }
+
+  .bodycta__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-4);
+    margin-top: var(--space-8);
+  }
+
+  /* ---- Responsive ---- */
+  /* Under 650px global.css gives every .btn width: 100%, so the row has to
+     become a stretched column or the buttons overflow the banner's padding. */
+  @media (max-width: 650px) {
+    .bodycta {
+      padding: var(--space-6) var(--space-6);
+    }
+    .bodycta__actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+</style>
