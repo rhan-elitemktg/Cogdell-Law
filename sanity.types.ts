@@ -268,6 +268,13 @@ export type LocationPage = {
   navLabel: string;
   slug: Slug;
   heroTitle: string;
+  heroImage?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
   lede?: string;
   body: BlockContent;
   faqs?: Array<{
@@ -277,6 +284,22 @@ export type LocationPage = {
     _key: string;
   }>;
   seo?: Seo;
+};
+
+export type SanityImageCrop = {
+  _type: "sanity.imageCrop";
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
+};
+
+export type SanityImageHotspot = {
+  _type: "sanity.imageHotspot";
+  x: number;
+  y: number;
+  height: number;
+  width: number;
 };
 
 export type Slug = {
@@ -331,22 +354,6 @@ export type PracticeArea = {
     _key: string;
   }>;
   seo?: Seo;
-};
-
-export type SanityImageCrop = {
-  _type: "sanity.imageCrop";
-  top: number;
-  bottom: number;
-  left: number;
-  right: number;
-};
-
-export type SanityImageHotspot = {
-  _type: "sanity.imageHotspot";
-  x: number;
-  y: number;
-  height: number;
-  width: number;
 };
 
 export type LegalPage = {
@@ -969,12 +976,12 @@ export type AllSanitySchemaTypes =
   | CtaButton
   | ServiceCityReference
   | LocationPage
+  | SanityImageCrop
+  | SanityImageHotspot
   | Slug
   | ServiceCity
   | PracticeAreaReference
   | PracticeArea
-  | SanityImageCrop
-  | SanityImageHotspot
   | LegalPage
   | Podcast
   | NewsItem
@@ -1039,12 +1046,19 @@ export type AREAS_WE_SERVE_NAV_QUERY_RESULT = Array<{
 
 // Source: src/sanity/lib/areasWeServe.ts
 // Variable: PATHS_QUERY
-// Query: *[_type == "locationPage"] | order(orderRank){  _id,  title,  navLabel,  heroTitle,  lede,  body,  faqs[]{ _key, question, answer },  "slug": slug.current,  "cityName": city->city,  "citySlug": city->citySlug.current,  _updatedAt,  seo{    metaTitle,    metaDescription,    canonicalUrl,    noIndex,    ogImage  }}
+// Query: *[_type == "locationPage"] | order(orderRank){  _id,  title,  navLabel,  heroTitle,  heroImage,  lede,  body,  faqs[]{ _key, question, answer },  "slug": slug.current,  "cityName": city->city,  "citySlug": city->citySlug.current,  _updatedAt,  seo{    metaTitle,    metaDescription,    canonicalUrl,    noIndex,    ogImage  }}
 export type PATHS_QUERY_RESULT = Array<{
   _id: string;
   title: string;
   navLabel: string;
   heroTitle: string;
+  heroImage: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  } | null;
   lede: string | null;
   body: BlockContent;
   faqs: Array<{
@@ -2041,7 +2055,7 @@ declare module "@sanity/client" {
     '*[_type == "attorney"] | order(orderRank){\n  "label": name,\n  "slug": slug.current\n}': ATTORNEYS_NAV_QUERY_RESULT;
     '*[_type == "practiceArea"] | order(orderRank){\n  _id,\n  title,\n  "slug": slug.current,\n  "parentId": parent._ref\n}': PRACTICE_AREAS_NAV_QUERY_RESULT;
     '*[_type == "serviceCity"] | order(orderRank){\n  "city": city,\n  "citySlug": citySlug.current,\n  "pages": *[_type == "locationPage" && references(^._id)] | order(orderRank){\n    "navLabel": navLabel,\n    "slug": slug.current\n  }\n}': AREAS_WE_SERVE_NAV_QUERY_RESULT;
-    '*[_type == "locationPage"] | order(orderRank){\n  _id,\n  title,\n  navLabel,\n  heroTitle,\n  lede,\n  body,\n  faqs[]{ _key, question, answer },\n  "slug": slug.current,\n  "cityName": city->city,\n  "citySlug": city->citySlug.current,\n  _updatedAt,\n  seo{\n    metaTitle,\n    metaDescription,\n    canonicalUrl,\n    noIndex,\n    ogImage\n  }\n}': PATHS_QUERY_RESULT;
+    '*[_type == "locationPage"] | order(orderRank){\n  _id,\n  title,\n  navLabel,\n  heroTitle,\n  heroImage,\n  lede,\n  body,\n  faqs[]{ _key, question, answer },\n  "slug": slug.current,\n  "cityName": city->city,\n  "citySlug": city->citySlug.current,\n  _updatedAt,\n  seo{\n    metaTitle,\n    metaDescription,\n    canonicalUrl,\n    noIndex,\n    ogImage\n  }\n}': PATHS_QUERY_RESULT;
     '*[_type == "attorney"] | order(orderRank){\n  _id,\n  name,\n  role,\n  credential,\n  photo,\n  photoAlt,\n  "slug": slug.current\n}': ATTORNEY_CARDS_QUERY_RESULT;
     '*[_type == "attorney" && defined(slug.current)]{"slug": slug.current, _updatedAt, "noIndex": seo.noIndex}': ATTORNEY_SLUGS_QUERY_RESULT;
     '*[_type == "attorney" && slug.current == $slug][0]{\n  _id,\n  name,\n  role,\n  credential,\n  photo,\n  photoAlt,\n  phone,\n  email,\n  practiceTags,\n  bio,\n  education[]{\n    _key,\n    school,\n    location,\n    lines\n  },\n  barAdmissions,\n  honors,\n  classesSeminars,\n  publishedWorks,\n  associations,\n  pastPositions,\n  representativeCases,\n  "slug": slug.current,\n  _updatedAt,\n  seo{\n    metaTitle,\n    metaDescription,\n    canonicalUrl,\n    noIndex,\n    ogImage\n  }\n}': ATTORNEY_QUERY_RESULT;

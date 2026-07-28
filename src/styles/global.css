@@ -70,8 +70,13 @@
   /* Section vertical rhythm — fluid. */
   --space-section: clamp(var(--space-12), 7vw, 80px);
 
-  /* Layout */
-  --container-max: 1660px;
+  /* Layout
+     --container-max is a BORDER-BOX width, so the readable content column is
+     (--container-max − 2 × --container-pad) = 1340px here. EVERY section on
+     every page runs at this width — the practice-area and location layouts
+     deliberately carry no cap of their own, so there is exactly one container
+     width site-wide. */
+  --container-max: 1440px;
   --container-pad: 50px;
 
   /* Breakpoints (for reference — CSS @media can't read custom properties,

@@ -1,26 +1,31 @@
 ---
-// The practice-area rail: consultation form, then the practice-areas tree.
+// The interior-page sidebar rail: consultation form, then a navigation tree.
+// Shared by practice-area pages (Practice Areas tree) and location pages
+// (Areas We Serve tree) — only `navHeading`/`navItems` differ.
 //
 // The form is the same one the bottom Consult band renders, reading the same
-// Consult singleton — so the firm edits its copy in one place. The rail skips
-// `consult.body`: that paragraph is written for a half-page column and would
-// swamp a 360px rail.
+// Consult singleton, so the firm edits its copy in one place. The rail skips
+// `consult.body`'s longer siblings — it renders the body but nothing else the
+// band shows — because the rail is ~414px wide.
 //
 // `id="case-evaluation"` is this form's anchor. The bottom band keeps
 // `id="contact"`, which 10+ pages link to.
 import { PortableText } from "astro-portabletext";
+import type { NavItem } from "../../data/navigation";
 import Eyebrow from "../Eyebrow.astro";
 import ConsultForm from "../consult/ConsultForm.astro";
 import ConsultBody from "../consult/ConsultBody.astro";
-import PracticeAreasNav from "./PracticeAreasNav.astro";
+import RailNav from "./RailNav.astro";
 import { proseComponents } from "../prose/components";
 import { getConsult } from "../../sanity/lib/consult";
 
 interface Props {
   pathname: string;
+  navHeading: string;
+  navItems: NavItem[];
 }
 
-const { pathname } = Astro.props;
+const { pathname, navHeading, navItems } = Astro.props;
 
 const consult = await getConsult();
 
@@ -33,16 +38,16 @@ if (!consult) {
 }
 ---
 
-<aside class="prail">
-  <div class="prail__inner">
-    <section class="prail__form" id="case-evaluation">
+<aside class="rail">
+  <div class="rail__inner">
+    <section class="rail__form" id="case-evaluation">
       <Eyebrow>{consult.eyebrow}</Eyebrow>
       {/* One tone on one line, unlike the band's stacked italic/bold pair — the
           rail is narrow and the mockup reads as a single white serif line. */}
-      <h2 class="prail__heading">
+      <h2 class="rail__heading">
         {consult.headingLead} {consult.headingStrong}
       </h2>
-      <div class="prail__body">
+      <div class="rail__body">
         <PortableText
           value={consult.body}
           components={{
@@ -59,12 +64,12 @@ if (!consult) {
       />
     </section>
 
-    <PracticeAreasNav pathname={pathname} />
+    <RailNav heading={navHeading} items={navItems} pathname={pathname} />
   </div>
 </aside>
 
 <style>
-  .prail__inner {
+  .rail__inner {
     display: flex;
     flex-direction: column;
     gap: var(--space-8);
@@ -73,7 +78,7 @@ if (!consult) {
     top: var(--space-8);
   }
 
-  .prail__form {
+  .rail__form {
     /* Same radial recipe as the imageless PageHero, so the panel reads as part
        of the same family rather than a flat navy block. */
     background: radial-gradient(
@@ -84,7 +89,7 @@ if (!consult) {
     border-top: 3px solid var(--cog-accent);
     padding: var(--space-8);
   }
-  .prail__heading {
+  .rail__heading {
     margin: var(--space-4) 0 0; /* standard eyebrow → heading gap */
     font-family: var(--font-heading);
     font-weight: 700;
@@ -95,7 +100,7 @@ if (!consult) {
   }
 
   /* Scoped styles don't reach into a child component's markup, hence :global (F14). */
-  .prail__body :global(.consult__body) {
+  .rail__body :global(.consult__body) {
     margin: var(--space-4) 0 var(--space-8);
     font-family: var(--font-body);
     font-size: var(--text-sm);
@@ -105,27 +110,27 @@ if (!consult) {
 
   /* Readability: the band renders the fineprint as small italic serif, which on
      navy at this size is genuinely hard to read. Body font, upright, brighter. */
-  .prail__form :global(.consult__fineprint) {
+  .rail__form :global(.consult__fineprint) {
     font-family: var(--font-body);
     font-style: normal;
     font-size: var(--text-sm);
     line-height: 1.6;
     color: var(--cog-navlink);
   }
-  .prail__form :global(.consult__thanks) {
+  .rail__form :global(.consult__thanks) {
     color: var(--cog-white);
   }
-  .prail__form :global(.consult__error) {
+  .rail__form :global(.consult__error) {
     color: var(--cog-cream);
   }
-  .prail__form :global(.consult__error a) {
+  .rail__form :global(.consult__error a) {
     color: var(--cog-white);
   }
 
   /* Below the two-column breakpoint the rail is just another stacked block, so
      drop the sticky (it has nothing left to stick against). */
   @media (max-width: 1024px) {
-    .prail__inner {
+    .rail__inner {
       position: static;
     }
   }

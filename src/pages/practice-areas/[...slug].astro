@@ -8,14 +8,10 @@ import PracticeFaqs from "../../components/practice/PracticeFaqs.astro";
 import CtaBar from "../../components/CtaBar.astro";
 import Consult from "../../components/Consult.astro";
 import { getPracticeAreaPaths, getPracticeAreaNode } from "../../sanity/lib/practiceAreas";
-import PracticeSidebar from "../../components/practice/PracticeSidebar.astro";
+import Rail from "../../components/rail/Rail.astro";
+import { getPracticeAreasNav } from "../../data/navigation";
 import { PRACTICE_AREA_ICONS } from "../../lib/practiceAreaIcons";
 import defaultHeroImage from "../../assets/firm-steps.jpg";
-
-// One width for the hero content, the breadcrumb and the body+sidebar grid, so
-// everything on the page shares a left and right edge. Passed to PageHero and
-// mirrored by `.pa-body__inner` below.
-const CONTENT_WIDTH = "1280px";
 
 export async function getStaticPaths() {
   return getPracticeAreaPaths();
@@ -52,6 +48,9 @@ const description = node.cardSummary ?? `${node.title} — Cogdell Law Firm.`;
 // Every area shares one firm photo unless an editor uploads its own (Page tab →
 // Hero image). A custom upload gets an empty alt: it's a backdrop behind the H1
 // and we have no idea what it depicts, so announcing it would be noise.
+// The rail's tree is the same branch the header menu renders.
+const practiceAreaNav = await getPracticeAreasNav();
+
 const hasCustomHero = Boolean(node.heroImage);
 const heroImageAlt = hasCustomHero
   ? ""
@@ -63,7 +62,7 @@ const heroImageAlt = hasCustomHero
     eyebrow="Practice Areas"
     titleStrong={node.heroTitle}
     align="center"
-    contentMaxWidth={CONTENT_WIDTH}
+    contentMaxWidth="none"
     image={hasCustomHero ? undefined : defaultHeroImage}
     sanityImage={node.heroImage}
     imageAlt={heroImageAlt}
@@ -80,24 +79,26 @@ const heroImageAlt = hasCustomHero
   </PageHero>
 
   <section class="pa-body">
-    <div class="container">
-      <div class="pa-body__inner">
-        <Breadcrumb trail={trail} bare />
+    <div class="container pa-body__inner">
+      <Breadcrumb trail={trail} bare />
 
-        <div class="pa-body__grid">
-          {/* A plain div, not <main>: the layout has no main landmark today, and
-              adding one here would claim only the body column — sending "skip to
-              main content" past the hero. The <aside> rail is still a
-              complementary landmark, which is what a sidebar should be. */}
-          <div class="pa-body__main">
-            <ProseBody body={node.body} bare />
-            {node.faqs && node.faqs.length > 0 && (
-              <PracticeFaqs faqs={node.faqs} variant="card" />
-            )}
-          </div>
-
-          <PracticeSidebar pathname={Astro.url.pathname} />
+      <div class="pa-body__grid">
+        {/* A plain div, not <main>: the layout has no main landmark today, and
+            adding one here would claim only the body column — sending "skip to
+            main content" past the hero. The <aside> rail is still a
+            complementary landmark, which is what a sidebar should be. */}
+        <div class="pa-body__main">
+          <ProseBody body={node.body} bare />
+          {node.faqs && node.faqs.length > 0 && (
+            <PracticeFaqs faqs={node.faqs} variant="card" />
+          )}
         </div>
+
+        <Rail
+          pathname={Astro.url.pathname}
+          navHeading="Practice Areas"
+          navItems={practiceAreaNav.children ?? []}
+        />
       </div>
     </div>
   </section>
@@ -118,19 +119,15 @@ const heroImageAlt = hasCustomHero
   <Consult />
 </Layout>
 
-<style define:vars={{ contentWidth: CONTENT_WIDTH }}>
+<style>
   .pa-body {
     background-color: var(--cog-paper);
   }
-  /* The width cap lives HERE, on an inner element, not on `.container`.
-     `.container` is border-box with padding-inline, so a max-width on it would
-     yield a content box of (width − 2×padding) — and that padding steps down at
-     1360px and 650px, so the column would drift out of alignment with the hero
-     at those widths. Capping the inner element gives a true `--contentWidth`
-     content block that tracks PageHero's `.page-hero__content` exactly. */
+  /* No width cap of its own — this page runs at the one global `.container`
+     width, same as every other section on the site. The hero matches by taking
+     `contentMaxWidth="none"`, so hero, breadcrumb, body and rail all share the
+     container's edges. */
   .pa-body__inner {
-    max-width: var(--contentWidth);
-    margin-inline: auto;
     padding-block: var(--space-section);
   }
 

@@ -30,6 +30,15 @@ export const locationPage = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({ name: "heroTitle", title: "Hero title", type: "string", group: "content", validation: (rule) => rule.required() }),
+    defineField({
+      name: "heroImage",
+      title: "Hero image",
+      type: "image",
+      description:
+        "Optional. Leave empty and the page uses the default firm photo. The hotspot sets what stays in frame when the photo is cropped to the hero.",
+      options: { hotspot: true },
+      group: "content",
+    }),
     defineField({ name: "lede", title: "Lede", type: "text", rows: 3, group: "content" }),
     defineField({
       name: "body",

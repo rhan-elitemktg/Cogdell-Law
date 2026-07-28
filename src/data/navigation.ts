@@ -127,8 +127,12 @@ export async function getPracticeAreasNav(): Promise<NavItem> {
 /**
  * Areas We Serve submenu — cities are grouping labels (no href) that open a
  * submenu of their location pages.
+ *
+ * Exported for the location-page sidebar, the same way getPracticeAreasNav is.
+ * Note the shape difference the rail has to cope with: these parents carry no
+ * `href`, so their label is plain text rather than a link.
  */
-async function getAreasWeServeNav(): Promise<NavItem> {
+export async function getAreasWeServeNav(): Promise<NavItem> {
   const cities = (await sanityClient.fetch(AREAS_WE_SERVE_NAV_QUERY)) ?? [];
   return {
     label: "Areas We Serve",
