@@ -10,7 +10,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "typegen": "sanity schema extract --enforce-required-fields && sanity typegen generate"
+    "typegen": "sanity schema extract --enforce-required-fields --force && sanity typegen generate"
   },
   "dependencies": {
     "@astrojs/react": "^6.0.1",

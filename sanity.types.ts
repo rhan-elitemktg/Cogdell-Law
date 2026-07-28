@@ -30,6 +30,30 @@ export type AccentText = Array<{
   _key: string;
 }>;
 
+export type PageBody = Array<
+  | {
+      children?: Array<{
+        marks?: Array<string>;
+        text?: string;
+        _type: "span";
+        _key: string;
+      }>;
+      style?: "normal" | "h2" | "h3" | "h4" | "blockquote";
+      listItem?: "bullet" | "number";
+      markDefs?: Array<{
+        href: string;
+        _type: "link";
+        _key: string;
+      }>;
+      level?: number;
+      _type: "block";
+      _key: string;
+    }
+  | ({
+      _key: string;
+    } & BodyCta)
+>;
+
 export type BlockContent = Array<{
   children?: Array<{
     marks?: Array<string>;
@@ -243,6 +267,14 @@ export type SellingPoint = {
   label: string;
 };
 
+export type BodyCta = {
+  _type: "bodyCta";
+  heading: string;
+  body?: string;
+  primaryCta?: CtaButton;
+  secondaryCta?: CtaButton;
+};
+
 export type CtaButton = {
   _type: "ctaButton";
   label: string;
@@ -276,7 +308,7 @@ export type LocationPage = {
     _type: "image";
   };
   lede?: string;
-  body: BlockContent;
+  body: PageBody;
   faqs?: Array<{
     question: string;
     answer: BlockContent;
@@ -346,7 +378,7 @@ export type PracticeArea = {
   };
   cardSummary?: string;
   icon?: "health" | "federal" | "fraud" | "collar" | "appeals";
-  body: BlockContent;
+  body: PageBody;
   faqs?: Array<{
     question: string;
     answer: BlockContent;
@@ -950,6 +982,7 @@ export type Geopoint = {
 
 export type AllSanitySchemaTypes =
   | AccentText
+  | PageBody
   | BlockContent
   | SanityImageAssetReference
   | Seo
@@ -973,6 +1006,7 @@ export type AllSanitySchemaTypes =
   | PracticeAreasBand
   | PracticeAreaCard
   | SellingPoint
+  | BodyCta
   | CtaButton
   | ServiceCityReference
   | LocationPage
@@ -1060,7 +1094,7 @@ export type PATHS_QUERY_RESULT = Array<{
     _type: "image";
   } | null;
   lede: string | null;
-  body: BlockContent;
+  body: PageBody;
   faqs: Array<{
     _key: string;
     question: string;
@@ -1445,6 +1479,24 @@ export type LEGAL_PAGE_QUERY_RESULT =
   | {
       title: string;
       body: BlockContent;
+      _updatedAt: string;
+      seo: {
+        metaTitle: string | null;
+        metaDescription: string | null;
+        canonicalUrl: string | null;
+        noIndex: boolean | null;
+        ogImage: {
+          asset?: SanityImageAssetReference;
+          media?: unknown;
+          hotspot?: SanityImageHotspot;
+          crop?: SanityImageCrop;
+          _type: "image";
+        } | null;
+      } | null;
+    }
+  | {
+      title: string;
+      body: PageBody;
       _updatedAt: string;
       seo: {
         metaTitle: string | null;
@@ -1867,7 +1919,7 @@ export type ALL_QUERY_RESULT = Array<{
   } | null;
   cardSummary: string | null;
   icon: "appeals" | "collar" | "federal" | "fraud" | "health" | null;
-  body: BlockContent;
+  body: PageBody;
   faqs: Array<{
     _key: string;
     question: string;

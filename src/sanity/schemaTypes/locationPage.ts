@@ -43,9 +43,11 @@ export const locationPage = defineType({
     defineField({
       name: "body",
       title: "Body Content",
-      type: "blockContent",
+      // `pageBody`, not `blockContent`: same text toolbar, plus the layout blocks
+      // an editor can drop between paragraphs (D16).
+      type: "pageBody",
       description:
-        "The whole page body — paragraphs, headings, lists, links. Use Heading 2 for section titles.",
+        "The whole page body — paragraphs, headings, lists, links. Use Heading 2 for section titles, and the Insert button to drop a CTA banner between sections.",
       group: "content",
       validation: (rule) => rule.required().min(1),
     }),

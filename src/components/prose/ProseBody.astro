@@ -6,10 +6,11 @@
 // it, styled here to match the bespoke section headings this replaced.
 import { PortableText } from "astro-portabletext";
 import { proseBodyComponents } from "./bodyComponents";
+import { pageBodyComponents } from "./pageBodyComponents";
 
 interface Props {
   title?: string;
-  body?: unknown; // blockContent
+  body?: unknown; // blockContent, or pageBody when `blocks` is set
   /**
    * Drop the section/container/800px wrapper and emit only the prose column, so
    * this can sit inside a page's own layout grid (the practice-area sidebar
@@ -17,8 +18,16 @@ interface Props {
    * apply either way.
    */
   bare?: boolean;
+  /**
+   * Render a `pageBody` rather than a `blockContent` — i.e. also render the
+   * layout blocks an editor can insert between paragraphs (D16). Only the
+   * practice-area and location routes pass this; legal pages stay plain prose,
+   * and their field can't hold those blocks anyway.
+   */
+  blocks?: boolean;
 }
-const { title, body, bare = false } = Astro.props;
+const { title, body, bare = false, blocks = false } = Astro.props;
+const components = blocks ? pageBodyComponents : proseBodyComponents;
 const hasBody = Array.isArray(body) && body.length > 0;
 ---
 
@@ -28,7 +37,7 @@ const hasBody = Array.isArray(body) && body.length > 0;
       {title && <h1 class="pbody__title">{title}</h1>}
       {hasBody && (
         <div class="pbody__content">
-          <PortableText value={body} components={proseBodyComponents} />
+          <PortableText value={body} components={components} />
         </div>
       )}
     </Fragment>
@@ -39,7 +48,7 @@ const hasBody = Array.isArray(body) && body.length > 0;
 
         {hasBody && (
           <div class="pbody__content">
-            <PortableText value={body} components={proseBodyComponents} />
+            <PortableText value={body} components={components} />
           </div>
         )}
       </div>

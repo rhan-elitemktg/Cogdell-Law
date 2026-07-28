@@ -88,7 +88,7 @@ const heroImageAlt = hasCustomHero
             main content" past the hero. The <aside> rail is still a
             complementary landmark, which is what a sidebar should be. */}
         <div class="pa-body__main">
-          <ProseBody body={node.body} bare />
+          <ProseBody body={node.body} bare blocks />
           {node.faqs && node.faqs.length > 0 && (
             <PracticeFaqs faqs={node.faqs} variant="card" />
           )}
