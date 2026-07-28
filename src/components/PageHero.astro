@@ -1,9 +1,21 @@
 ---
 // Interior page hero — full-bleed photo with a left-to-right navy scrim,
 // eyebrow + two-tone title + lede, and CTA buttons via the default slot.
+//
+// The photo comes from one of two places. `image` is a build-time asset import
+// (astro:assets, the original path — most pages hardcode theirs). `sanityImage`
+// is an editor-uploaded image, served straight off Sanity's CDN via urlFor the
+// same way Attorneys/Press do, since astro:assets can't process a remote URL at
+// build time. `sanityImage` wins when both are set, which is what lets a page
+// ship a default asset and let an editor override it.
 import { Image } from "astro:assets";
 import type { ImageMetadata } from "astro";
+import type { SanityImageSource } from "@sanity/image-url/lib/types/types";
+import { urlFor } from "../sanity/lib/image";
 import Eyebrow from "./Eyebrow.astro";
+
+/** A Sanity image object; `hotspot` rides along when the editor sets one. */
+type SanityHeroImage = { hotspot?: { x: number; y: number } | null } | null;
 
 interface Props {
   eyebrow: string;
@@ -11,6 +23,7 @@ interface Props {
   titleStrong: string; // bold white line
   lede?: string;
   image?: ImageMetadata; // omit for a plain navy hero (no photo)
+  sanityImage?: SanityHeroImage; // editor override — takes precedence over `image`
   imageAlt?: string;
   imagePosition?: string;
   align?: "left" | "center"; // content-column position — text stays left (default left)
@@ -23,28 +36,59 @@ const {
   titleStrong,
   lede,
   image,
+  sanityImage,
   imageAlt = "",
   imagePosition = "center 30%",
   align = "left",
   contentMaxWidth = "720px",
 } = Astro.props;
+
+// Same widths the astro:assets branch emits, so both paths serve like-for-like.
+const HERO_WIDTHS = [900, 1200, 1584];
+const heroUrl = (w: number) =>
+  urlFor(sanityImage as SanityImageSource).width(w).auto("format").url();
+
+const sanitySrc = sanityImage ? heroUrl(1584) : null;
+const sanitySrcset = sanityImage
+  ? HERO_WIDTHS.map((w) => `${heroUrl(w)} ${w}w`).join(", ")
+  : null;
+
+// The photo is object-fit:cover, so the hotspot is exactly an object-position —
+// honouring it here is what makes the Studio's focal point control do anything.
+const hotspot = sanityImage?.hotspot;
+const resolvedPosition = hotspot
+  ? `${(hotspot.x * 100).toFixed(1)}% ${(hotspot.y * 100).toFixed(1)}%`
+  : imagePosition;
+
+const hasPhoto = Boolean(sanitySrc || image);
 ---
 
-<section class:list={["page-hero", !image && "page-hero--plain"]}>
+<section class:list={["page-hero", !hasPhoto && "page-hero--plain"]}>
   {
-    image && (
+    sanitySrc ? (
+      <img
+        src={sanitySrc}
+        srcset={sanitySrcset}
+        sizes="100vw"
+        alt={imageAlt}
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
+        class="page-hero__bg"
+      />
+    ) : image ? (
       <Image
         src={image}
         alt={imageAlt}
-        widths={[900, 1200, 1584]}
+        widths={HERO_WIDTHS}
         sizes="100vw"
         loading="eager"
         fetchpriority="high"
         class="page-hero__bg"
       />
-    )
+    ) : null
   }
-  {image && <div class="page-hero__overlay" aria-hidden="true" />}
+  {hasPhoto && <div class="page-hero__overlay" aria-hidden="true" />}
 
   <div class="container page-hero__inner">
     <div
@@ -66,7 +110,7 @@ const {
   </div>
 </section>
 
-<style define:vars={{ imagePosition, contentMaxWidth }}>
+<style define:vars={{ imagePosition: resolvedPosition, contentMaxWidth }}>
   .page-hero {
     position: relative;
     overflow: hidden;

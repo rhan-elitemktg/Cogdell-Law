@@ -35,18 +35,24 @@ export const attorney = defineType({
   // Drag-to-reorder in the Studio (D2). Documents have no inherent order, and
   // attorneys have no curating page to supply one — so the rank lives here.
   orderings: [orderRankOrdering],
+  groups: [
+    { name: "content", title: "Content", default: true },
+    { name: "seo", title: "SEO" },
+  ],
   fields: [
     orderRankField({ type: "attorney" }),
     defineField({
       name: "name",
       title: "Name",
       type: "string",
+      group: "content",
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: "slug",
       title: "Slug",
       type: "slug",
+      group: "content",
       description: "The URL segment — /attorney/<slug>. Changing it breaks existing links.",
       options: { source: "name", maxLength: 96 },
       validation: (rule) => rule.required(),
@@ -55,6 +61,7 @@ export const attorney = defineType({
       name: "role",
       title: "Role",
       type: "string",
+      group: "content",
       description:
         'The professional title, shown on the cards AND the bio page — e.g. "Of Counsel", "Principal & Founder". One value everywhere, on purpose.',
       validation: (rule) => rule.required(),
@@ -63,6 +70,7 @@ export const attorney = defineType({
       name: "credential",
       title: "Card blurb",
       type: "string",
+      group: "content",
       description:
         'The one-line summary under the name on the homepage / attorneys cards — e.g. "Federal appeals & post-conviction". Not shown on the bio page.',
       validation: (rule) => rule.required(),
@@ -71,6 +79,7 @@ export const attorney = defineType({
       name: "photo",
       title: "Photo",
       type: "image",
+      group: "content",
       description: "Headshot. Use the hotspot to control cropping on the cards.",
       options: { hotspot: true },
       validation: (rule) => rule.required(),
@@ -79,6 +88,7 @@ export const attorney = defineType({
       name: "photoAlt",
       title: "Photo alt text",
       type: "string",
+      group: "content",
       description: "Describes the photo for screen readers and search engines.",
       validation: (rule) => rule.required(),
     }),
@@ -86,6 +96,7 @@ export const attorney = defineType({
       name: "phone",
       title: "Phone",
       type: "string",
+      group: "content",
       description: 'Display form — e.g. "713-426-2244".',
       validation: (rule) => rule.required(),
     }),
@@ -93,6 +104,7 @@ export const attorney = defineType({
       name: "email",
       title: "Email",
       type: "string",
+      group: "content",
       description:
         'Optional. When set, the bio page\'s "Email" button opens a mail client; otherwise it points at the contact form.',
       validation: (rule) => rule.email(),
@@ -107,12 +119,14 @@ export const attorney = defineType({
       name: "bio",
       title: "Biography",
       type: "blockContent",
+      group: "content",
       description: "Optional — some attorneys have none, and the section is then omitted.",
     }),
     defineField({
       name: "education",
       title: "Education",
       type: "array",
+      group: "content",
       of: [defineArrayMember({ type: "educationEntry" })],
       validation: (rule) => rule.required().min(1),
     }),
@@ -127,7 +141,7 @@ export const attorney = defineType({
       name: "seo",
       title: "SEO",
       type: "seo",
-      options: { collapsible: true, collapsed: true },
+      group: "seo",
     }),
   ],
   preview: {

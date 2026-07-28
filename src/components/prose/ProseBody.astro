@@ -10,22 +10,42 @@ import { proseBodyComponents } from "./bodyComponents";
 interface Props {
   title?: string;
   body?: unknown; // blockContent
+  /**
+   * Drop the section/container/800px wrapper and emit only the prose column, so
+   * this can sit inside a page's own layout grid (the practice-area sidebar
+   * layout). The heading rules below hang off `.pbody__content`, so they still
+   * apply either way.
+   */
+  bare?: boolean;
 }
-const { title, body } = Astro.props;
+const { title, body, bare = false } = Astro.props;
 const hasBody = Array.isArray(body) && body.length > 0;
 ---
 
-<section class="pbody">
-  <div class="container pbody__inner">
-    {title && <h1 class="pbody__title">{title}</h1>}
+{
+  bare ? (
+    <Fragment>
+      {title && <h1 class="pbody__title">{title}</h1>}
+      {hasBody && (
+        <div class="pbody__content">
+          <PortableText value={body} components={proseBodyComponents} />
+        </div>
+      )}
+    </Fragment>
+  ) : (
+    <section class="pbody">
+      <div class="container pbody__inner">
+        {title && <h1 class="pbody__title">{title}</h1>}
 
-    {hasBody && (
-      <div class="pbody__content">
-        <PortableText value={body} components={proseBodyComponents} />
+        {hasBody && (
+          <div class="pbody__content">
+            <PortableText value={body} components={proseBodyComponents} />
+          </div>
+        )}
       </div>
-    )}
-  </div>
-</section>
+    </section>
+  )
+}
 
 <style>
   .pbody {

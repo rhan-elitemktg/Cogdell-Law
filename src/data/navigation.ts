@@ -95,8 +95,11 @@ async function getAttorneysNav(): Promise<NavItem> {
  * Practice Areas submenu — the flat `practiceArea` docs rebuilt into their
  * two-level tree via the self-referencing `parent` ref (D1). Order is preserved
  * because the query is already ranked and we filter it in place.
+ *
+ * Exported because the practice-area sidebar renders the same tree the header
+ * menu does — one source, so the rail can never drift from the nav.
  */
-async function getPracticeAreasNav(): Promise<NavItem> {
+export async function getPracticeAreasNav(): Promise<NavItem> {
   const areas = (await sanityClient.fetch(PRACTICE_AREAS_NAV_QUERY)) ?? [];
   const childrenOf = (parentId: string | null) =>
     areas.filter((a) => (a.parentId ?? null) === parentId);
@@ -124,8 +127,12 @@ async function getPracticeAreasNav(): Promise<NavItem> {
 /**
  * Areas We Serve submenu — cities are grouping labels (no href) that open a
  * submenu of their location pages.
+ *
+ * Exported for the location-page sidebar, the same way getPracticeAreasNav is.
+ * Note the shape difference the rail has to cope with: these parents carry no
+ * `href`, so their label is plain text rather than a link.
  */
-async function getAreasWeServeNav(): Promise<NavItem> {
+export async function getAreasWeServeNav(): Promise<NavItem> {
   const cities = (await sanityClient.fetch(AREAS_WE_SERVE_NAV_QUERY)) ?? [];
   return {
     label: "Areas We Serve",

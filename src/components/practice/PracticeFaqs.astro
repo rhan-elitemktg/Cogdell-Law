@@ -14,6 +14,12 @@ interface Props {
   eyebrow?: string;
   headingLead?: string;
   headingStrong?: string;
+  /**
+   * "band" is the full-bleed cream section. "card" drops the section and
+   * `.container` so this can sit inside a page's own content column, keeping the
+   * cream as a padded card so it still reads as its own block.
+   */
+  variant?: "band" | "card";
 }
 
 const {
@@ -21,7 +27,10 @@ const {
   eyebrow = "Common Questions",
   headingLead = "Frequently Asked",
   headingStrong = "Questions.",
+  variant = "band",
 } = Astro.props;
+
+const isCard = variant === "card";
 
 // FAQPage markup from the same list the accordion renders — no page changes.
 // Only this component emits it, and no page renders it alongside the homepage's
@@ -31,8 +40,8 @@ const schema = faqSchema(faqs);
 
 {schema && <JsonLd data={schema} />}
 
-<section class="pfaq">
-  <div class="container pfaq__inner">
+<section class:list={["pfaq", isCard && "pfaq--card"]}>
+  <div class:list={[!isCard && "container", "pfaq__inner", isCard && "pfaq__inner--card"]}>
     <div class="pfaq__head">
       <Eyebrow>{eyebrow}</Eyebrow>
       <h2 class="pfaq__heading">
@@ -90,11 +99,29 @@ const schema = faqSchema(faqs);
     color: var(--cog-ink);
   }
 
+  /* Card: a block inside someone else's column rather than a full-bleed band. */
+  .pfaq--card {
+    margin-top: var(--space-14);
+    border: 1px solid var(--cog-line-ink);
+  }
+  .pfaq__inner--card {
+    max-width: none;
+    padding: var(--space-8);
+  }
+  .pfaq--card .pfaq__head {
+    margin-bottom: var(--space-8);
+  }
+  .pfaq--card .pfaq__heading {
+    font-size: var(--text-2xl);
+  }
+  @media (max-width: 650px) {
+    .pfaq__inner--card {
+      padding: var(--space-6);
+    }
+  }
+
   .pfaq__item {
     border-top: 1px solid var(--cog-line-ink);
-  }
-  .pfaq__item:last-child {
-    border-bottom: 1px solid var(--cog-line-ink);
   }
   .pfaq__q {
     display: flex;

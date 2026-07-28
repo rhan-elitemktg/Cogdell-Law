@@ -268,6 +268,13 @@ export type LocationPage = {
   navLabel: string;
   slug: Slug;
   heroTitle: string;
+  heroImage?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
   lede?: string;
   body: BlockContent;
   faqs?: Array<{
@@ -277,6 +284,22 @@ export type LocationPage = {
     _key: string;
   }>;
   seo?: Seo;
+};
+
+export type SanityImageCrop = {
+  _type: "sanity.imageCrop";
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
+};
+
+export type SanityImageHotspot = {
+  _type: "sanity.imageHotspot";
+  x: number;
+  y: number;
+  height: number;
+  width: number;
 };
 
 export type Slug = {
@@ -314,7 +337,13 @@ export type PracticeArea = {
   slug: Slug;
   parent?: PracticeAreaReference;
   heroTitle: string;
-  lede?: string;
+  heroImage?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
   cardSummary?: string;
   icon?: "health" | "federal" | "fraud" | "collar" | "appeals";
   body: BlockContent;
@@ -369,22 +398,6 @@ export type Podcast = {
   spotifyUrl?: string;
   chapters?: string;
   seo?: Seo;
-};
-
-export type SanityImageCrop = {
-  _type: "sanity.imageCrop";
-  top: number;
-  bottom: number;
-  left: number;
-  right: number;
-};
-
-export type SanityImageHotspot = {
-  _type: "sanity.imageHotspot";
-  x: number;
-  y: number;
-  height: number;
-  width: number;
 };
 
 export type NewsItem = {
@@ -963,14 +976,14 @@ export type AllSanitySchemaTypes =
   | CtaButton
   | ServiceCityReference
   | LocationPage
+  | SanityImageCrop
+  | SanityImageHotspot
   | Slug
   | ServiceCity
   | PracticeAreaReference
   | PracticeArea
   | LegalPage
   | Podcast
-  | SanityImageCrop
-  | SanityImageHotspot
   | NewsItem
   | Faq
   | Testimonial
@@ -1033,12 +1046,19 @@ export type AREAS_WE_SERVE_NAV_QUERY_RESULT = Array<{
 
 // Source: src/sanity/lib/areasWeServe.ts
 // Variable: PATHS_QUERY
-// Query: *[_type == "locationPage"] | order(orderRank){  _id,  title,  navLabel,  heroTitle,  lede,  body,  faqs[]{ _key, question, answer },  "slug": slug.current,  "cityName": city->city,  "citySlug": city->citySlug.current,  _updatedAt,  seo{    metaTitle,    metaDescription,    canonicalUrl,    noIndex,    ogImage  }}
+// Query: *[_type == "locationPage"] | order(orderRank){  _id,  title,  navLabel,  heroTitle,  heroImage,  lede,  body,  faqs[]{ _key, question, answer },  "slug": slug.current,  "cityName": city->city,  "citySlug": city->citySlug.current,  _updatedAt,  seo{    metaTitle,    metaDescription,    canonicalUrl,    noIndex,    ogImage  }}
 export type PATHS_QUERY_RESULT = Array<{
   _id: string;
   title: string;
   navLabel: string;
   heroTitle: string;
+  heroImage: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  } | null;
   lede: string | null;
   body: BlockContent;
   faqs: Array<{
@@ -1833,12 +1853,18 @@ export type PODCAST_HERO_QUERY_RESULT =
 
 // Source: src/sanity/lib/practiceAreas.ts
 // Variable: ALL_QUERY
-// Query: *[_type == "practiceArea"] | order(orderRank){  _id,  title,  heroTitle,  lede,  cardSummary,  icon,  body,  faqs[]{ _key, question, answer },  "slug": slug.current,  "parentId": parent._ref,  _updatedAt,  seo{    metaTitle,    metaDescription,    canonicalUrl,    noIndex,    ogImage  }}
+// Query: *[_type == "practiceArea"] | order(orderRank){  _id,  title,  heroTitle,  heroImage,  cardSummary,  icon,  body,  faqs[]{ _key, question, answer },  "slug": slug.current,  "parentId": parent._ref,  _updatedAt,  seo{    metaTitle,    metaDescription,    canonicalUrl,    noIndex,    ogImage  }}
 export type ALL_QUERY_RESULT = Array<{
   _id: string;
   title: string;
   heroTitle: string;
-  lede: string | null;
+  heroImage: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  } | null;
   cardSummary: string | null;
   icon: "appeals" | "collar" | "federal" | "fraud" | "health" | null;
   body: BlockContent;
@@ -2029,7 +2055,7 @@ declare module "@sanity/client" {
     '*[_type == "attorney"] | order(orderRank){\n  "label": name,\n  "slug": slug.current\n}': ATTORNEYS_NAV_QUERY_RESULT;
     '*[_type == "practiceArea"] | order(orderRank){\n  _id,\n  title,\n  "slug": slug.current,\n  "parentId": parent._ref\n}': PRACTICE_AREAS_NAV_QUERY_RESULT;
     '*[_type == "serviceCity"] | order(orderRank){\n  "city": city,\n  "citySlug": citySlug.current,\n  "pages": *[_type == "locationPage" && references(^._id)] | order(orderRank){\n    "navLabel": navLabel,\n    "slug": slug.current\n  }\n}': AREAS_WE_SERVE_NAV_QUERY_RESULT;
-    '*[_type == "locationPage"] | order(orderRank){\n  _id,\n  title,\n  navLabel,\n  heroTitle,\n  lede,\n  body,\n  faqs[]{ _key, question, answer },\n  "slug": slug.current,\n  "cityName": city->city,\n  "citySlug": city->citySlug.current,\n  _updatedAt,\n  seo{\n    metaTitle,\n    metaDescription,\n    canonicalUrl,\n    noIndex,\n    ogImage\n  }\n}': PATHS_QUERY_RESULT;
+    '*[_type == "locationPage"] | order(orderRank){\n  _id,\n  title,\n  navLabel,\n  heroTitle,\n  heroImage,\n  lede,\n  body,\n  faqs[]{ _key, question, answer },\n  "slug": slug.current,\n  "cityName": city->city,\n  "citySlug": city->citySlug.current,\n  _updatedAt,\n  seo{\n    metaTitle,\n    metaDescription,\n    canonicalUrl,\n    noIndex,\n    ogImage\n  }\n}': PATHS_QUERY_RESULT;
     '*[_type == "attorney"] | order(orderRank){\n  _id,\n  name,\n  role,\n  credential,\n  photo,\n  photoAlt,\n  "slug": slug.current\n}': ATTORNEY_CARDS_QUERY_RESULT;
     '*[_type == "attorney" && defined(slug.current)]{"slug": slug.current, _updatedAt, "noIndex": seo.noIndex}': ATTORNEY_SLUGS_QUERY_RESULT;
     '*[_type == "attorney" && slug.current == $slug][0]{\n  _id,\n  name,\n  role,\n  credential,\n  photo,\n  photoAlt,\n  phone,\n  email,\n  practiceTags,\n  bio,\n  education[]{\n    _key,\n    school,\n    location,\n    lines\n  },\n  barAdmissions,\n  honors,\n  classesSeminars,\n  publishedWorks,\n  associations,\n  pastPositions,\n  representativeCases,\n  "slug": slug.current,\n  _updatedAt,\n  seo{\n    metaTitle,\n    metaDescription,\n    canonicalUrl,\n    noIndex,\n    ogImage\n  }\n}': ATTORNEY_QUERY_RESULT;
@@ -2058,7 +2084,7 @@ declare module "@sanity/client" {
     '*[_type == "podcast" && slug.current == $slug][0]{\n  _id,\n  title,\n  episodeNumber,\n  tag,\n  summary,\n  "slug": slug.current,\n  "date": coalesce(publishedAt, _createdAt),\n  coverImage,\n  body,\n  spotifyUrl,\n  chapters,\n  _updatedAt,\n  seo{\n    metaTitle,\n    metaDescription,\n    canonicalUrl,\n    noIndex,\n    ogImage\n  }\n}': PODCAST_QUERY_RESULT;
     '*[_type == "podcast" && defined(slug.current)]{"slug": slug.current, _updatedAt, "noIndex": seo.noIndex}': PODCAST_SLUGS_QUERY_RESULT;
     '*[_id == "podcastPage"][0].hero{\n  eyebrow,\n  title,\n  subtitle\n}': PODCAST_HERO_QUERY_RESULT;
-    '*[_type == "practiceArea"] | order(orderRank){\n  _id,\n  title,\n  heroTitle,\n  lede,\n  cardSummary,\n  icon,\n  body,\n  faqs[]{ _key, question, answer },\n  "slug": slug.current,\n  "parentId": parent._ref,\n  _updatedAt,\n  seo{\n    metaTitle,\n    metaDescription,\n    canonicalUrl,\n    noIndex,\n    ogImage\n  }\n}': ALL_QUERY_RESULT;
+    '*[_type == "practiceArea"] | order(orderRank){\n  _id,\n  title,\n  heroTitle,\n  heroImage,\n  cardSummary,\n  icon,\n  body,\n  faqs[]{ _key, question, answer },\n  "slug": slug.current,\n  "parentId": parent._ref,\n  _updatedAt,\n  seo{\n    metaTitle,\n    metaDescription,\n    canonicalUrl,\n    noIndex,\n    ogImage\n  }\n}': ALL_QUERY_RESULT;
     "*[_id == $pageId][0].practiceAreas{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  description,\n  cards[]{\n    _key,\n    icon,\n    title,\n    desc\n  }\n}": PRACTICE_AREAS_BAND_QUERY_RESULT;
     "*[_id == $pageId][0].seo{\n  metaTitle,\n  metaDescription,\n  canonicalUrl,\n  noIndex,\n  ogImage\n}": PAGE_SEO_QUERY_RESULT;
     '*[_id in $ids]{\n  _id,\n  _updatedAt,\n  "noIndex": seo.noIndex\n}': STATIC_PAGE_SEO_QUERY_RESULT;

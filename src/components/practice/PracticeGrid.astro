@@ -15,13 +15,15 @@ interface Props {
   eyebrow?: string;
   headingLead?: string;
   headingStrong?: string;
+  /** Section background, same idea as the `background` prop on PracticeAreas. */
+  background?: "paper" | "card";
 }
 
-const { items, eyebrow, headingLead, headingStrong } = Astro.props;
+const { items, eyebrow, headingLead, headingStrong, background = "paper" } = Astro.props;
 const hasHead = Boolean(eyebrow || headingLead);
 ---
 
-<section class="pgrid">
+<section class:list={["pgrid", background === "card" && "pgrid--card"]}>
   <div class="container">
     {
       hasHead && (
@@ -76,6 +78,11 @@ const hasHead = Boolean(eyebrow || headingLead);
   .pgrid {
     background-color: var(--cog-paper);
     padding-block: var(--space-section);
+  }
+  /* On the single practice-area pages the FAQ block moved into the content
+     column, so this band takes over as the page's cream break. */
+  .pgrid--card {
+    background-color: var(--cog-paper-card);
   }
   .pgrid__head {
     display: flex;

@@ -19,7 +19,11 @@ export const newsItem = defineType({
   title: "News",
   type: "document",
   icon: icons["document-text"],
-  groups: [{ name: "content", title: "Content", default: true }, { name: "meta", title: "Meta" }],
+  groups: [
+    { name: "content", title: "Content", default: true },
+    { name: "meta", title: "Meta" },
+    { name: "seo", title: "SEO" },
+  ],
   fields: [
     defineField({
       name: "title",
@@ -143,8 +147,7 @@ export const newsItem = defineType({
       name: "seo",
       title: "SEO",
       type: "seo",
-      group: "meta",
-      options: { collapsible: true, collapsed: true },
+      group: "seo",
     }),
   ],
   orderings: [

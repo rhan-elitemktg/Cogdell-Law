@@ -206,7 +206,7 @@ const results = about.featured ?? [];
 
   .about__scroller {
     display: flex;
-    gap: var(--space-6);
+    gap: var(--space-4);
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     padding: 4px 4px 8px;
@@ -218,7 +218,9 @@ const results = about.featured ?? [];
     display: none; /* Chrome, Safari */
   }
   .about__result {
-    flex: 0 0 calc(50% - var(--space-3));
+    /* Half the scroller's gap, so two whole cards still fill the row. Keep this
+       in step with `.about__scroller`'s gap. */
+    flex: 0 0 calc(50% - var(--space-2));
     scroll-snap-align: start;
     min-width: 0;
     padding: var(--space-6) var(--space-6) 26px;
@@ -363,7 +365,10 @@ const results = about.featured ?? [];
     if (!scroller) return;
     const step = () => {
       const card = scroller.querySelector<HTMLElement>(".about__result");
-      return card ? card.offsetWidth + 24 : 320;
+      // Read the gap rather than hardcoding it, so changing the CSS gap can't
+      // silently leave the arrows scrolling by the wrong amount.
+      const gap = parseFloat(getComputedStyle(scroller).columnGap) || 0;
+      return card ? card.offsetWidth + gap : 320;
     };
     root
       .querySelector('[data-dir="prev"]')

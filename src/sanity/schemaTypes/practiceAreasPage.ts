@@ -12,18 +12,23 @@ export const practiceAreasPage = defineType({
   title: "Practice Areas Page",
   type: "document",
   icon: icons["th-large"],
+  groups: [
+    { name: "content", title: "Content", default: true },
+    { name: "seo", title: "SEO" },
+  ],
   fields: [
     defineField({
       name: "hero",
       title: "Hero",
       type: "pageHero",
       options: { collapsible: true, collapsed: true },
+      group: "content",
     }),
     defineField({
       name: "seo",
       title: "SEO",
       type: "seo",
-      options: { collapsible: true, collapsed: true },
+      group: "seo",
     }),
   ],
   preview: {

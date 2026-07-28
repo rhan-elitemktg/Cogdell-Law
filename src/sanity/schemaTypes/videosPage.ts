@@ -12,17 +12,23 @@ export const videosPage = defineType({
   title: "Videos Page",
   type: "document",
   icon: icons.play,
+  groups: [
+    { name: "content", title: "Content", default: true },
+    { name: "seo", title: "SEO" },
+  ],
   fields: [
     defineField({
       name: "hero",
       title: "Hero",
       type: "pageHero",
+      group: "content",
       options: { collapsible: true, collapsed: true },
     }),
     defineField({
       name: "grid",
       title: "Video Grid",
       type: "object",
+      group: "content",
       options: { collapsible: true, collapsed: true },
       fields: [
         defineField({ name: "eyebrow", title: "Eyebrow", type: "string", validation: (rule) => rule.required() }),
@@ -34,7 +40,7 @@ export const videosPage = defineType({
       name: "seo",
       title: "SEO",
       type: "seo",
-      options: { collapsible: true, collapsed: true },
+      group: "seo",
     }),
   ],
   preview: {

@@ -1,0 +1,271 @@
+---
+// The consultation form itself, extracted from Consult.astro so the band and the
+// practice-area sidebar can both render it against the same /api/consult endpoint.
+//
+// Two instances can share a page (the sidebar rail plus the bottom band), so:
+//  - every field id is prefixed, because ids must stay unique per document;
+//  - the submit script binds EVERY .consult__form on the page, not the first one.
+//
+// The form's styles live here rather than in Consult.astro: Astro scopes styles
+// by component, so markup moved into a child stops matching the parent's rules.
+
+interface Props {
+  /** Prefixes every field id. Must differ between instances on one page. */
+  idPrefix?: string;
+  /** "band" = the two-column section form; "rail" = narrow navy sidebar form. */
+  variant?: "band" | "rail";
+  fineprint?: string;
+  thankYou?: string;
+}
+
+const {
+  idPrefix = "consult",
+  variant = "band",
+  fineprint,
+  thankYou,
+} = Astro.props;
+
+const id = (name: string) => `${idPrefix}-${name}`;
+const isRail = variant === "rail";
+
+/**
+ * The rail drops visible labels for placeholder-only fields, so its placeholder
+ * has to carry the label's wording — a placeholder is the only name a sighted
+ * user gets. The label element itself stays in the DOM either way (just
+ * visually hidden in the rail): a placeholder is not an accessible name, it
+ * disappears the moment you type, and screen readers shouldn't be left guessing.
+ */
+const FIELDS = {
+  name: { label: "Full Name", placeholder: "Jane Doe" },
+  phone: { label: "Phone", placeholder: "(713) 000-0000" },
+  email: { label: "Email", placeholder: "you@email.com" },
+  message: { label: "How can we help?", placeholder: "Briefly describe your situation" },
+} as const;
+
+const placeholderFor = (k: keyof typeof FIELDS) =>
+  isRail ? FIELDS[k].label : FIELDS[k].placeholder;
+
+const labelClass = ["consult__label", isRail && "visually-hidden"].filter(Boolean).join(" ");
+
+// Native constraint validation — `form.reportValidity()` in the script below
+// already gates submission, so these need no JS. Both are anchored implicitly.
+// Phone is optional, so the pattern only applies once something is typed.
+const PHONE_PATTERN = "(\\+?1[\\s.\\-]?)?\\(?\\d{3}\\)?[\\s.\\-]?\\d{3}[\\s.\\-]?\\d{4}";
+const PHONE_TITLE = "Enter a 10-digit US phone number, e.g. (713) 426-2244";
+// Stricter than type="email" alone, which accepts "someone@localhost".
+const EMAIL_PATTERN = "[^@\\s]+@[^@\\s]+\\.[A-Za-z]{2,}";
+const EMAIL_TITLE = "Enter a complete email address, e.g. you@email.com";
+---
+
+<form class:list={["consult__form", isRail && "consult__form--rail"]}>
+  <div class="consult__field">
+    <label class={labelClass} for={id("name")}>{FIELDS.name.label}</label>
+    <input class="consult__input" id={id("name")} name="name" type="text" placeholder={placeholderFor("name")} maxlength="100" autocomplete="name" required />
+  </div>
+  <div class="consult__field">
+    <label class={labelClass} for={id("phone")}>{FIELDS.phone.label}</label>
+    <input class="consult__input" id={id("phone")} name="phone" type="tel" placeholder={placeholderFor("phone")} pattern={PHONE_PATTERN} title={PHONE_TITLE} maxlength="20" inputmode="tel" autocomplete="tel" />
+  </div>
+  <div class="consult__field consult__field--wide">
+    <label class={labelClass} for={id("email")}>{FIELDS.email.label}</label>
+    <input class="consult__input" id={id("email")} name="email" type="email" placeholder={placeholderFor("email")} pattern={EMAIL_PATTERN} title={EMAIL_TITLE} maxlength="254" autocomplete="email" required />
+  </div>
+  <div class="consult__field consult__field--wide">
+    <label class={labelClass} for={id("message")}>{FIELDS.message.label}</label>
+    <textarea class="consult__input consult__textarea" id={id("message")} name="message" rows="4" placeholder={placeholderFor("message")} maxlength="2000"></textarea>
+  </div>
+  {/* Honeypot: hidden from people, tempting to bots. If filled, we treat
+      the submission as spam. Kept out of the tab order and off-screen. */}
+  <div class="consult__hp" aria-hidden="true">
+    <label for={id("company")}>Company</label>
+    <input id={id("company")} name="company" type="text" tabindex="-1" autocomplete="off" />
+  </div>
+  {fineprint && <p class="consult__fineprint">{fineprint}</p>}
+  <div class="consult__actions">
+    <button class="btn btn--primary" type="submit">
+      <span class="btn__label">Request Consultation</span>
+      <svg class="btn__icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+    </button>
+  </div>
+</form>
+
+<p class="consult__thanks" hidden>{thankYou}</p>
+{/* Kept on one line: a newline before the <a> collapses away and the sentence
+    renders as "call us at713-426-2244". */}
+<p class="consult__error" role="alert" hidden>
+  Something went wrong sending your message. Please try again, or call us at <a href="tel:7134262244">713-426-2244</a>.
+</p>
+
+<style>
+  .consult__form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+  }
+  .consult__field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .consult__field--wide {
+    grid-column: 1 / -1;
+  }
+  .consult__label {
+    font-family: var(--font-body);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--cog-ink-muted);
+  }
+  .consult__input {
+    width: 100%;
+    height: 60px;
+    padding: 14px 16px;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    color: var(--cog-ink);
+    background-color: var(--cog-white);
+    border: 1px solid var(--cog-line-ink);
+    border-radius: 0;
+    transition: border-color var(--transition);
+  }
+  .consult__input::placeholder {
+    color: var(--cog-ink-muted);
+  }
+  .consult__input:focus {
+    outline: none;
+    border-color: var(--cog-accent);
+  }
+  .consult__textarea {
+    height: auto;
+    min-height: 120px;
+    resize: vertical;
+  }
+  .consult__fineprint {
+    grid-column: 1 / -1;
+    margin: 0;
+    font-family: var(--font-heading);
+    font-style: italic;
+    font-size: var(--text-base);
+    color: var(--cog-ink-muted);
+  }
+  .consult__actions {
+    grid-column: 1 / -1;
+    margin-top: var(--space-2);
+  }
+  .consult__thanks {
+    margin: var(--space-6) 0 0;
+    font-family: var(--font-heading);
+    font-size: var(--text-lg);
+    line-height: 1.5;
+    color: var(--cog-ink);
+  }
+  /* Honeypot — pulled off-screen; real visitors never see or tab to it. */
+  .consult__hp {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+  .consult__error {
+    margin: var(--space-6) 0 0;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    color: var(--cog-error, #b3261e);
+  }
+  .consult__error a {
+    color: inherit;
+    font-weight: 700;
+  }
+
+  /* ---- Rail variant: one placeholder-only column on a navy panel ---- */
+  .consult__form--rail {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+  .consult__form--rail .consult__input {
+    height: 58px;
+    padding: 16px 18px;
+    font-size: var(--text-base);
+    border-color: transparent;
+  }
+  .consult__form--rail .consult__input::placeholder {
+    color: var(--cog-muted);
+    opacity: 1; /* Firefox dims placeholders by default */
+  }
+  .consult__form--rail .consult__textarea {
+    height: auto;
+    min-height: 150px;
+  }
+  .consult__form--rail .consult__actions {
+    margin-top: var(--space-2);
+  }
+  .consult__form--rail .consult__actions .btn {
+    width: 100%;
+    justify-content: center;
+    padding-block: var(--space-6);
+  }
+  /* Fine print sits under the button in the rail, not inside the field flow. */
+  .consult__form--rail .consult__fineprint {
+    order: 99;
+  }
+
+  /* ---- Responsive ---- */
+  @media (max-width: 650px) {
+    /* Stack every field full-width on phones (Full Name + Phone no longer split). */
+    .consult__form {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  // Submit to our /api/consult function (which emails the firm via Resend).
+  // Native `required` validation still runs first; on success we swap the form
+  // for the thank-you, on failure we surface an error and let them retry.
+  //
+  // Bind EVERY form on the page — a practice-area page carries two (the sidebar
+  // rail and the bottom band). Astro bundles this script once no matter how many
+  // times the component renders, so one pass wires them all. Each form's
+  // thanks/error are its own siblings, so scope the lookup to its parent.
+  document
+    .querySelectorAll<HTMLFormElement>(".consult__form")
+    .forEach((form) => {
+      const scope: ParentNode = form.parentElement ?? document;
+      const thanks = scope.querySelector<HTMLElement>(".consult__thanks");
+      const errorEl = scope.querySelector<HTMLElement>(".consult__error");
+      const submitBtn = form.querySelector<HTMLButtonElement>("button[type='submit']");
+      const submitLabelEl = submitBtn?.querySelector<HTMLElement>(".btn__label");
+      const submitLabel = submitLabelEl?.textContent ?? "Request Consultation";
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        if (!form.reportValidity()) return; // browser shows the built-in field errors
+
+        if (errorEl) errorEl.hidden = true;
+        if (submitBtn) submitBtn.disabled = true;
+        if (submitLabelEl) submitLabelEl.textContent = "Sending…";
+
+        try {
+          const payload = Object.fromEntries(new FormData(form).entries());
+          const res = await fetch("/api/consult", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+
+          form.hidden = true;
+          if (thanks) thanks.hidden = false;
+        } catch (err) {
+          console.error("Consult submit failed:", err);
+          if (errorEl) errorEl.hidden = false;
+          if (submitBtn) submitBtn.disabled = false;
+          if (submitLabelEl) submitLabelEl.textContent = submitLabel;
+        }
+      });
+    });
+</script>

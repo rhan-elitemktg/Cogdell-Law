@@ -21,11 +21,16 @@ export const homePage = defineType({
   title: "Home Page",
   type: "document",
   icon: icons.home,
+  groups: [
+    { name: "content", title: "Content", default: true },
+    { name: "seo", title: "SEO" },
+  ],
   fields: [
     defineField({
       name: "hero",
       title: "Hero",
       type: "object",
+      group: "content",
       options: { collapsible: true, collapsed: true },
       fields: [
         defineField({
@@ -110,6 +115,7 @@ export const homePage = defineType({
       name: "sellingPoints",
       title: "Selling Points",
       type: "object",
+      group: "content",
       options: { collapsible: true, collapsed: true },
       fields: [
         defineField({
@@ -131,12 +137,14 @@ export const homePage = defineType({
       name: "practiceAreas",
       title: "Practice Areas",
       type: "practiceAreasBand",
+      group: "content",
       options: { collapsible: true, collapsed: true },
     }),
     defineField({
       name: "about",
       title: "About",
       type: "object",
+      group: "content",
       options: { collapsible: true, collapsed: true },
       fields: [
         defineField({
@@ -197,6 +205,7 @@ export const homePage = defineType({
       name: "statement",
       title: "Statement Band",
       type: "object",
+      group: "content",
       options: { collapsible: true, collapsed: true },
       fields: [
         defineField({
@@ -240,6 +249,7 @@ export const homePage = defineType({
       name: "ctaBar",
       title: "CTA Bar override",
       type: "ctaBarContent",
+      group: "content",
       description:
         "Optional. Leave empty to use the site-wide CTA Bar; fill this in only to give this page its own wording.",
       options: { collapsible: true, collapsed: true },
@@ -248,12 +258,14 @@ export const homePage = defineType({
       name: "attorneys",
       title: "Attorneys",
       type: "attorneysBand",
+      group: "content",
       options: { collapsible: true, collapsed: true },
     }),
     defineField({
       name: "firmStory",
       title: "Firm Story",
       type: "object",
+      group: "content",
       options: { collapsible: true, collapsed: true },
       fields: [
         defineField({
@@ -298,18 +310,21 @@ export const homePage = defineType({
       name: "testimonials",
       title: "Testimonials",
       type: "testimonialsBand",
+      group: "content",
       options: { collapsible: true, collapsed: true },
     }),
     defineField({
       name: "whyChoose",
       title: "Why Choose",
       type: "whyChooseBand",
+      group: "content",
       options: { collapsible: true, collapsed: true },
     }),
     defineField({
       name: "practiceReach",
       title: "Practice Reach",
       type: "object",
+      group: "content",
       options: { collapsible: true, collapsed: true },
       fields: [
         defineField({
@@ -354,6 +369,7 @@ export const homePage = defineType({
       name: "press",
       title: "Press",
       type: "object",
+      group: "content",
       options: { collapsible: true, collapsed: true },
       fields: [
         defineField({
@@ -371,19 +387,21 @@ export const homePage = defineType({
       name: "faq",
       title: "FAQ",
       type: "faqBand",
+      group: "content",
       options: { collapsible: true, collapsed: true },
     }),
     defineField({
       name: "news",
       title: "News",
       type: "newsBand",
+      group: "content",
       options: { collapsible: true, collapsed: true },
     }),
     defineField({
       name: "seo",
       title: "SEO",
       type: "seo",
-      options: { collapsible: true, collapsed: true },
+      group: "seo",
     }),
   ],
   preview: {

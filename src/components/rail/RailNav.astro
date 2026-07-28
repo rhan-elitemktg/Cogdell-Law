@@ -1,0 +1,286 @@
+---
+// The sidebar rail's navigation tree. Fed the SAME NavItem branch the header
+// menu renders, so a rail can never drift from the nav: practice-area pages
+// pass getPracticeAreasNav()'s children, location pages pass
+// getAreasWeServeNav()'s.
+//
+// Three row shapes, because the two trees aren't identical:
+//   1. children + href — a practice area: label is a link, icon toggles.
+//   2. children, no href — a city in Areas We Serve: cities are grouping labels
+//      with no page of their own, so the label is plain text and the whole row
+//      toggles.
+//   3. no children — a childless area: a plain link row with an arrow.
+//
+// Each parent with children is a native <details>. Deliberately no shared `name`
+// attribute: unlike the FAQ accordion, opening one shouldn't slam another shut
+// while someone is comparing them. The branch containing the current page opens
+// on load.
+//
+// Where the label IS a link it sits inside the <summary>, which normally toggles
+// on any click within it — the script at the bottom stops the event at the
+// anchor so the label navigates instead.
+import type { NavItem } from "../../data/navigation";
+import { isOnTrail, pathMatches, normalizePath } from "../../data/navigation";
+
+interface Props {
+  heading: string;
+  items: NavItem[];
+  /** Current pathname, for the active trail. */
+  pathname: string;
+}
+
+const { heading, items, pathname } = Astro.props;
+const current = normalizePath(pathname);
+---
+
+<nav class="rnav" aria-label={heading}>
+  <h2 class="rnav__heading">{heading}</h2>
+
+  <ul class="rnav__list">
+    {
+      items.map((item) => {
+        const onTrail = isOnTrail(item, current);
+        const isCurrent = pathMatches(item.href, current);
+        const kids = item.children ?? [];
+
+        return (
+          <li class="rnav__item">
+            {kids.length > 0 ? (
+              <details class="rnav__details" open={onTrail}>
+                <summary class="rnav__summary">
+                  {item.href ? (
+                    <a
+                      class:list={["rnav__label", onTrail && "is-active", isCurrent && "is-current"]}
+                      href={item.href}
+                      aria-current={isCurrent ? "page" : undefined}
+                    >
+                      {item.label}
+                    </a>
+                  ) : (
+                    <span class:list={["rnav__label", onTrail && "is-active"]}>{item.label}</span>
+                  )}
+                  <span class="rnav__icon" aria-hidden="true" />
+                </summary>
+                <ul class="rnav__sublist">
+                  {kids.map((kid) => {
+                    const kidCurrent = pathMatches(kid.href, current);
+                    return (
+                      <li>
+                        <a
+                          class:list={["rnav__sublink", kidCurrent && "is-current"]}
+                          href={kid.href}
+                          aria-current={kidCurrent ? "page" : undefined}
+                        >
+                          {kid.label}
+                        </a>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </details>
+            ) : (
+              <a
+                class:list={["rnav__link", isCurrent && "is-current"]}
+                href={item.href}
+                aria-current={isCurrent ? "page" : undefined}
+              >
+                <span class:list={["rnav__label", onTrail && "is-active"]}>{item.label}</span>
+                <span class="rnav__arrow" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12h14M13 6l6 6-6 6" />
+                  </svg>
+                </span>
+              </a>
+            )}
+          </li>
+        );
+      })
+    }
+  </ul>
+</nav>
+
+<style>
+  /* Panel chrome matches .rail__form: accent rule on top, same padding, so the
+     two rail blocks read as one system. */
+  .rnav {
+    background-color: var(--cog-paper-card);
+    border: 1px solid var(--cog-line-ink);
+    border-top: 3px solid var(--cog-accent);
+    padding: var(--space-8);
+  }
+  /* Same token, weight and metrics as .rail__heading. */
+  .rnav__heading {
+    margin: 0 0 var(--space-6);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: var(--text-3xl);
+    line-height: 1.06;
+    letter-spacing: -0.01em;
+    color: var(--cog-ink);
+  }
+
+  .rnav__list,
+  .rnav__sublist {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .rnav__item {
+    border-top: 1px solid var(--cog-line-ink);
+  }
+  .rnav__item:first-child {
+    border-top: 0;
+  }
+
+  /* ---- Parent row (both the <summary> and the link-only variant) ---- */
+  .rnav__summary,
+  .rnav__link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-4) 0;
+    cursor: pointer;
+    list-style: none;
+    text-decoration: none;
+  }
+  .rnav__summary::-webkit-details-marker {
+    display: none;
+  }
+  /* Sized to the rail form's inputs (--text-base); sub-items drop to the body
+     copy's --text-sm, so the rail runs on one scale throughout. */
+  .rnav__label {
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--cog-ink);
+    text-decoration: none;
+    transition: color var(--transition);
+  }
+  .rnav__summary:hover .rnav__label,
+  .rnav__link:hover .rnav__label {
+    color: var(--cog-accent);
+  }
+  .rnav__label.is-active,
+  .rnav__label.is-current {
+    color: var(--cog-accent);
+  }
+  /* Where the label is a link inside the summary, give it its own focus ring so
+     keyboard users can tell it apart from the summary's toggle focus. */
+  .rnav__label:focus-visible {
+    outline: 2px solid var(--cog-accent);
+    outline-offset: 3px;
+  }
+  .rnav__arrow {
+    flex-shrink: 0;
+    color: var(--cog-accent);
+    transition: transform var(--transition);
+  }
+  .rnav__link:hover .rnav__arrow {
+    transform: translateX(4px);
+  }
+
+  /* Plus/minus toggle — same recipe as the FAQ accordion. */
+  .rnav__icon {
+    position: relative;
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+  }
+  .rnav__icon::before,
+  .rnav__icon::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    background-color: var(--cog-accent);
+    transform: translate(-50%, -50%);
+    transition: transform var(--transition);
+  }
+  .rnav__icon::before {
+    width: 100%;
+    height: 2px;
+  }
+  .rnav__icon::after {
+    width: 2px;
+    height: 100%;
+  }
+  .rnav__details[open] .rnav__icon::after {
+    transform: translate(-50%, -50%) scaleY(0);
+  }
+
+  /* ---- Sub-items ---- */
+  .rnav__sublist {
+    padding: 0 0 var(--space-4);
+  }
+  .rnav__sublink {
+    display: block;
+    padding: var(--space-3) 0 var(--space-3) var(--space-4);
+    border-left: 2px solid var(--cog-line-ink);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    line-height: 1.5;
+    color: var(--cog-ink-body);
+    text-decoration: none;
+    transition:
+      color var(--transition),
+      border-color var(--transition);
+  }
+  .rnav__sublink:hover {
+    color: var(--cog-accent);
+    border-left-color: var(--cog-accent);
+  }
+  .rnav__sublink.is-current {
+    color: var(--cog-accent);
+    font-weight: 600;
+    border-left-color: var(--cog-accent);
+  }
+
+  /* Animated expand where supported (matches PracticeFaqs). */
+  @supports (interpolate-size: allow-keywords) {
+    .rnav__details::details-content {
+      block-size: 0;
+      overflow: hidden;
+      transition:
+        block-size var(--transition),
+        content-visibility var(--transition);
+      transition-behavior: allow-discrete;
+    }
+    .rnav__details[open]::details-content {
+      block-size: auto;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rnav__label,
+    .rnav__arrow,
+    .rnav__sublink,
+    .rnav__icon::before,
+    .rnav__icon::after {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  // A <summary> toggles on any click inside it, so without this a linked parent
+  // label would both navigate AND flip the accordion. Stopping the event at the
+  // anchor keeps the summary from ever seeing it: the label navigates, and
+  // everything else in the row (the icon, the empty space) still toggles.
+  // Rows whose label is a plain <span> (Areas We Serve cities) aren't matched
+  // here, so the whole row keeps toggling — which is what we want there.
+  //
+  // Progressive enhancement — with JS off the label still navigates, which is
+  // the part that matters; only the redundant toggle leaks through.
+  document.querySelectorAll<HTMLAnchorElement>(".rnav__summary a.rnav__label").forEach((link) => {
+    link.addEventListener("click", (e) => e.stopPropagation());
+    // Enter on the focused link fires a click, so that path is covered too; but
+    // Space would scroll-or-toggle, so swallow it and follow the link instead.
+    link.addEventListener("keydown", (e) => {
+      if (e.key === " ") {
+        e.preventDefault();
+        link.click();
+      }
+    });
+  });
+</script>
