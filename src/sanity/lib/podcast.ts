@@ -36,7 +36,7 @@ const PODCAST_QUERY = defineQuery(`*[_type == "podcast" && slug.current == $slug
   coverImage,
   body,
   spotifyUrl,
-  transcript[]{ _key, time, text },
+  chapters,
   _updatedAt,
   seo{
     metaTitle,

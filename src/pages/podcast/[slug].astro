@@ -1,13 +1,12 @@
 ---
 // Episode page at /podcast/[slug]: meta + title + brand artwork, the show-notes
-// body, a hashtag row, the audio player, a collapsible transcript, then a
+// body, a hashtag row, the audio player with its chapter list, then a
 // related-episodes grid. Layout matches the episode mockup.
 import Layout from "../../layouts/Layout.astro";
 import { PortableText } from "astro-portabletext";
 import { proseBodyComponents } from "../../components/prose/bodyComponents";
 import PodcastArtwork from "../../components/podcast/PodcastArtwork.astro";
 import SpotifyPlayer from "../../components/podcast/SpotifyPlayer.astro";
-import Transcript from "../../components/podcast/Transcript.astro";
 import RelatedPodcasts from "../../components/podcast/RelatedPodcasts.astro";
 import CtaBar from "../../components/CtaBar.astro";
 import Consult from "../../components/Consult.astro";
@@ -34,7 +33,6 @@ const displayTitle =
   episode.episodeNumber != null ? `${episode.title} | Ep. ${episode.episodeNumber}` : (episode.title ?? "");
 const playerLabel =
   episode.episodeNumber != null ? `Ep. ${episode.episodeNumber} — ${episode.title}` : (episode.title ?? "");
-const cues = (episode.transcript ?? []).filter((c: { time?: string | null; text?: string | null }) => c?.time && c?.text);
 const hasBody = Array.isArray(episode.body) && episode.body.length > 0;
 const description = episode.summary ?? `${episode.title} — The Cogdell Counsel podcast.`;
 ---
@@ -67,16 +65,8 @@ const description = episode.summary ?? `${episode.title} — The Cogdell Counsel
         }
 
         <div class="episode__player">
-          <SpotifyPlayer url={episode.spotifyUrl} title={playerLabel} />
+          <SpotifyPlayer url={episode.spotifyUrl} title={playerLabel} chapters={episode.chapters} />
         </div>
-
-        {
-          cues.length > 0 && (
-            <div class="episode__transcript">
-              <Transcript cues={cues} />
-            </div>
-          )
-        }
       </div>
     </div>
   </article>
@@ -153,11 +143,8 @@ const description = episode.summary ?? `${episode.title} — The Cogdell Counsel
     margin-top: 0;
   }
 
-  /* ---- Player + transcript ---- */
+  /* ---- Player ---- */
   .episode__player {
-    margin-top: var(--space-8);
-  }
-  .episode__transcript {
     margin-top: var(--space-8);
   }
 </style>

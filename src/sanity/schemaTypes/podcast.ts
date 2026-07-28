@@ -1,6 +1,7 @@
-import { defineType, defineField, defineArrayMember } from "sanity";
+import { defineType, defineField } from "sanity";
 import { icons } from "@sanity/icons";
 import { PODCAST_TAGS } from "../../lib/podcastTags";
+import { badChapterLines, parseChapters } from "../../lib/podcastChapters";
 
 /**
  * A podcast episode — "The Cogdell Counsel". The single source of truth for an
@@ -93,36 +94,29 @@ export const podcast = defineType({
       validation: (rule) => rule.uri({ scheme: ["https"] }),
     }),
     defineField({
-      name: "transcript",
-      title: "Transcript",
-      type: "array",
-      description: "Timestamped transcript cues, shown in the collapsible Transcript panel.",
-      of: [
-        defineArrayMember({
-          type: "object",
-          name: "cue",
-          title: "Cue",
-          fields: [
-            defineField({
-              name: "time",
-              title: "Timestamp",
-              type: "string",
-              description: 'e.g. "0:14" or "12:03".',
-              validation: (rule) => rule.required(),
-            }),
-            defineField({
-              name: "text",
-              title: "Text",
-              type: "text",
-              rows: 2,
-              validation: (rule) => rule.required(),
-            }),
-          ],
-          preview: {
-            select: { time: "time", text: "text" },
-            prepare: ({ time, text }) => ({ title: text, subtitle: time }),
-          },
+      name: "chapters",
+      title: "Chapters",
+      type: "text",
+      rows: 8,
+      description:
+        'One chapter per line — timestamp, then title: "02:14 Meeting Dick DeGuerin". Shown under the player, and clicking one jumps the episode to that point. Paste the same block into Buzzsprout so Spotify shows the same chapters.',
+      validation: (rule) => [
+        // An error, not a warning: a line we can't read is silently missing from
+        // the page, and the editor would never find out.
+        rule.custom((value?: string) => {
+          const bad = badChapterLines(value);
+          if (bad.length === 0) return true;
+          return `Start every line with a timestamp, e.g. "02:14 Meeting Dick DeGuerin". Check ${
+            bad.length === 1 ? `line ${bad[0]}` : `lines ${bad.join(", ")}`
+          }.`;
         }),
+        rule
+          .custom((value?: string) => {
+            const chapters = parseChapters(value);
+            const backwards = chapters.some((c, i) => i > 0 && c.seconds <= chapters[i - 1].seconds);
+            return backwards ? "Timestamps aren't in order — chapters are listed exactly as typed." : true;
+          })
+          .warning(),
       ],
     }),
     defineField({

@@ -12,7 +12,7 @@
  *
  * Each episode is seeded with a one-paragraph body (the summary) so the page
  * isn't empty; the firm expands the show notes, and adds the artwork photo, audio
- * URL and transcript in the Studio (those need asset uploads / real media, so
+ * URL and chapters in the Studio (those need asset uploads / real media, so
  * they aren't seeded here). Matched on slug, so re-running updates in place.
  */
 import { getCliClient } from "sanity/cli";
@@ -88,7 +88,7 @@ async function main() {
     .commit();
   console.log("  podcastPage.hero copy");
 
-  console.log("Done. Add each episode's artwork photo, audio URL and transcript in the Studio.");
+  console.log("Done. Add each episode's artwork photo, audio URL and chapters in the Studio.");
 }
 
 main().catch((err) => {
