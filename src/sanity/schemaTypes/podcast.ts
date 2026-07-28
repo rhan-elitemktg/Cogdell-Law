@@ -1,0 +1,156 @@
+import { defineType, defineField, defineArrayMember } from "sanity";
+import { icons } from "@sanity/icons";
+import { PODCAST_TAGS } from "../../lib/podcastTags";
+
+/**
+ * A podcast episode — "The Cogdell Counsel". The single source of truth for an
+ * episode, shown on /podcast (the filterable index grid) and /podcast/<slug>
+ * (the full episode page).
+ *
+ * The card + episode-page artwork is a code-rendered brand lockup over
+ * `coverImage` (see PodcastArtwork.astro) with the episode number printed on it,
+ * so editors only upload a background photo and set the number.
+ *
+ * Audio comes from Spotify: paste the episode's Spotify link into `spotifyUrl`
+ * and the page embeds Spotify's player (which pulls the audio + controls).
+ *
+ * NOTE (do not reintroduce): no field `groups`/tabs, and the Studio list preview
+ * stays text-only with a single ordering — selecting `coverImage` in the preview
+ * crashed the Podcast Episodes list (Studio LoadingPane + React 19 ref loop).
+ */
+export const podcast = defineType({
+  name: "podcast",
+  title: "Podcast",
+  type: "document",
+  icon: icons.microphone,
+  fields: [
+    defineField({
+      name: "title",
+      title: "Episode title",
+      type: "string",
+      description: 'No need to add "| Ep. N" — that\'s added automatically from the number below.',
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "episodeNumber",
+      title: "Episode number",
+      type: "number",
+      description: 'Printed on the artwork ("EPISODE 12") and after the title ("| Ep. 12").',
+      validation: (rule) => rule.required().integer().positive(),
+    }),
+    defineField({
+      name: "slug",
+      title: "Slug",
+      type: "slug",
+      description: "URL segment — /podcast/<slug>.",
+      options: { source: "title", maxLength: 96 },
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "tag",
+      title: "Tag",
+      type: "string",
+      description: "The category badge on the card, and the filter button that reveals it on /podcast.",
+      options: { list: PODCAST_TAGS.map((t) => ({ ...t })) },
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "publishedAt",
+      title: "Published date",
+      type: "datetime",
+      description:
+        'Leave empty to use the date this episode was added. Set it to override — this is what "newest" sorts by.',
+    }),
+    defineField({
+      name: "coverImage",
+      title: "Artwork background photo",
+      type: "image",
+      options: { hotspot: true },
+      description:
+        'The photo behind the "Cogdell Counsel" lockup on the card + episode page. Optional — leave empty to use the firm default; upload one to override it.',
+    }),
+    defineField({
+      name: "summary",
+      title: "Summary",
+      type: "text",
+      rows: 3,
+      description: "A short blurb — used for search/social metadata when no SEO description is set.",
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "body",
+      title: "Episode content",
+      type: "blockContent",
+      description: "The show notes / write-up shown on the episode page.",
+      validation: (rule) => rule.required().min(1),
+    }),
+    defineField({
+      name: "spotifyUrl",
+      title: "Spotify episode link",
+      type: "url",
+      description:
+        "Paste the episode's Spotify URL (e.g. https://open.spotify.com/episode/…). The page embeds Spotify's player from this.",
+      validation: (rule) => rule.uri({ scheme: ["https"] }),
+    }),
+    defineField({
+      name: "transcript",
+      title: "Transcript",
+      type: "array",
+      description: "Timestamped transcript cues, shown in the collapsible Transcript panel.",
+      of: [
+        defineArrayMember({
+          type: "object",
+          name: "cue",
+          title: "Cue",
+          fields: [
+            defineField({
+              name: "time",
+              title: "Timestamp",
+              type: "string",
+              description: 'e.g. "0:14" or "12:03".',
+              validation: (rule) => rule.required(),
+            }),
+            defineField({
+              name: "text",
+              title: "Text",
+              type: "text",
+              rows: 2,
+              validation: (rule) => rule.required(),
+            }),
+          ],
+          preview: {
+            select: { time: "time", text: "text" },
+            prepare: ({ time, text }) => ({ title: text, subtitle: time }),
+          },
+        }),
+      ],
+    }),
+    defineField({
+      name: "seo",
+      title: "SEO",
+      type: "seo",
+      options: { collapsible: true, collapsed: true },
+    }),
+  ],
+  orderings: [
+    {
+      title: "Newest",
+      name: "newest",
+      by: [
+        { field: "publishedAt", direction: "desc" },
+        { field: "_createdAt", direction: "desc" },
+      ],
+    },
+  ],
+  preview: {
+    // Text-only list preview — no image select (see NOTE above). Rows show the
+    // document icon.
+    select: { title: "title", episodeNumber: "episodeNumber", tag: "tag" },
+    prepare({ title, episodeNumber, tag }) {
+      return {
+        title: episodeNumber ? `${title} | Ep. ${episodeNumber}` : title,
+        subtitle: tag,
+      };
+    },
+  },
+});

@@ -11,6 +11,7 @@ import { contactPage } from "./contactPage";
 import { ourFirmPage } from "./ourFirmPage";
 import { videosPage } from "./videosPage";
 import { newsPage } from "./newsPage";
+import { podcastPage } from "./podcastPage";
 import { practiceAreasPage } from "./practiceAreasPage";
 import { video } from "./video";
 import { attorney } from "./attorney";
@@ -18,6 +19,7 @@ import { faq } from "./faq";
 import { newsItem } from "./newsItem";
 import { legalPage } from "./legalPage";
 import { practiceArea } from "./practiceArea";
+import { podcast } from "./podcast";
 import { serviceCity } from "./serviceCity";
 import { locationPage } from "./locationPage";
 import { testimonial } from "./testimonial";
@@ -56,6 +58,7 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   ourFirmPage,
   videosPage,
   newsPage,
+  podcastPage,
   practiceAreasPage,
   ctaBar,
   consult,
@@ -66,6 +69,7 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   testimonial,
   faq,
   newsItem,
+  podcast,
   legalPage,
   practiceArea,
   serviceCity,

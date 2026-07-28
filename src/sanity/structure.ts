@@ -17,6 +17,7 @@ export const SINGLETONS = [
   "ourFirmPage",
   "videosPage",
   "newsPage",
+  "podcastPage",
   "practiceAreasPage",
   "consult",
 ];
@@ -33,6 +34,7 @@ const COLLECTIONS = [
   "faq",
   "testimonial",
   "newsItem",
+  "podcast",
   "trialResult",
 ];
 
@@ -93,6 +95,7 @@ export const structure: StructureResolver = (S, context) =>
               page(S, "ourFirmPage", "Our Firm Page", icons.book),
               page(S, "practiceAreasPage", "Practice Areas Page", icons["th-large"]),
               page(S, "newsPage", "News Page", icons.documents),
+              page(S, "podcastPage", "Podcast Page", icons.microphone),
               page(S, "videosPage", "Videos Page", icons.play),
               page(S, "contactPage", "Contact Page", icons.envelope),
               // The rarely-edited legal pages, tucked out of the main list.
@@ -176,6 +179,9 @@ export const structure: StructureResolver = (S, context) =>
               S.documentTypeListItem("newsItem")
                 .title("News Articles")
                 .icon(icons["document-text"]),
+              S.documentTypeListItem("podcast")
+                .title("Podcast Episodes")
+                .icon(icons.microphone),
               S.documentTypeListItem("trialResult")
                 .title("Trial Results")
                 .icon(icons.star),

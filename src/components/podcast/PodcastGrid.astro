@@ -1,0 +1,231 @@
+---
+// Filterable, paginated episode grid. Mechanics (filter buttons, grid spacing,
+// staggered entrance animation) match /trial-experience's TrialResults; the new
+// piece is "Load More", which reveals the next batch and cooperates with the
+// active tag filter (changing the filter resets the page).
+import PodcastCard from "./PodcastCard.astro";
+import { PODCAST_TAGS } from "../../lib/podcastTags";
+
+interface Props {
+  items: Array<{
+    _id: string;
+    title: string | null;
+    episodeNumber: number | null;
+    tag: string | null;
+    slug: string | null;
+    date: string | null;
+    coverImage: unknown;
+  }>;
+}
+
+const { items } = Astro.props;
+
+// First page size — the rest are revealed by "Load More".
+const BATCH = 9;
+
+// "All" reset + one button per tag that's actually in use (in PODCAST_TAGS order,
+// so unused tags don't show a dead filter).
+const usedTags = new Set(items.map((i) => i.tag).filter(Boolean));
+const filters = [
+  { id: "all", label: "All Episodes" },
+  ...PODCAST_TAGS.filter((t) => usedTags.has(t.value)).map((t) => ({ id: t.value, label: t.title })),
+];
+---
+
+<section class="pgrid" data-batch={BATCH}>
+  <div class="container pgrid__inner">
+    <div class="pgrid__filters" role="group" aria-label="Filter episodes by topic">
+      {
+        filters.map((f, i) => (
+          <button class="pgrid__filter" type="button" data-filter={f.id} aria-pressed={i === 0 ? "true" : "false"}>
+            {f.label}
+          </button>
+        ))
+      }
+    </div>
+
+    <div class="pgrid__grid">
+      {items.map((item, i) => <PodcastCard item={item} hidden={i >= BATCH} loading={i < 3 ? "eager" : "lazy"} />)}
+    </div>
+
+    <button class="pgrid__more" type="button" hidden={items.length <= BATCH}>
+      Load More Episodes
+      <svg class="pgrid__more-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+    </button>
+  </div>
+</section>
+
+<noscript>
+  <style>
+    /* No JS: reveal every episode (the filter/paging enhancements are off). */
+    .pgrid .pcard[hidden] { display: flex !important; }
+    .pgrid__more { display: none !important; }
+  </style>
+</noscript>
+
+<style>
+  .pgrid {
+    background-color: var(--cog-paper);
+  }
+  .pgrid__inner {
+    padding-block: var(--space-section);
+  }
+
+  /* ---- Filters (matches TrialResults) ---- */
+  .pgrid__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-bottom: var(--space-8);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--cog-line-ink);
+  }
+  .pgrid__filter {
+    padding: var(--space-2) var(--space-4);
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--cog-ink-body);
+    background-color: transparent;
+    border: 1px solid var(--cog-line-ink);
+    cursor: pointer;
+    transition:
+      color var(--transition),
+      background-color var(--transition),
+      border-color var(--transition);
+  }
+  .pgrid__filter:hover {
+    border-color: var(--cog-ink-muted);
+  }
+  .pgrid__filter[aria-pressed="true"] {
+    color: var(--cog-white);
+    background-color: var(--cog-navy);
+    border-color: var(--cog-navy);
+  }
+
+  /* ---- Grid (matches TrialResults spacing) ---- */
+  .pgrid__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-6);
+    align-items: stretch;
+  }
+
+  /* ---- Load more ---- */
+  .pgrid__more {
+    display: flex;
+    width: fit-content;
+    align-items: center;
+    gap: var(--space-3);
+    margin: var(--space-12) auto 0;
+    padding: var(--space-4) var(--space-8);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--cog-accent);
+    background-color: transparent;
+    border: 1px solid var(--cog-accent);
+    cursor: pointer;
+    transition:
+      color var(--transition),
+      background-color var(--transition);
+  }
+  .pgrid__more:hover {
+    color: var(--cog-white);
+    background-color: var(--cog-accent);
+  }
+  .pgrid__more[hidden] {
+    display: none;
+  }
+  .pgrid__more-icon {
+    flex-shrink: 0;
+    transition: transform var(--transition);
+  }
+  .pgrid__more:hover .pgrid__more-icon {
+    transform: translateX(4px);
+  }
+
+  /* ---- Responsive (matches TrialResults) ---- */
+  @media (max-width: 900px) {
+    .pgrid__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  @media (max-width: 650px) {
+    .pgrid__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>(".pgrid").forEach((root) => {
+    const filterButtons = root.querySelectorAll<HTMLButtonElement>(".pgrid__filter");
+    const cards = Array.from(root.querySelectorAll<HTMLElement>(".pcard"));
+    const loadMore = root.querySelector<HTMLButtonElement>(".pgrid__more");
+    const BATCH = Number(root.dataset.batch) || 9;
+
+    let filter = "all";
+    let limit = BATCH;
+
+    const matches = (card: HTMLElement) => filter === "all" || card.dataset.tag === filter;
+
+    // Render the visible set. `animateFrom` = the visible position at/after which
+    // to run the entrance animation (0 = animate all, e.g. on filter change;
+    // old-limit = only the freshly revealed batch; null = no animation, initial).
+    function render(animateFrom: number | null) {
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const totalInFilter = cards.filter(matches).length;
+
+      let pos = 0;
+      cards.forEach((card) => {
+        if (!matches(card)) {
+          card.hidden = true;
+          return;
+        }
+        const visible = pos < limit;
+        card.hidden = !visible;
+        if (visible && !reduce && animateFrom != null && pos >= animateFrom) {
+          card.animate(
+            [
+              { opacity: 0, transform: "translateY(14px)" },
+              { opacity: 1, transform: "translateY(0)" },
+            ],
+            {
+              duration: 400,
+              delay: (pos - animateFrom) * 45,
+              easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+              fill: "backwards",
+            },
+          );
+        }
+        pos++;
+      });
+
+      if (loadMore) loadMore.hidden = limit >= totalInFilter;
+    }
+
+    filterButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        filterButtons.forEach((b) => b.setAttribute("aria-pressed", "false"));
+        btn.setAttribute("aria-pressed", "true");
+        filter = btn.dataset.filter ?? "all";
+        limit = BATCH;
+        render(0);
+      });
+    });
+
+    loadMore?.addEventListener("click", () => {
+      const from = limit;
+      limit += BATCH;
+      render(from);
+    });
+
+    // Initial pass — reconcile with the SSR'd hidden state, no animation.
+    render(null);
+  });
+</script>

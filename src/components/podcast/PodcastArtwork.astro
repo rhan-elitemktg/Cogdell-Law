@@ -1,0 +1,119 @@
+---
+// The Cogdell Counsel episode artwork — a code-rendered brand lockup over the
+// episode's background photo, with the episode number printed on it. Shared by
+// the index/related cards and the episode page, so every episode looks on-brand
+// from one uploaded photo + a number (no pre-made image files).
+//
+// Text scales with the artwork's own width (container-query units), so the same
+// component reads correctly at card size and at the larger episode-page size.
+import { urlFor } from "../../sanity/lib/image";
+import { getImage } from "astro:assets";
+import defaultCover from "../../assets/white-collar-defense.jpg";
+import type { SanityImageSource } from "@sanity/image-url/lib/types/types";
+
+interface Props {
+  image?: SanityImageSource | null;
+  episodeNumber?: number;
+  loading?: "eager" | "lazy";
+  class?: string;
+}
+
+const { image, episodeNumber, loading = "lazy", class: className } = Astro.props;
+
+// The editor's uploaded photo when present; otherwise the firm-wide default.
+const src = image
+  ? urlFor(image).width(880).height(495).fit("crop").auto("format").url()
+  : (await getImage({ src: defaultCover, width: 880, height: 495 })).src;
+---
+
+<div class:list={["pcast-art", className]}>
+  <img class="pcast-art__bg lazy-fade" src={src} alt="" loading={loading} width="880" height="495" />
+  <div class="pcast-art__scrim" aria-hidden="true"></div>
+  <div class="pcast-art__lockup">
+    <span class="pcast-art__the">The</span>
+    <span class="pcast-art__name">Cogdell Counsel</span>
+    <span class="pcast-art__kicker">Podcast</span>
+    <span class="pcast-art__rule" aria-hidden="true"></span>
+    {episodeNumber != null && <span class="pcast-art__ep">Episode {episodeNumber}</span>}
+  </div>
+</div>
+
+<style>
+  .pcast-art {
+    container-type: inline-size;
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background-color: var(--cog-navy-deep);
+    /* The orange top rule that sits above every episode card. */
+    border-top: 3px solid var(--cog-accent);
+  }
+  .pcast-art__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .pcast-art__scrim {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(120% 120% at 50% 40%, rgba(7, 16, 29, 0.72) 0%, rgba(7, 16, 29, 0.92) 100%),
+      linear-gradient(180deg, rgba(7, 16, 29, 0.55) 0%, rgba(7, 16, 29, 0.85) 100%);
+  }
+  .pcast-art__lockup {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 6cqw;
+    color: var(--cog-white);
+  }
+  .pcast-art__the {
+    font-family: var(--font-heading);
+    font-style: italic;
+    font-size: 2.8cqw;
+    line-height: 1;
+    color: var(--cog-cream);
+  }
+  .pcast-art__name {
+    margin-top: 0.4cqw;
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 6.6cqw;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    color: var(--cog-white);
+  }
+  .pcast-art__kicker {
+    margin-top: 1.6cqw;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 2.3cqw;
+    letter-spacing: 0.42em;
+    /* letter-spacing pushes the block right; nudge it back to stay centered. */
+    text-indent: 0.42em;
+    text-transform: uppercase;
+    color: var(--cog-navlink);
+  }
+  .pcast-art__rule {
+    width: 5cqw;
+    height: 2px;
+    margin: 2cqw 0;
+    background-color: var(--cog-accent);
+  }
+  .pcast-art__ep {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 2cqw;
+    letter-spacing: 0.3em;
+    text-indent: 0.3em;
+    text-transform: uppercase;
+    color: var(--cog-accent);
+  }
+</style>
