@@ -1,0 +1,358 @@
+---
+// Spotify episode player — embeds Spotify's own player from the episode's
+// `spotifyUrl`. Accepts any Spotify episode link (e.g.
+// https://open.spotify.com/episode/<id>?si=…) and pulls out the id.
+//
+// Chapters live here rather than in a sibling component because clicking one has
+// to talk to the player: Spotify's Embed iFrame API hands back a controller with
+// `seek(seconds)`, and keeping the list in the same scoped <script> avoids
+// plumbing that controller across components.
+//
+// Spotify's own chapters can't be read — the Web API's `chapters` endpoints are
+// audiobooks-only and automatic chapters never leave the Spotify app — so the
+// list is authored in the Studio (`podcast.chapters`, see lib/podcastChapters).
+//
+// Progressive enhancement, deliberately: with no chapters this renders the exact
+// static iframe it always did. With chapters, the iFrame API builds the player
+// instead — and if that script is slow, blocked or broken, a timer drops the
+// plain iframe back in and the buttons stay disabled. The player must never
+// depend on the enhancement working.
+import { parseChapters } from "../../lib/podcastChapters";
+
+interface Props {
+  url?: string | null;
+  title?: string;
+  chapters?: string | null;
+}
+
+const { url, title = "Spotify episode player", chapters } = Astro.props;
+
+// Grab the episode id from a share/normal/embed Spotify URL.
+const id = url?.match(/episode\/([A-Za-z0-9]+)/)?.[1] ?? null;
+const embedSrc = `https://open.spotify.com/embed/episode/${id}?utm_source=generator&theme=0`;
+
+const marks = parseChapters(chapters);
+// Only take over the plain iframe when there's actually something to seek to.
+const interactive = id !== null && marks.length > 0;
+---
+
+<div class="spotify">
+  {
+    id ? (
+      interactive ? (
+        <Fragment>
+          <div class="spotify__mount" data-uri={`spotify:episode:${id}`} data-src={embedSrc} data-title={title} />
+          <noscript>
+            <iframe
+              class="spotify__frame"
+              src={embedSrc}
+              width="100%"
+              height="152"
+              title={title}
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            />
+          </noscript>
+        </Fragment>
+      ) : (
+        <iframe
+          class="spotify__frame"
+          src={embedSrc}
+          width="100%"
+          height="152"
+          loading="lazy"
+          title={title}
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+        />
+      )
+    ) : (
+      <p class="spotify__empty">Add this episode's Spotify link in the Studio to show the player.</p>
+    )
+  }
+
+  {
+    marks.length > 0 && (
+      <div class="spotify__chapters">
+        <p class="spotify__head">Chapters</p>
+        <ol class="spotify__list">
+          {marks.map((chapter) => (
+            <li class="spotify__item">
+              {/* Enabled by the script once the controller is live, so a visitor
+                  without JS gets a readable list instead of dead controls. */}
+              <button class="spotify__jump" type="button" data-seconds={chapter.seconds} disabled>
+                <span class="spotify__time">{chapter.label}</span>
+                <span class="spotify__label">{chapter.title}</span>
+              </button>
+            </li>
+          ))}
+        </ol>
+      </div>
+    )
+  }
+</div>
+
+<style>
+  /* :global so it catches the iframe the iFrame API builds at runtime, which
+     never gets Astro's scoping attribute. */
+  .spotify :global(iframe) {
+    display: block;
+    width: 100%;
+    border: 0;
+    border-radius: 12px;
+  }
+  /* Hold the player's height before the API swaps this for the real iframe. */
+  .spotify__mount {
+    min-height: 152px;
+  }
+  .spotify__empty {
+    margin: 0;
+    padding: var(--space-6);
+    font-size: var(--text-sm);
+    font-style: italic;
+    color: var(--cog-ink-muted);
+    background-color: var(--cog-paper-card);
+    border: 1px solid var(--cog-line-ink);
+  }
+
+  /* ---- Chapters ---- */
+  .spotify__chapters {
+    margin-top: var(--space-6);
+    background-color: var(--cog-paper-card);
+    border: 1px solid var(--cog-line-ink);
+  }
+  .spotify__head {
+    margin: 0;
+    padding: var(--space-4) var(--space-6);
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--cog-ink);
+    border-bottom: 1px solid var(--cog-line-ink);
+  }
+  .spotify__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .spotify__item + .spotify__item {
+    border-top: 1px solid var(--cog-line-ink);
+  }
+
+  .spotify__jump {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: var(--space-4);
+    width: 100%;
+    padding: var(--space-3) var(--space-6);
+    text-align: left;
+    font-family: var(--font-body);
+    background-color: transparent;
+    border: 0;
+    cursor: pointer;
+    transition: background-color var(--transition);
+  }
+  .spotify__jump:disabled {
+    cursor: default;
+  }
+  .spotify__jump:not(:disabled):hover {
+    background-color: var(--cog-paper);
+  }
+  .spotify__time {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--cog-accent);
+  }
+  .spotify__label {
+    font-size: var(--text-sm);
+    line-height: 1.5;
+    color: var(--cog-ink-body);
+  }
+  .spotify__jump[aria-current="true"] .spotify__label {
+    font-weight: 600;
+    color: var(--cog-ink);
+  }
+
+  @media (max-width: 650px) {
+    .spotify__jump {
+      grid-template-columns: 1fr;
+      gap: var(--space-1);
+    }
+  }
+</style>
+
+<script>
+  // Spotify's Embed iFrame API: https://developer.spotify.com/documentation/embeds
+  interface PlaybackData {
+    position?: number;
+    duration?: number;
+    isPaused?: boolean;
+  }
+  interface EmbedController {
+    play(): void;
+    /** Resumes paused playback, or starts it if it hasn't begun. */
+    resume(): void;
+    seek(seconds: number): void;
+    addListener(event: string, cb: (e: { data?: PlaybackData }) => void): void;
+  }
+  interface IFrameAPI {
+    createController(
+      element: HTMLElement,
+      options: { uri: string; width: string; height: string },
+      cb: (controller: EmbedController) => void,
+    ): void;
+  }
+
+  interface Player {
+    root: HTMLElement;
+    mount: HTMLElement;
+    buttons: HTMLButtonElement[];
+    controller: EmbedController | null;
+    /** The embed has reported a duration — it's loaded, so seek() will stick. */
+    ready: boolean;
+    /** Last known playing/paused state, from playback_update. */
+    paused: boolean;
+    /** Seek target parked until the embed is ready. */
+    pending: number | null;
+    /** Set once the API attaches OR the fallback iframe goes in — whichever wins. */
+    settled: boolean;
+  }
+
+  // How long to wait for Spotify's script before giving up on the enhancement.
+  const API_TIMEOUT = 3000;
+  // play() is known to be dropped occasionally; nudge it a couple of times.
+  const PLAY_RETRIES = 3;
+  const PLAY_RETRY_DELAY = 700;
+
+  const players: Player[] = [];
+
+  document.querySelectorAll<HTMLElement>(".spotify").forEach((root) => {
+    const mount = root.querySelector<HTMLElement>(".spotify__mount");
+    if (!mount) return; // No chapters — the static iframe is already doing its job.
+    players.push({
+      root,
+      mount,
+      buttons: Array.from(root.querySelectorAll<HTMLButtonElement>(".spotify__jump")),
+      controller: null,
+      ready: false,
+      paused: true,
+      pending: null,
+      settled: false,
+    });
+  });
+
+  /** Drop in the plain iframe and leave the chapter list inert. */
+  function useFallback(player: Player) {
+    if (player.settled) return;
+    player.settled = true;
+    const iframe = document.createElement("iframe");
+    iframe.className = "spotify__frame";
+    iframe.src = player.mount.dataset.src ?? "";
+    iframe.title = player.mount.dataset.title ?? "Spotify episode player";
+    iframe.width = "100%";
+    iframe.height = "152";
+    iframe.loading = "lazy";
+    iframe.allow = "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture";
+    player.mount.replaceWith(iframe);
+  }
+
+  /** Highlight the chapter covering `seconds` — the last one at or before it. */
+  function markActive(player: Player, seconds: number) {
+    let activeIndex = -1;
+    player.buttons.forEach((btn, i) => {
+      if (Number(btn.dataset.seconds) <= seconds) activeIndex = i;
+    });
+    player.buttons.forEach((btn, i) => {
+      if (i === activeIndex) btn.setAttribute("aria-current", "true");
+      else btn.removeAttribute("aria-current");
+    });
+  }
+
+  function jumpTo(player: Player, seconds: number) {
+    const controller = player.controller;
+    if (!controller) return;
+    markActive(player, seconds);
+
+    if (player.ready) {
+      // Commands queue in order, so seek-then-resume lands at the chapter and
+      // plays from there. resume() is a no-op when it's already playing.
+      controller.seek(seconds);
+      if (player.paused) controller.resume();
+      return;
+    }
+
+    // The embed hasn't loaded yet — seek() would be dropped. Park the target and
+    // let the playback_update listener flush it once a duration comes through.
+    player.pending = seconds;
+    let attempts = 0;
+    const nudge = () => {
+      if (player.ready || player.pending === null) return;
+      if (attempts++ >= PLAY_RETRIES) return;
+      controller.play();
+      window.setTimeout(nudge, PLAY_RETRY_DELAY);
+    };
+    nudge();
+  }
+
+  function attach(api: IFrameAPI, player: Player) {
+    if (player.settled) return;
+    player.settled = true;
+
+    api.createController(
+      player.mount,
+      { uri: player.mount.dataset.uri ?? "", width: "100%", height: "152" },
+      (controller) => {
+        player.controller = controller;
+
+        // The generated iframe carries no title of its own.
+        player.root
+          .querySelector("iframe")
+          ?.setAttribute("title", player.mount.dataset.title ?? "Spotify episode player");
+
+        controller.addListener("playback_update", (e) => {
+          const { position = 0, duration = 0, isPaused = true } = e?.data ?? {};
+          player.paused = isPaused;
+          if (duration > 0) {
+            player.ready = true;
+            if (player.pending !== null) {
+              const target = player.pending;
+              player.pending = null;
+              controller.seek(target);
+              if (isPaused) controller.resume();
+              return; // Position is about to jump; don't mark off the stale one.
+            }
+          }
+          if (position > 0) markActive(player, position / 1000);
+        });
+
+        player.buttons.forEach((btn) => {
+          btn.disabled = false;
+          btn.addEventListener("click", () => jumpTo(player, Number(btn.dataset.seconds ?? 0)));
+        });
+      },
+    );
+  }
+
+  if (players.length > 0) {
+    const timer = window.setTimeout(() => players.forEach(useFallback), API_TIMEOUT);
+    const giveUp = () => {
+      window.clearTimeout(timer);
+      players.forEach(useFallback);
+    };
+
+    // Only one onSpotifyIframeApiReady can exist per page — Spotify's script
+    // calls this global once it's loaded.
+    const host = window as unknown as { onSpotifyIframeApiReady?: (api: IFrameAPI) => void };
+    host.onSpotifyIframeApiReady = (api) => {
+      window.clearTimeout(timer);
+      players.forEach((player) => attach(api, player));
+    };
+
+    const script = document.createElement("script");
+    script.src = "https://open.spotify.com/embed/iframe-api/v1";
+    script.async = true;
+    script.onerror = giveUp;
+    document.head.appendChild(script);
+  }
+</script>

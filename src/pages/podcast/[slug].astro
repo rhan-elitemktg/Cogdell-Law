@@ -1,0 +1,150 @@
+---
+// Episode page at /podcast/[slug]: meta + title + brand artwork, the show-notes
+// body, a hashtag row, the audio player with its chapter list, then a
+// related-episodes grid. Layout matches the episode mockup.
+import Layout from "../../layouts/Layout.astro";
+import { PortableText } from "astro-portabletext";
+import { proseBodyComponents } from "../../components/prose/bodyComponents";
+import PodcastArtwork from "../../components/podcast/PodcastArtwork.astro";
+import SpotifyPlayer from "../../components/podcast/SpotifyPlayer.astro";
+import RelatedPodcasts from "../../components/podcast/RelatedPodcasts.astro";
+import CtaBar from "../../components/CtaBar.astro";
+import Consult from "../../components/Consult.astro";
+import { getPodcast, getPodcastSlugs } from "../../sanity/lib/podcast";
+import { PODCAST_TAG_LABEL } from "../../lib/podcastTags";
+
+export async function getStaticPaths() {
+  const slugs = await getPodcastSlugs();
+  return slugs.map(({ slug }) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+const episode = await getPodcast(slug!);
+
+if (!episode) {
+  throw new Error(`No podcast episode found in Sanity for slug "${slug}".`);
+}
+
+const tagLabel = episode.tag ? (PODCAST_TAG_LABEL[episode.tag] ?? episode.tag) : "";
+const dateLabel = episode.date
+  ? new Date(episode.date).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+  : "";
+const displayTitle =
+  episode.episodeNumber != null ? `${episode.title} | Ep. ${episode.episodeNumber}` : (episode.title ?? "");
+const playerLabel =
+  episode.episodeNumber != null ? `Ep. ${episode.episodeNumber} — ${episode.title}` : (episode.title ?? "");
+const hasBody = Array.isArray(episode.body) && episode.body.length > 0;
+const description = episode.summary ?? `${episode.title} — The Cogdell Counsel podcast.`;
+---
+
+<Layout title={displayTitle} description={description} seo={episode.seo}>
+  <article class="episode">
+    <div class="container">
+      <div class="episode__col">
+        <p class="episode__meta">
+          {dateLabel && <span class="episode__date">{dateLabel}</span>}
+          {dateLabel && tagLabel && <span class="episode__dot" aria-hidden="true">•</span>}
+          {tagLabel && <span class="episode__tag">{tagLabel}</span>}
+        </p>
+        <h1 class="episode__title">{displayTitle}</h1>
+
+        <div class="episode__art">
+          <PodcastArtwork
+            image={episode.coverImage}
+            episodeNumber={episode.episodeNumber ?? undefined}
+            loading="eager"
+          />
+        </div>
+
+        {
+          hasBody && (
+            <div class="episode__prose">
+              <PortableText value={episode.body} components={proseBodyComponents} />
+            </div>
+          )
+        }
+
+        <div class="episode__player">
+          <SpotifyPlayer url={episode.spotifyUrl} title={playerLabel} chapters={episode.chapters} />
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <RelatedPodcasts items={episode.related ?? []} />
+
+  <CtaBar />
+  <Consult />
+</Layout>
+
+<style>
+  .episode {
+    background-color: var(--cog-white);
+  }
+  .episode__col {
+    max-width: 820px;
+    margin-inline: auto;
+    padding-block: var(--space-section);
+  }
+
+  .episode__meta {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--space-2);
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .episode__date,
+  .episode__dot {
+    color: var(--cog-ink-muted);
+  }
+  .episode__tag {
+    color: var(--cog-accent);
+  }
+
+  .episode__title {
+    margin-top: var(--space-4);
+    text-align: left;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: clamp(2rem, 3.6vw, 3rem);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    color: var(--cog-ink);
+  }
+
+  .episode__art {
+    margin: var(--space-8) 0 var(--space-12);
+  }
+
+  /* ---- Body copy ---- */
+  .episode__prose :global(.prose__h2) {
+    margin: var(--space-12) 0 var(--space-4);
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: clamp(1.375rem, 2.2vw, 1.75rem);
+    line-height: 1.2;
+    color: var(--cog-ink);
+  }
+  .episode__prose :global(.prose__h3) {
+    margin: var(--space-8) 0 var(--space-3);
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: var(--text-xl);
+    line-height: 1.25;
+    color: var(--cog-ink);
+  }
+  .episode__prose :global(.prose__p:first-child) {
+    /* An italic lead line often opens the notes; keep it snug to the artwork. */
+    margin-top: 0;
+  }
+
+  /* ---- Player ---- */
+  .episode__player {
+    margin-top: var(--space-8);
+  }
+</style>

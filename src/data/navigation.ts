@@ -157,6 +157,7 @@ export async function getNavItems(): Promise<NavItem[]> {
         areasWeServeNav,
         { label: "Testimonials", href: "/testimonials" },
         { label: "Videos", href: "/videos" },
+        { label: "The Cogdell Counsel", href: "/podcast" },
       ],
     },
     practiceAreasNav,

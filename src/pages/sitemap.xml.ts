@@ -15,6 +15,7 @@ import { getPracticeAreaPaths } from "../sanity/lib/practiceAreas";
 import { getAreaPaths } from "../sanity/lib/areasWeServe";
 import { getAttorneySlugs } from "../sanity/lib/attorneys";
 import { getOwnedNewsSlugs } from "../sanity/lib/news";
+import { getPodcastSlugs } from "../sanity/lib/podcast";
 
 interface Entry {
   path: string;
@@ -32,6 +33,7 @@ const DOCUMENT_BACKED: Record<string, string> = {
   testimonialsPage: "/testimonials",
   videosPage: "/videos",
   newsPage: "/news",
+  podcastPage: "/podcast",
   contactPage: "/contact",
   privacy: "/privacy",
   disclaimer: "/disclaimer",
@@ -47,12 +49,13 @@ const xmlEscape = (value: string) =>
 export const GET: APIRoute = async ({ site }) => {
   const origin = canonicalize(site?.href ?? "https://www.cogdell-law.com");
 
-  const [pageSeo, practiceAreas, locations, attorneys, ownedNews] = await Promise.all([
+  const [pageSeo, practiceAreas, locations, attorneys, ownedNews, podcasts] = await Promise.all([
     getStaticPageSeo(Object.keys(DOCUMENT_BACKED)),
     getPracticeAreaPaths(),
     getAreaPaths(),
     getAttorneySlugs(),
     getOwnedNewsSlugs(),
+    getPodcastSlugs(),
   ]);
 
   const entries: Entry[] = [
@@ -79,6 +82,11 @@ export const GET: APIRoute = async ({ site }) => {
     })),
     ...ownedNews.map((item) => ({
       path: `/news/${item.slug}`,
+      lastmod: item._updatedAt,
+      noIndex: item.noIndex,
+    })),
+    ...podcasts.map((item) => ({
+      path: `/podcast/${item.slug}`,
       lastmod: item._updatedAt,
       noIndex: item.noIndex,
     })),

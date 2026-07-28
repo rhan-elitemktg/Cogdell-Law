@@ -338,6 +338,55 @@ export type LegalPage = {
   seo?: Seo;
 };
 
+export type Podcast = {
+  _id: string;
+  _type: "podcast";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title: string;
+  episodeNumber: number;
+  slug: Slug;
+  tag:
+    | "white-collar"
+    | "federal-defense"
+    | "trial-strategy"
+    | "grand-jury"
+    | "health-care-fraud"
+    | "securities-fraud"
+    | "appeals"
+    | "the-firm";
+  publishedAt?: string;
+  coverImage?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+  summary: string;
+  body: BlockContent;
+  spotifyUrl?: string;
+  chapters?: string;
+  seo?: Seo;
+};
+
+export type SanityImageCrop = {
+  _type: "sanity.imageCrop";
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
+};
+
+export type SanityImageHotspot = {
+  _type: "sanity.imageHotspot";
+  x: number;
+  y: number;
+  height: number;
+  width: number;
+};
+
 export type NewsItem = {
   _id: string;
   _type: "newsItem";
@@ -362,22 +411,6 @@ export type NewsItem = {
   ctaLabel?: string;
   body?: BlockContent;
   seo?: Seo;
-};
-
-export type SanityImageCrop = {
-  _type: "sanity.imageCrop";
-  top: number;
-  bottom: number;
-  left: number;
-  right: number;
-};
-
-export type SanityImageHotspot = {
-  _type: "sanity.imageHotspot";
-  x: number;
-  y: number;
-  height: number;
-  width: number;
 };
 
 export type Faq = {
@@ -490,6 +523,20 @@ export type PracticeAreasPage = {
   _updatedAt: string;
   _rev: string;
   hero?: PageHero;
+  seo?: Seo;
+};
+
+export type PodcastPage = {
+  _id: string;
+  _type: "podcastPage";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  hero?: {
+    eyebrow: string;
+    title: string;
+    subtitle?: string;
+  };
   seo?: Seo;
 };
 
@@ -921,9 +968,10 @@ export type AllSanitySchemaTypes =
   | PracticeAreaReference
   | PracticeArea
   | LegalPage
-  | NewsItem
+  | Podcast
   | SanityImageCrop
   | SanityImageHotspot
+  | NewsItem
   | Faq
   | Testimonial
   | Attorney
@@ -931,6 +979,7 @@ export type AllSanitySchemaTypes =
   | Consult
   | CtaBar
   | PracticeAreasPage
+  | PodcastPage
   | NewsPage
   | VideosPage
   | OurFirmPage
@@ -1594,6 +1643,19 @@ export type OUR_FIRM_QUERY_RESULT =
   | {
       hero: {
         eyebrow: string;
+        title: string;
+        subtitle?: string;
+      } | null;
+      intro: null;
+      stats: null;
+      quote: null;
+      foundingAttorney: null;
+      originStory: null;
+      values: null;
+    }
+  | {
+      hero: {
+        eyebrow: string;
         titleLead: string;
         titleStrong: string;
         lede: string;
@@ -1670,6 +1732,103 @@ export type PAGE_HERO_QUERY_RESULT =
       titleLead: string;
       titleStrong: string;
       lede: string;
+    };
+
+// Source: src/sanity/lib/podcast.ts
+// Variable: ALL_PODCASTS_QUERY
+// Query: *[_type == "podcast"] | order(coalesce(publishedAt, _createdAt) desc){  _id,  title,  episodeNumber,  tag,  "slug": slug.current,  "date": coalesce(publishedAt, _createdAt),  coverImage}
+export type ALL_PODCASTS_QUERY_RESULT = Array<{
+  _id: string;
+  title: string;
+  episodeNumber: number;
+  tag:
+    | "appeals"
+    | "federal-defense"
+    | "grand-jury"
+    | "health-care-fraud"
+    | "securities-fraud"
+    | "the-firm"
+    | "trial-strategy"
+    | "white-collar";
+  slug: string;
+  date: string;
+  coverImage: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  } | null;
+}>;
+
+// Source: src/sanity/lib/podcast.ts
+// Variable: PODCAST_QUERY
+// Query: *[_type == "podcast" && slug.current == $slug][0]{  _id,  title,  episodeNumber,  tag,  summary,  "slug": slug.current,  "date": coalesce(publishedAt, _createdAt),  coverImage,  body,  spotifyUrl,  chapters,  _updatedAt,  seo{    metaTitle,    metaDescription,    canonicalUrl,    noIndex,    ogImage  }}
+export type PODCAST_QUERY_RESULT = {
+  _id: string;
+  title: string;
+  episodeNumber: number;
+  tag:
+    | "appeals"
+    | "federal-defense"
+    | "grand-jury"
+    | "health-care-fraud"
+    | "securities-fraud"
+    | "the-firm"
+    | "trial-strategy"
+    | "white-collar";
+  summary: string;
+  slug: string;
+  date: string;
+  coverImage: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  } | null;
+  body: BlockContent;
+  spotifyUrl: string | null;
+  chapters: string | null;
+  _updatedAt: string;
+  seo: {
+    metaTitle: string | null;
+    metaDescription: string | null;
+    canonicalUrl: string | null;
+    noIndex: boolean | null;
+    ogImage: {
+      asset?: SanityImageAssetReference;
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      _type: "image";
+    } | null;
+  } | null;
+} | null;
+
+// Source: src/sanity/lib/podcast.ts
+// Variable: PODCAST_SLUGS_QUERY
+// Query: *[_type == "podcast" && defined(slug.current)]{"slug": slug.current, _updatedAt, "noIndex": seo.noIndex}
+export type PODCAST_SLUGS_QUERY_RESULT = Array<{
+  slug: string;
+  _updatedAt: string;
+  noIndex: boolean | null;
+}>;
+
+// Source: src/sanity/lib/podcast.ts
+// Variable: PODCAST_HERO_QUERY
+// Query: *[_id == "podcastPage"][0].hero{  eyebrow,  title,  subtitle}
+export type PODCAST_HERO_QUERY_RESULT =
+  | {
+      eyebrow: string;
+      title: null;
+      subtitle: null;
+    }
+  | null
+  | {
+      eyebrow: string;
+      title: string;
+      subtitle: string | null;
     };
 
 // Source: src/sanity/lib/practiceAreas.ts
@@ -1895,6 +2054,10 @@ declare module "@sanity/client" {
     '*[_id == "newsPage"][0].grid{\n  eyebrow,\n  headingLead,\n  headingStrong\n}': NEWS_GRID_HEADER_QUERY_RESULT;
     '*[_id == "ourFirmPage"][0]{\n  hero,\n  intro{ eyebrow, headingLead, headingStrong, body },\n  stats{ items[]{ _key, value, label } },\n  quote{ lead, accent, attribution },\n  foundingAttorney{ eyebrow, headingLead, headingStrong, body },\n  originStory{ eyebrow, headingLead, headingStrong, body, milestones[]{ _key, key, title, desc } },\n  values{ eyebrow, headingLead, headingStrong, items[]{ _key, icon, title, body } }\n}': OUR_FIRM_QUERY_RESULT;
     "*[_id == $pageId][0].hero{\n  eyebrow,\n  titleLead,\n  titleStrong,\n  lede\n}": PAGE_HERO_QUERY_RESULT;
+    '*[_type == "podcast"] | order(coalesce(publishedAt, _createdAt) desc){\n  _id,\n  title,\n  episodeNumber,\n  tag,\n  "slug": slug.current,\n  "date": coalesce(publishedAt, _createdAt),\n  coverImage\n}': ALL_PODCASTS_QUERY_RESULT;
+    '*[_type == "podcast" && slug.current == $slug][0]{\n  _id,\n  title,\n  episodeNumber,\n  tag,\n  summary,\n  "slug": slug.current,\n  "date": coalesce(publishedAt, _createdAt),\n  coverImage,\n  body,\n  spotifyUrl,\n  chapters,\n  _updatedAt,\n  seo{\n    metaTitle,\n    metaDescription,\n    canonicalUrl,\n    noIndex,\n    ogImage\n  }\n}': PODCAST_QUERY_RESULT;
+    '*[_type == "podcast" && defined(slug.current)]{"slug": slug.current, _updatedAt, "noIndex": seo.noIndex}': PODCAST_SLUGS_QUERY_RESULT;
+    '*[_id == "podcastPage"][0].hero{\n  eyebrow,\n  title,\n  subtitle\n}': PODCAST_HERO_QUERY_RESULT;
     '*[_type == "practiceArea"] | order(orderRank){\n  _id,\n  title,\n  heroTitle,\n  lede,\n  cardSummary,\n  icon,\n  body,\n  faqs[]{ _key, question, answer },\n  "slug": slug.current,\n  "parentId": parent._ref,\n  _updatedAt,\n  seo{\n    metaTitle,\n    metaDescription,\n    canonicalUrl,\n    noIndex,\n    ogImage\n  }\n}': ALL_QUERY_RESULT;
     "*[_id == $pageId][0].practiceAreas{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  description,\n  cards[]{\n    _key,\n    icon,\n    title,\n    desc\n  }\n}": PRACTICE_AREAS_BAND_QUERY_RESULT;
     "*[_id == $pageId][0].seo{\n  metaTitle,\n  metaDescription,\n  canonicalUrl,\n  noIndex,\n  ogImage\n}": PAGE_SEO_QUERY_RESULT;

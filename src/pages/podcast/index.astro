@@ -1,0 +1,44 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import PodcastHero from "../../components/podcast/PodcastHero.astro";
+import PodcastGrid from "../../components/podcast/PodcastGrid.astro";
+import CtaBar from "../../components/CtaBar.astro";
+import Consult from "../../components/Consult.astro";
+import { getAllPodcasts, getPodcastHero } from "../../sanity/lib/podcast";
+import { getSeo } from "../../sanity/lib/seo";
+// Podcast-studio hero photo (art direction, kept in code — D6).
+import heroImage from "../../assets/podcast-studio.jpg";
+
+const [episodes, heroCopy, seo] = await Promise.all([
+  getAllPodcasts(),
+  getPodcastHero(),
+  getSeo("podcastPage"),
+]);
+
+// Fall back to the launch copy so the page renders before the singleton is seeded.
+const hero = {
+  eyebrow: heroCopy?.eyebrow ?? "News & Insights",
+  title: heroCopy?.title ?? "The Cogdell Counsel Podcast",
+  subtitle:
+    heroCopy?.subtitle ??
+    "Candid conversations on federal investigations, white collar defense, and four decades of high-profile victories — straight from the trial lawyers who win the cases others call unwinnable.",
+};
+---
+
+<Layout
+  seo={seo}
+  title="The Cogdell Counsel Podcast"
+  description="The Cogdell Counsel — candid conversations on federal investigations, white collar defense, and four decades of high-profile trial victories from Cogdell Law Firm."
+>
+  <PodcastHero
+    eyebrow={hero.eyebrow}
+    title={hero.title}
+    subtitle={hero.subtitle}
+    image={heroImage}
+  />
+
+  <PodcastGrid items={episodes} />
+
+  <CtaBar />
+  <Consult />
+</Layout>
