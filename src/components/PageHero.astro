@@ -159,6 +159,12 @@ const hasPhoto = Boolean(sanitySrc || image);
     padding-block: var(--space-section);
   }
   .page-hero__content {
+    /* `width` matters once __inner becomes a flex column at ≥901px: an auto
+       cross-axis margin DISABLES flex stretch, so `--center`'s margin-inline
+       would otherwise shrink this to its intrinsic width and centre the text.
+       Filling the line first, then capping with max-width, reproduces exactly
+       what block layout did — and is a no-op below the breakpoint. */
+    width: 100%;
     max-width: var(--contentMaxWidth);
   }
   /* Centers the content column in the container (so it sits above a centered

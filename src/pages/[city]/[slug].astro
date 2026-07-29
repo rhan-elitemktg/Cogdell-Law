@@ -4,7 +4,6 @@
 // a sticky rail — but the rail's tree is Areas We Serve rather than Practice
 // Areas. Location pages have no child-topic grid, so the page ends at the CTA.
 import Layout from "../../layouts/Layout.astro";
-import Breadcrumb from "../../components/practice/Breadcrumb.astro";
 import PageHero from "../../components/PageHero.astro";
 import ProseBody from "../../components/prose/ProseBody.astro";
 import PracticeFaqs from "../../components/practice/PracticeFaqs.astro";
@@ -34,7 +33,9 @@ if (!entry) {
       "still serving the route list it cached at startup. Restart the dev server.",
   );
 }
-const { page, cityName, trail } = entry;
+// `trail` is still built by trailFor() — the Breadcrumb it fed was pulled
+// site-wide for now (the component stays, unused).
+const { page, cityName } = entry;
 
 const description = page.lede ?? `${page.title} — Cogdell Law Firm.`;
 
@@ -80,8 +81,6 @@ const heroImageAlt = hasCustomHero
 
   <section class="loc-body">
     <div class="container loc-body__inner">
-      <Breadcrumb trail={trail} bare />
-
       <div class="loc-body__grid">
         {/* A plain div, not <main>: the layout has no main landmark today, and
             adding one here would claim only the body column — sending "skip to

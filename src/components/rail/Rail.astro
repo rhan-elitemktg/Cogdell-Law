@@ -16,6 +16,7 @@ import Eyebrow from "../Eyebrow.astro";
 import ConsultForm from "../consult/ConsultForm.astro";
 import ConsultBody from "../consult/ConsultBody.astro";
 import RailNav from "./RailNav.astro";
+import ReviewedBy from "./ReviewedBy.astro";
 import { proseComponents } from "../prose/components";
 import { getConsult } from "../../sanity/lib/consult";
 
@@ -23,9 +24,16 @@ interface Props {
   pathname: string;
   navHeading: string;
   navItems: NavItem[];
+  /**
+   * Document id of the host page. Pass it to head the rail with the "Reviewed
+   * By" panel (D18); omit it and the rail opens on the form as before. Only the
+   * practice-area route passes one today — location pages have no `reviewedBy`
+   * field yet, so they'd have nothing to override the default with.
+   */
+  pageId?: string;
 }
 
-const { pathname, navHeading, navItems } = Astro.props;
+const { pathname, navHeading, navItems, pageId } = Astro.props;
 
 const consult = await getConsult();
 
@@ -40,6 +48,8 @@ if (!consult) {
 
 <aside class="rail">
   <div class="rail__inner">
+    {pageId && <ReviewedBy pageId={pageId} />}
+
     <section class="rail__form" id="case-evaluation">
       <Eyebrow>{consult.eyebrow}</Eyebrow>
       {/* One tone on one line, unlike the band's stacked italic/bold pair — the
