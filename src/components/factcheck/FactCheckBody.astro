@@ -1,0 +1,7 @@
+---
+// Paragraph renderer for the fact-checked banner's statement. Styling lives in
+// FactCheck.astro under `.factcheck__body :global(.factcheck__text)` — this is a
+// child component, so its markup carries no parent scope id (F14).
+---
+
+<p class="factcheck__text"><slot /></p>

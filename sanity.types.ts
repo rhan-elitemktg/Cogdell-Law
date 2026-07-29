@@ -130,6 +130,12 @@ export type EducationEntry = {
   lines: Array<string>;
 };
 
+export type FactCheckContent = {
+  _type: "factCheckContent";
+  label: string;
+  body: BlockContent;
+};
+
 export type ConsultContent = {
   _type: "consultContent";
   eyebrow: string;
@@ -369,6 +375,10 @@ export type LocationPage = {
     _type: "practiceFaq";
     _key: string;
   }>;
+  factCheck?: {
+    show?: boolean;
+    content?: FactCheckContent;
+  };
   seo?: Seo;
 };
 
@@ -439,6 +449,10 @@ export type PracticeArea = {
     _type: "practiceFaq";
     _key: string;
   }>;
+  factCheck?: {
+    show?: boolean;
+    content?: FactCheckContent;
+  };
   seo?: Seo;
 };
 
@@ -596,6 +610,15 @@ export type TrialResult = {
     outcome?: string;
     note?: string;
   };
+};
+
+export type FactCheck = {
+  _id: string;
+  _type: "factCheck";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  content: FactCheckContent;
 };
 
 export type Consult = {
@@ -1044,6 +1067,7 @@ export type AllSanitySchemaTypes =
   | TrialResultReference
   | TrialResultList
   | EducationEntry
+  | FactCheckContent
   | ConsultContent
   | CtaBarContent
   | NewsItemReference
@@ -1084,6 +1108,7 @@ export type AllSanitySchemaTypes =
   | Testimonial
   | Attorney
   | TrialResult
+  | FactCheck
   | Consult
   | CtaBar
   | PracticeAreasPage
@@ -1352,6 +1377,14 @@ export type ATTORNEYS_BAND_QUERY_RESULT = {
 // Query: *[_id == "consult"][0].content{  eyebrow,  headingLead,  headingStrong,  body,  fineprint,  thankYou}
 export type CONSULT_QUERY_RESULT =
   | {
+      eyebrow: null;
+      headingLead: null;
+      headingStrong: null;
+      body: BlockContent;
+      fineprint: null;
+      thankYou: null;
+    }
+  | {
       eyebrow: string;
       headingLead: string;
       headingStrong: null;
@@ -1374,6 +1407,13 @@ export type CONSULT_QUERY_RESULT =
 // Query: coalesce(  *[_id == $pageId][0].ctaBar,  *[_id == "ctaBar"][0].content){  eyebrow,  headingLead,  headingRest,  body,  cta{    label,    href  }}
 export type CTA_BAR_QUERY_RESULT =
   | {
+      eyebrow: null;
+      headingLead: null;
+      headingRest: null;
+      body: BlockContent;
+      cta: null;
+    }
+  | {
       eyebrow: string;
       headingLead: string;
       headingRest: null;
@@ -1391,6 +1431,23 @@ export type CTA_BAR_QUERY_RESULT =
       };
     }
   | null;
+
+// Source: src/sanity/lib/factCheck.ts
+// Variable: FACT_CHECK_QUERY
+// Query: {  "show": coalesce(*[_id == $pageId][0].factCheck.show, true),  "content": coalesce(    *[_id == $pageId][0].factCheck.content,    *[_id == "factCheck"][0].content  ){    label,    body  }}
+export type FACT_CHECK_QUERY_RESULT = {
+  show: boolean | true;
+  content:
+    | {
+        label: null;
+        body: BlockContent;
+      }
+    | {
+        label: string;
+        body: BlockContent;
+      }
+    | null;
+};
 
 // Source: src/sanity/lib/faqs.ts
 // Variable: FAQS_QUERY
@@ -2333,6 +2390,7 @@ declare module "@sanity/client" {
     "*[_id == $pageId][0].attorneys{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  lede\n}": ATTORNEYS_BAND_QUERY_RESULT;
     '*[_id == "consult"][0].content{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  body,\n  fineprint,\n  thankYou\n}': CONSULT_QUERY_RESULT;
     'coalesce(\n  *[_id == $pageId][0].ctaBar,\n  *[_id == "ctaBar"][0].content\n){\n  eyebrow,\n  headingLead,\n  headingRest,\n  body,\n  cta{\n    label,\n    href\n  }\n}': CTA_BAR_QUERY_RESULT;
+    '{\n  "show": coalesce(*[_id == $pageId][0].factCheck.show, true),\n  "content": coalesce(\n    *[_id == $pageId][0].factCheck.content,\n    *[_id == "factCheck"][0].content\n  ){\n    label,\n    body\n  }\n}': FACT_CHECK_QUERY_RESULT;
     '*[_type == "faq"] | order(orderRank){\n  _id,\n  question,\n  answer\n}': FAQS_QUERY_RESULT;
     '*[_id == "homePage"][0].faq{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  lede,\n  questions[]->{\n    _id,\n    question,\n    answer\n  }\n}': FAQ_BAND_QUERY_RESULT;
     '*[_id == "firmDetails"][0]{\n  title,\n  tagline,\n  phone,\n  email,\n  address,\n  socials[]{\n    platform,\n    url\n  },\n  copyrightNotice,\n  legalLinks[]{\n    label,\n    href\n  },\n  logo{\n    ...,\n    "dimensions": asset->metadata.dimensions\n  }\n}': FIRM_DETAILS_QUERY_RESULT;

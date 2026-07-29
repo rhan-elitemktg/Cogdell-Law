@@ -7,6 +7,8 @@ import { testimonialsPage } from "./testimonialsPage";
 import { attorneysPage } from "./attorneysPage";
 import { ctaBar } from "./ctaBar";
 import { consult } from "./consult";
+import { factCheck } from "./factCheck";
+import { factCheckContent } from "./factCheckContent";
 import { contactPage } from "./contactPage";
 import { ourFirmPage } from "./ourFirmPage";
 import { videosPage } from "./videosPage";
@@ -68,6 +70,7 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   practiceAreasPage,
   ctaBar,
   consult,
+  factCheck,
   // Documents
   video,
   trialResult,
@@ -102,6 +105,7 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   newsBand,
   ctaBarContent,
   consultContent,
+  factCheckContent, // shared by the factCheck singleton and the per-page override
   educationEntry,
   trialResultList,
   seo, // per-page search metadata — attached to every routed document (D15)

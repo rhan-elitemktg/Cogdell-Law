@@ -1,6 +1,7 @@
 import { defineType, defineField, defineArrayMember } from "sanity";
 import { icons } from "@sanity/icons";
 import { orderRankField, orderRankOrdering } from "@sanity/orderable-document-list";
+import { factCheckField } from "./factCheckContent";
 
 /**
  * An "Areas We Serve" location page at /<citySlug>/<slug>. Same body model as a
@@ -65,6 +66,7 @@ export const locationPage = defineType({
         preview: { select: { title: "question" } },
       })],
     }),
+    factCheckField("content"),
     defineField({
       name: "seo",
       title: "SEO",

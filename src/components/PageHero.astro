@@ -205,4 +205,22 @@ const hasPhoto = Boolean(sanitySrc || image);
   .page-hero__actions:empty {
     display: none;
   }
+
+  /* ---- Responsive ---- */
+  /* Interior heroes hold a floor on desktop, so a one-line title doesn't make a
+     shallow band beside a two-line one — the photo needs room to read as a
+     photo. Below this the hero is content-sized as before: 410px of a phone
+     screen is a wall.
+     `min-height` includes the padding (box-sizing is border-box globally), so
+     this is the hero's total height, not an addition to it. The flex column
+     centres the content in whatever extra room the floor creates; heroes already
+     taller than 410px are untouched. */
+  @media (min-width: 901px) {
+    .page-hero__inner {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 410px;
+    }
+  }
 </style>

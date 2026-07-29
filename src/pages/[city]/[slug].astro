@@ -10,6 +10,7 @@ import ProseBody from "../../components/prose/ProseBody.astro";
 import PracticeFaqs from "../../components/practice/PracticeFaqs.astro";
 import Rail from "../../components/rail/Rail.astro";
 import CtaBar from "../../components/CtaBar.astro";
+import FactCheck from "../../components/FactCheck.astro";
 import Consult from "../../components/Consult.astro";
 import { getAreaPaths, getLocationPage } from "../../sanity/lib/areasWeServe";
 import { getAreasWeServeNav } from "../../data/navigation";
@@ -99,6 +100,10 @@ const heroImageAlt = hasCustomHero
           navItems={areasNav.children ?? []}
         />
       </div>
+
+      {/* Outside the grid, so it runs the full container width under both the
+          body column and the rail. */}
+      <FactCheck pageId={page._id} />
     </div>
   </section>
 
