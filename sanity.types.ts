@@ -449,6 +449,7 @@ export type PracticeArea = {
     _type: "practiceFaq";
     _key: string;
   }>;
+  reviewedBy?: AttorneyReference;
   factCheck?: {
     show?: boolean;
     content?: FactCheckContent;
@@ -549,44 +550,6 @@ export type Testimonial = {
   reviewedAt?: string;
   tag?: string;
   featured?: boolean;
-};
-
-export type Attorney = {
-  _id: string;
-  _type: "attorney";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  orderRank?: string;
-  name: string;
-  slug: Slug;
-  role: string;
-  credential: string;
-  photo: {
-    asset?: SanityImageAssetReference;
-    media?: unknown;
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    _type: "image";
-  };
-  photoAlt: string;
-  phone: string;
-  email?: string;
-  practiceTags: Array<string>;
-  bio?: BlockContent;
-  education: Array<
-    {
-      _key: string;
-    } & EducationEntry
-  >;
-  barAdmissions: Array<string>;
-  honors: Array<string>;
-  classesSeminars?: Array<string>;
-  publishedWorks?: Array<string>;
-  associations?: Array<string>;
-  pastPositions?: Array<string>;
-  representativeCases?: Array<string>;
-  seo?: Seo;
 };
 
 export type TrialResult = {
@@ -959,6 +922,45 @@ export type FirmDetails = {
     _type: "legalLink";
     _key: string;
   }>;
+  defaultReviewer?: AttorneyReference;
+};
+
+export type Attorney = {
+  _id: string;
+  _type: "attorney";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  orderRank?: string;
+  name: string;
+  slug: Slug;
+  role: string;
+  credential: string;
+  photo: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+  photoAlt: string;
+  phone: string;
+  email?: string;
+  practiceTags: Array<string>;
+  bio?: BlockContent;
+  education: Array<
+    {
+      _key: string;
+    } & EducationEntry
+  >;
+  barAdmissions: Array<string>;
+  honors: Array<string>;
+  classesSeminars?: Array<string>;
+  publishedWorks?: Array<string>;
+  associations?: Array<string>;
+  pastPositions?: Array<string>;
+  representativeCases?: Array<string>;
+  seo?: Seo;
 };
 
 export type SanityImagePaletteSwatch = {
@@ -1106,7 +1108,6 @@ export type AllSanitySchemaTypes =
   | NewsItem
   | Faq
   | Testimonial
-  | Attorney
   | TrialResult
   | FactCheck
   | Consult
@@ -1125,6 +1126,7 @@ export type AllSanitySchemaTypes =
   | Video
   | GlobalSeo
   | FirmDetails
+  | Attorney
   | SanityImagePaletteSwatch
   | SanityImagePalette
   | SanityImageDimensions
@@ -2235,6 +2237,27 @@ export type PRACTICE_AREAS_BAND_QUERY_RESULT = {
   }>;
 } | null;
 
+// Source: src/sanity/lib/reviewedBy.ts
+// Variable: REVIEWED_BY_QUERY
+// Query: {  "reviewer": coalesce(    *[_id == $pageId][0].reviewedBy->,    *[_id == "firmDetails"][0].defaultReviewer->,    *[_type == "attorney"] | order(orderRank)[0]  ){    name,    role,    photo,    photoAlt,    "slug": slug.current  },  "createdAt": *[_id == $pageId][0]._createdAt,  "updatedAt": *[_id == $pageId][0]._updatedAt}
+export type REVIEWED_BY_QUERY_RESULT = {
+  reviewer: {
+    name: string;
+    role: string;
+    photo: {
+      asset?: SanityImageAssetReference;
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      _type: "image";
+    };
+    photoAlt: string;
+    slug: string;
+  } | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+};
+
 // Source: src/sanity/lib/seo.ts
 // Variable: PAGE_SEO_QUERY
 // Query: *[_id == $pageId][0].seo{  metaTitle,  metaDescription,  canonicalUrl,  noIndex,  ogImage}
@@ -2415,6 +2438,7 @@ declare module "@sanity/client" {
     '*[_id == "podcastPage"][0].hero{\n  eyebrow,\n  title,\n  subtitle\n}': PODCAST_HERO_QUERY_RESULT;
     '*[_type == "practiceArea"] | order(orderRank){\n  _id,\n  title,\n  heroTitle,\n  heroImage,\n  cardSummary,\n  icon,\n  body[]{\n    ...,\n    _type == "bodyAttorney" => { attorney->{ name, photo, photoAlt } },\n    _type == "bodyQuoteCta" => { attorney->{ name, photo, photoAlt } },\n    _type == "bodyTestimonial" => { testimonial->{ quote, author, reviewedAt } }\n  },\n  faqs[]{ _key, question, answer },\n  "slug": slug.current,\n  "parentId": parent._ref,\n  _updatedAt,\n  seo{\n    metaTitle,\n    metaDescription,\n    canonicalUrl,\n    noIndex,\n    ogImage\n  }\n}': ALL_QUERY_RESULT;
     "*[_id == $pageId][0].practiceAreas{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  description,\n  cards[]{\n    _key,\n    icon,\n    title,\n    desc\n  }\n}": PRACTICE_AREAS_BAND_QUERY_RESULT;
+    '{\n  "reviewer": coalesce(\n    *[_id == $pageId][0].reviewedBy->,\n    *[_id == "firmDetails"][0].defaultReviewer->,\n    *[_type == "attorney"] | order(orderRank)[0]\n  ){\n    name,\n    role,\n    photo,\n    photoAlt,\n    "slug": slug.current\n  },\n  "createdAt": *[_id == $pageId][0]._createdAt,\n  "updatedAt": *[_id == $pageId][0]._updatedAt\n}': REVIEWED_BY_QUERY_RESULT;
     "*[_id == $pageId][0].seo{\n  metaTitle,\n  metaDescription,\n  canonicalUrl,\n  noIndex,\n  ogImage\n}": PAGE_SEO_QUERY_RESULT;
     '*[_id in $ids]{\n  _id,\n  _updatedAt,\n  "noIndex": seo.noIndex\n}': STATIC_PAGE_SEO_QUERY_RESULT;
     '*[_id == "globalSeo"][0]{\n  discourageCrawling,\n  defaultOgImage\n}': GLOBAL_SEO_QUERY_RESULT;

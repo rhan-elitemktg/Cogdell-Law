@@ -170,6 +170,14 @@ export const firmDetails = defineType({
         }),
       ],
     }),
+    defineField({
+      name: "defaultReviewer",
+      title: "Default reviewer",
+      type: "reference",
+      to: [{ type: "attorney" }],
+      description:
+        'Who the "Reviewed By" panel credits on practice area pages that don\'t name their own. Leave empty and the first attorney in Collections → Attorney Bios is used.',
+    }),
   ],
   preview: {
     select: { title: "title" },

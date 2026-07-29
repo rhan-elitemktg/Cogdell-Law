@@ -1,0 +1,180 @@
+---
+// "Reviewed By" panel — the first thing in the practice-area rail (D18).
+//
+// Three tiers: an eyebrow, then the person (photo + name + role), then the date
+// on its own under a rule. An earlier pass stacked all four facts in one column
+// beside a small photo, which left a tall thin block next to a circle that
+// looked unattached, and used the rule as an underline for two stray words.
+//
+// The eyebrow is the shared component, so it brings the house 24px accent rule
+// with it. Its gap to the content is owned here (the standard var(--space-4)),
+// set as a margin on the next element rather than on the Eyebrow itself — that
+// keeps it a plain scoped rule instead of reaching into a child (F14).
+//
+// Self-fetches from the page id, like CtaBar and FactCheck: the reviewer is
+// resolved from a three-step fallback in GROQ, and threading that through Rail
+// would only give the route a chance to get it wrong.
+import Eyebrow from "../Eyebrow.astro";
+import { urlFor } from "../../sanity/lib/image";
+import { getReviewedBy } from "../../sanity/lib/reviewedBy";
+
+interface Props {
+  /** Document id of the host page — resolves its reviewer and its dates. */
+  pageId: string;
+}
+const { pageId } = Astro.props;
+
+const data = await getReviewedBy(pageId);
+const reviewer = data?.reviewer;
+
+const DATE_FORMAT = {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+} as const;
+const format = (iso?: string | null) =>
+  iso ? new Date(iso).toLocaleDateString("en-US", DATE_FORMAT) : "";
+
+const published = format(data?.createdAt);
+const updated = format(data?.updatedAt);
+
+// "Published on" until the page is actually edited, then "Updated on".
+//
+// The two are compared as FORMATTED DATES, not as instants. Every published
+// document is written at least twice — creating it and publishing it are
+// separate mutations — so `_updatedAt` is essentially never equal to
+// `_createdAt`, and comparing timestamps would label every page "Updated" from
+// the moment it went live. Comparing the rendered strings also keeps the label
+// honest about what the reader can see: if both render "June 4, 2026", calling
+// it an update is a distinction with no visible difference.
+const isUpdated = Boolean(updated) && updated !== published;
+const dateLabel = isUpdated ? "Updated on" : "Published on";
+const dateValue = isUpdated ? updated : published;
+const dateIso = isUpdated ? data?.updatedAt : data?.createdAt;
+
+const PHOTO = 72;
+const photoUrl = reviewer?.photo
+  ? urlFor(reviewer.photo).width(PHOTO * 2).height(PHOTO * 2).fit("crop").url()
+  : null;
+
+const href = reviewer?.slug ? `/attorney/${reviewer.slug}` : null;
+---
+
+{
+  reviewer?.name && (
+    <section class="rvw">
+      <Eyebrow tone="accent">Reviewed by</Eyebrow>
+
+      <div class="rvw__person">
+        {photoUrl && (
+          <img
+            class="rvw__photo"
+            src={photoUrl}
+            alt={reviewer.photoAlt ?? reviewer.name}
+            width={PHOTO}
+            height={PHOTO}
+            loading="lazy"
+            decoding="async"
+          />
+        )}
+
+        <div>
+          <p class="rvw__nameline">
+            {href ? (
+              <a class="rvw__name" href={href}>{reviewer.name}</a>
+            ) : (
+              <span class="rvw__name">{reviewer.name}</span>
+            )}
+          </p>
+          {reviewer.role && <p class="rvw__role">{reviewer.role}</p>}
+        </div>
+      </div>
+
+      {dateValue && (
+        <p class="rvw__date">
+          {/* Explicit space: Astro collapses the one in the template. */}
+          {`${dateLabel} `}
+          <time datetime={dateIso}>{dateValue}</time>
+        </p>
+      )}
+    </section>
+  )
+}
+
+<style>
+  /* Matches the rail's other panels: paper card, accent rule along the top.
+     No margin — `.rail__inner` is a flex column with `gap: var(--space-8)`,
+     which already spaces this from the form exactly as the form is spaced from
+     the nav. A margin here would stack on top of that gap and double it. */
+  .rvw {
+    padding: var(--space-6);
+    background-color: var(--cog-paper-card);
+    border-top: 3px solid var(--cog-accent);
+  }
+
+  /* var(--space-4) is the house eyebrow → content gap. Set here rather than on
+     the Eyebrow, which is a child component (F14). */
+  .rvw__person {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: var(--space-4);
+    margin-top: var(--space-4);
+  }
+
+  /* No accent ring — the eyebrow above already carries the accent, and a second
+     one turned the panel into two competing marks. */
+  .rvw__photo {
+    display: block;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .rvw__nameline {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: var(--text-xl);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: var(--cog-ink);
+  }
+  /* Ink rather than accent, so the eyebrow stays the only accent in the panel.
+     The hairline underline keeps it findable as a link without colour alone
+     carrying that job. */
+  .rvw__name {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: var(--cog-line);
+    text-underline-offset: 3px;
+    /* Both, or they fall out of step: the global `a` rule transitions only
+       `color`, so the text faded while the underline snapped. */
+    transition:
+      color var(--transition),
+      text-decoration-color var(--transition);
+  }
+  a.rvw__name:hover {
+    color: var(--cog-accent);
+    text-decoration-color: var(--cog-accent);
+  }
+
+  .rvw__role {
+    margin: var(--space-1) 0 0;
+    font-size: var(--text-sm);
+    line-height: 1.5;
+    color: var(--cog-ink-muted);
+  }
+
+  /* Its own tier under a full-width rule — when the date sat in the same column
+     as the name it read as part of the credit rather than page metadata. */
+  .rvw__date {
+    margin: var(--space-4) 0 0;
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--cog-line);
+    font-size: var(--text-sm);
+    line-height: 1.5;
+    color: var(--cog-ink-muted);
+  }
+</style>

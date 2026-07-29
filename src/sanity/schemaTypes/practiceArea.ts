@@ -121,6 +121,15 @@ export const practiceArea = defineType({
         }),
       ],
     }),
+    defineField({
+      name: "reviewedBy",
+      title: "Reviewed by",
+      type: "reference",
+      to: [{ type: "attorney" }],
+      description:
+        "Optional. Leave empty and the page credits the firm's default reviewer, set in Site Settings → Firm Details. Their name, photo and role come from their own record.",
+      group: "page",
+    }),
     factCheckField("page"),
     // On its own tab the collapsible wrapper is just an extra click — the tab
     // already does the hiding.

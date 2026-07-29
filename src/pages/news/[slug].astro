@@ -3,13 +3,11 @@
 // "article" (external mentions link straight out and never reach here).
 import { PortableText } from "astro-portabletext";
 import Layout from "../../layouts/Layout.astro";
-import Breadcrumb from "../../components/practice/Breadcrumb.astro";
 import PageHero from "../../components/PageHero.astro";
 import CtaBar from "../../components/CtaBar.astro";
 import Consult from "../../components/Consult.astro";
 import { proseComponents } from "../../components/prose/components";
 import { getNewsItem, getOwnedNewsSlugs } from "../../sanity/lib/news";
-import type { Crumb } from "../../lib/breadcrumb";
 
 export async function getStaticPaths() {
   const slugs = await getOwnedNewsSlugs();
@@ -23,13 +21,10 @@ if (!item) {
   throw new Error(`No news article found in Sanity for slug "${slug}".`);
 }
 
-const trail: Crumb[] = [{ title: "News", href: "/news" }, { title: item.title }];
 const description = item.summary ?? `${item.title} — Cogdell Law Firm.`;
 ---
 
 <Layout title={item.title} description={description} seo={item.seo}>
-  <Breadcrumb trail={trail} />
-
   <PageHero
     eyebrow={item.outlet}
     titleStrong={item.title}

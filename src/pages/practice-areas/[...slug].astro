@@ -1,6 +1,5 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import Breadcrumb from "../../components/practice/Breadcrumb.astro";
 import PageHero from "../../components/PageHero.astro";
 import ProseBody from "../../components/prose/ProseBody.astro";
 import PracticeGrid from "../../components/practice/PracticeGrid.astro";
@@ -32,7 +31,9 @@ if (!entry) {
       "Astro is still serving the route list it cached at startup. Restart the dev server.",
   );
 }
-const { node, trail, children } = entry;
+// `trail` is still built by getPracticeAreaNode — the Breadcrumb it fed was
+// pulled site-wide for now (the component stays, unused).
+const { node, children } = entry;
 
 const childItems = (children ?? []).map((c: any) => ({
   title: c.title,
@@ -81,8 +82,6 @@ const heroImageAlt = hasCustomHero
 
   <section class="pa-body">
     <div class="container pa-body__inner">
-      <Breadcrumb trail={trail} bare />
-
       <div class="pa-body__grid">
         {/* A plain div, not <main>: the layout has no main landmark today, and
             adding one here would claim only the body column — sending "skip to
@@ -99,6 +98,7 @@ const heroImageAlt = hasCustomHero
           pathname={Astro.url.pathname}
           navHeading="Practice Areas"
           navItems={practiceAreaNav.children ?? []}
+          pageId={node._id}
         />
       </div>
 
