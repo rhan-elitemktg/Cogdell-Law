@@ -18,8 +18,17 @@
 import { proseBodyComponents } from "./bodyComponents";
 import BodyCta from "../body/BodyCta.astro";
 import BodyPhoneBar from "../body/BodyPhoneBar.astro";
+import BodyAttorney from "../body/BodyAttorney.astro";
+import BodyQuoteCta from "../body/BodyQuoteCta.astro";
+import BodyTestimonial from "../body/BodyTestimonial.astro";
 
 export const pageBodyComponents = {
   ...proseBodyComponents,
-  type: { bodyCta: BodyCta, bodyPhoneBar: BodyPhoneBar },
+  type: {
+    bodyCta: BodyCta,
+    bodyPhoneBar: BodyPhoneBar,
+    bodyAttorney: BodyAttorney,
+    bodyQuoteCta: BodyQuoteCta,
+    bodyTestimonial: BodyTestimonial,
+  },
 };

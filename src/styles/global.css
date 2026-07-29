@@ -40,11 +40,24 @@
   /* Typography — self-hosted via Astro Fonts API (see astro.config.mjs).*/
   --font-heading: var(--font-cormorant), Georgia, "Times New Roman", serif;
   --font-body: var(--font-instrument), system-ui, -apple-system, sans-serif;
+  /* Decorative quote marks only — the ❝ ornament (U+275D).
+     Google Fonts ships no Dingbats block, so U+275D is in NEITHER self-hosted
+     subset (verified against the built woff2: Cormorant carries U+201C but not
+     U+275D). The glyph therefore ALWAYS comes from a system font. Naming the
+     symbol families makes that predictable instead of platform-roulette —
+     without them a machine with no covering font shows tofu. Cormorant stays
+     first so the declaration reads as intent; the browser simply skips it.
+     Use this ONLY for the ornament, never for text set in it. */
+  --font-ornament: var(--font-cormorant), "Apple Symbols", "Segoe UI Symbol",
+    "Noto Sans Symbols 2", "Segoe UI Emoji", Georgia, serif;
 
   /* Type scale — fluid via clamp(min, preferred, max).
     Comment shows the px range: mobile (~375px) → desktop (~1280px+). */
   --text-xs:   clamp(0.75rem,   0.724rem + 0.110vw, 0.8125rem); /* 12 → 13px */
   --text-sm:   clamp(0.8125rem, 0.787rem + 0.110vw, 0.875rem); /* 13 → 14px */
+  /* Between sm and base — body copy that should sit a touch under the page's
+     own prose without dropping to label size. */
+  --text-md:   clamp(0.9375rem, 0.911rem + 0.110vw, 1rem);     /* 15 → 16px */
   --text-base: clamp(1rem,      0.948rem + 0.221vw, 1.125rem); /* 16 → 18px */
   --text-lg:   clamp(1.125rem,  1.073rem + 0.221vw, 1.25rem);  /* 18 → 20px */
   --text-xl:   clamp(1.375rem,  1.323rem + 0.221vw, 1.5rem);   /* 22 → 24px */
@@ -87,6 +100,11 @@
      (container padding also steps down at 1360px)  */
 
   /* Misc */
+  /* Lifted paper card — blockquotes and the body testimonial block. A token
+     rather than two literals so "the same shadow as the blockquote" stays true
+     if either is ever tuned. */
+  --shadow-card: 0 14px 34px rgba(7, 16, 29, 0.06);
+
   --radius: 4px;
   --ease: cubic-bezier(0.17, 0.66, 0.34, 0.98); /* shared easing curve */
   --transition: 0.5s var(--ease); /* duration + easing — append after a property */
@@ -240,22 +258,22 @@ a:hover {
     padding: var(--space-6) var(--space-8) var(--space-6) var(--space-12);
     background-color: var(--cog-paper-card);
     border-left: 4px solid var(--cog-accent);
-    box-shadow: 0 14px 34px rgba(7, 16, 29, 0.06);
+    box-shadow: var(--shadow-card);
     font-family: var(--font-heading);
-    font-style: italic;
     font-weight: 500;
     font-size: var(--text-xl);
     line-height: 1.5;
     color: var(--cog-ink);
   }
-  /* Decorative opening quotation mark. */
+  /* Decorative opening quotation mark — the ❝ ornament (U+275D), site-wide.
+     Sized in `em`, so it scales with the quote it opens. */
   .prose__quote::before {
-    content: "\201C";
+    content: "\275D";
     position: absolute;
     top: 0.28em;
     left: var(--space-4);
-    font-family: var(--font-heading);
-    font-size: 2.75rem;
+    font-family: var(--font-ornament);
+    font-size: 1.5em;
     line-height: 1;
     color: var(--cog-gold);
   }

@@ -24,8 +24,12 @@ import { bodyBlockMember } from "./blockContent";
  * Give it an icon no other member uses — the Portable Text Insert menu
  * distinguishes block types by icon alone (F23), and `options.insertMenu` (the
  * views/groups config) is only read on the plain array input, not this one.
- * Reserved so they can't collide: `bulb-outline` (Key Takeaways), `user`
- * (attorney card), `double-quote` (quote CTA).
+ * Reserved so they can't collide: `bulb-outline` (Key Takeaways),
+ * `double-quote` (quote CTA).
+ *
+ * A block holding a REFERENCE also needs a `_type ==` conditional added to the
+ * `body[]{...}` projection in BOTH practiceAreas.ts and areasWeServe.ts — see
+ * `bodyAttorney` for the shape.
  */
 export const pageBody = defineType({
   name: "pageBody",
@@ -35,6 +39,9 @@ export const pageBody = defineType({
     bodyBlockMember(),
     defineArrayMember({ type: "bodyCta" }),
     defineArrayMember({ type: "bodyPhoneBar" }),
-    // Future (D16): bodyTakeaways, bodyAttorney, bodyQuoteCta.
+    defineArrayMember({ type: "bodyAttorney" }),
+    defineArrayMember({ type: "bodyQuoteCta" }),
+    defineArrayMember({ type: "bodyTestimonial" }),
+    // Future (D16): bodyTakeaways.
   ],
 });
