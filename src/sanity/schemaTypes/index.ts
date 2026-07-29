@@ -47,6 +47,9 @@ import { accentText } from "./accentText";
 import { blockContent } from "./blockContent";
 import { bodyCta } from "./bodyCta";
 import { bodyPhoneBar } from "./bodyPhoneBar";
+import { bodyAttorney } from "./bodyAttorney";
+import { bodyQuoteCta } from "./bodyQuoteCta";
+import { bodyTestimonial } from "./bodyTestimonial";
 import { pageBody } from "./pageBody";
 
 export const schemaTypes: SchemaTypeDefinition[] = [
@@ -81,6 +84,9 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   ctaButton,
   bodyCta, // a page-body block (D16) — wraps two ctaButtons
   bodyPhoneBar, // a page-body block (D16)
+  bodyAttorney, // a page-body block (D16) — references an attorney doc
+  bodyQuoteCta, // a page-body block (D16) — references an attorney doc
+  bodyTestimonial, // a page-body block (D16) — references a testimonial doc
   sellingPoint,
   practiceAreaCard,
   practiceAreasBand,

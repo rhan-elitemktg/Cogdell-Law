@@ -1,7 +1,22 @@
 import { sanityClient } from "sanity:client";
 import { defineQuery } from "groq";
 
-/** Every practice area with its parent ref — the tree is rebuilt in JS. */
+/**
+ * Every practice area with its parent ref — the tree is rebuilt in JS.
+ *
+ * `body` is projected rather than taken raw because its `bodyAttorney` blocks
+ * hold a reference, which would otherwise arrive as a bare `_ref` (D16). The
+ * same projection lives in areasWeServe.ts — duplicated ON PURPOSE: TypeGen
+ * parses `defineQuery()` statically, so hoisting it into a shared const would
+ * leave both query result types unresolved. Change one, change the other.
+ *
+ * The two `_type ==` arms are also deliberate. Collapsing them into one
+ * `_type in ["bodyAttorney", "bodyQuoteCta"] =>` reads better and returns the
+ * same data, but TypeGen can't prove it applies: it then emits BOTH a
+ * dereferenced and a raw-`_ref` variant per block, so `attorney` widens to
+ * `AttorneyReference | {…}` and every renderer has to narrow it. One arm per
+ * type, even when the projection is identical.
+ */
 const ALL_QUERY = defineQuery(`*[_type == "practiceArea"] | order(orderRank){
   _id,
   title,
@@ -9,7 +24,12 @@ const ALL_QUERY = defineQuery(`*[_type == "practiceArea"] | order(orderRank){
   heroImage,
   cardSummary,
   icon,
-  body,
+  body[]{
+    ...,
+    _type == "bodyAttorney" => { attorney->{ name, photo, photoAlt } },
+    _type == "bodyQuoteCta" => { attorney->{ name, photo, photoAlt } },
+    _type == "bodyTestimonial" => { testimonial->{ quote, author, reviewedAt } }
+  },
   faqs[]{ _key, question, answer },
   "slug": slug.current,
   "parentId": parent._ref,

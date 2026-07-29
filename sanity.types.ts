@@ -55,6 +55,15 @@ export type PageBody = Array<
   | ({
       _key: string;
     } & BodyPhoneBar)
+  | ({
+      _key: string;
+    } & BodyAttorney)
+  | ({
+      _key: string;
+    } & BodyQuoteCta)
+  | ({
+      _key: string;
+    } & BodyTestimonial)
 >;
 
 export type BlockContent = Array<{
@@ -268,6 +277,41 @@ export type SellingPoint = {
   _type: "sellingPoint";
   value: string;
   label: string;
+};
+
+export type TestimonialReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "testimonial";
+};
+
+export type BodyTestimonial = {
+  _type: "bodyTestimonial";
+  testimonial: TestimonialReference;
+};
+
+export type AttorneyReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "attorney";
+};
+
+export type BodyQuoteCta = {
+  _type: "bodyQuoteCta";
+  attorney: AttorneyReference;
+  quote: string;
+  primaryCta?: CtaButton;
+  secondaryCta?: CtaButton;
+};
+
+export type BodyAttorney = {
+  _type: "bodyAttorney";
+  attorney: AttorneyReference;
+  body: string;
+  primaryCta?: CtaButton;
+  secondaryCta?: CtaButton;
 };
 
 export type BodyPhoneBar = {
@@ -488,6 +532,7 @@ export type Testimonial = {
   orderRank?: string;
   quote: string;
   author: string;
+  reviewedAt?: string;
   tag?: string;
   featured?: boolean;
 };
@@ -1016,6 +1061,11 @@ export type AllSanitySchemaTypes =
   | PracticeAreasBand
   | PracticeAreaCard
   | SellingPoint
+  | TestimonialReference
+  | BodyTestimonial
+  | AttorneyReference
+  | BodyQuoteCta
+  | BodyAttorney
   | BodyPhoneBar
   | BodyCta
   | CtaButton
@@ -1091,7 +1141,7 @@ export type AREAS_WE_SERVE_NAV_QUERY_RESULT = Array<{
 
 // Source: src/sanity/lib/areasWeServe.ts
 // Variable: PATHS_QUERY
-// Query: *[_type == "locationPage"] | order(orderRank){  _id,  title,  navLabel,  heroTitle,  heroImage,  lede,  body,  faqs[]{ _key, question, answer },  "slug": slug.current,  "cityName": city->city,  "citySlug": city->citySlug.current,  _updatedAt,  seo{    metaTitle,    metaDescription,    canonicalUrl,    noIndex,    ogImage  }}
+// Query: *[_type == "locationPage"] | order(orderRank){  _id,  title,  navLabel,  heroTitle,  heroImage,  lede,  body[]{    ...,    _type == "bodyAttorney" => { attorney->{ name, photo, photoAlt } },    _type == "bodyQuoteCta" => { attorney->{ name, photo, photoAlt } },    _type == "bodyTestimonial" => { testimonial->{ quote, author, reviewedAt } }  },  faqs[]{ _key, question, answer },  "slug": slug.current,  "cityName": city->city,  "citySlug": city->citySlug.current,  _updatedAt,  seo{    metaTitle,    metaDescription,    canonicalUrl,    noIndex,    ogImage  }}
 export type PATHS_QUERY_RESULT = Array<{
   _id: string;
   title: string;
@@ -1105,7 +1155,86 @@ export type PATHS_QUERY_RESULT = Array<{
     _type: "image";
   } | null;
   lede: string | null;
-  body: PageBody;
+  body: Array<
+    | {
+        children?: Array<{
+          marks?: Array<string>;
+          text?: string;
+          _type: "span";
+          _key: string;
+        }>;
+        style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+        listItem?: "bullet" | "number";
+        markDefs?: Array<{
+          href: string;
+          _type: "link";
+          _key: string;
+        }>;
+        level?: number;
+        _type: "block";
+        _key: string;
+      }
+    | {
+        _key: string;
+        _type: "bodyAttorney";
+        attorney: {
+          name: string;
+          photo: {
+            asset?: SanityImageAssetReference;
+            media?: unknown;
+            hotspot?: SanityImageHotspot;
+            crop?: SanityImageCrop;
+            _type: "image";
+          };
+          photoAlt: string;
+        };
+        body: string;
+        primaryCta?: CtaButton;
+        secondaryCta?: CtaButton;
+      }
+    | {
+        _key: string;
+        _type: "bodyCta";
+        heading: string;
+        body?: string;
+        primaryCta?: CtaButton;
+        secondaryCta?: CtaButton;
+      }
+    | {
+        _key: string;
+        _type: "bodyPhoneBar";
+        heading: string;
+        eyebrow?: string;
+        phone?: string;
+      }
+    | {
+        _key: string;
+        _type: "bodyQuoteCta";
+        attorney: {
+          name: string;
+          photo: {
+            asset?: SanityImageAssetReference;
+            media?: unknown;
+            hotspot?: SanityImageHotspot;
+            crop?: SanityImageCrop;
+            _type: "image";
+          };
+          photoAlt: string;
+        };
+        quote: string;
+        primaryCta?: CtaButton;
+        secondaryCta?: CtaButton;
+      }
+    | {
+        _key: string;
+        _type: "bodyTestimonial";
+        testimonial: {
+          quote: string;
+          author: string;
+          reviewedAt: string | null;
+        };
+      }
+  >;
   faqs: Array<{
     _key: string;
     question: string;
@@ -1916,7 +2045,7 @@ export type PODCAST_HERO_QUERY_RESULT =
 
 // Source: src/sanity/lib/practiceAreas.ts
 // Variable: ALL_QUERY
-// Query: *[_type == "practiceArea"] | order(orderRank){  _id,  title,  heroTitle,  heroImage,  cardSummary,  icon,  body,  faqs[]{ _key, question, answer },  "slug": slug.current,  "parentId": parent._ref,  _updatedAt,  seo{    metaTitle,    metaDescription,    canonicalUrl,    noIndex,    ogImage  }}
+// Query: *[_type == "practiceArea"] | order(orderRank){  _id,  title,  heroTitle,  heroImage,  cardSummary,  icon,  body[]{    ...,    _type == "bodyAttorney" => { attorney->{ name, photo, photoAlt } },    _type == "bodyQuoteCta" => { attorney->{ name, photo, photoAlt } },    _type == "bodyTestimonial" => { testimonial->{ quote, author, reviewedAt } }  },  faqs[]{ _key, question, answer },  "slug": slug.current,  "parentId": parent._ref,  _updatedAt,  seo{    metaTitle,    metaDescription,    canonicalUrl,    noIndex,    ogImage  }}
 export type ALL_QUERY_RESULT = Array<{
   _id: string;
   title: string;
@@ -1930,7 +2059,86 @@ export type ALL_QUERY_RESULT = Array<{
   } | null;
   cardSummary: string | null;
   icon: "appeals" | "collar" | "federal" | "fraud" | "health" | null;
-  body: PageBody;
+  body: Array<
+    | {
+        children?: Array<{
+          marks?: Array<string>;
+          text?: string;
+          _type: "span";
+          _key: string;
+        }>;
+        style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+        listItem?: "bullet" | "number";
+        markDefs?: Array<{
+          href: string;
+          _type: "link";
+          _key: string;
+        }>;
+        level?: number;
+        _type: "block";
+        _key: string;
+      }
+    | {
+        _key: string;
+        _type: "bodyAttorney";
+        attorney: {
+          name: string;
+          photo: {
+            asset?: SanityImageAssetReference;
+            media?: unknown;
+            hotspot?: SanityImageHotspot;
+            crop?: SanityImageCrop;
+            _type: "image";
+          };
+          photoAlt: string;
+        };
+        body: string;
+        primaryCta?: CtaButton;
+        secondaryCta?: CtaButton;
+      }
+    | {
+        _key: string;
+        _type: "bodyCta";
+        heading: string;
+        body?: string;
+        primaryCta?: CtaButton;
+        secondaryCta?: CtaButton;
+      }
+    | {
+        _key: string;
+        _type: "bodyPhoneBar";
+        heading: string;
+        eyebrow?: string;
+        phone?: string;
+      }
+    | {
+        _key: string;
+        _type: "bodyQuoteCta";
+        attorney: {
+          name: string;
+          photo: {
+            asset?: SanityImageAssetReference;
+            media?: unknown;
+            hotspot?: SanityImageHotspot;
+            crop?: SanityImageCrop;
+            _type: "image";
+          };
+          photoAlt: string;
+        };
+        quote: string;
+        primaryCta?: CtaButton;
+        secondaryCta?: CtaButton;
+      }
+    | {
+        _key: string;
+        _type: "bodyTestimonial";
+        testimonial: {
+          quote: string;
+          author: string;
+          reviewedAt: string | null;
+        };
+      }
+  >;
   faqs: Array<{
     _key: string;
     question: string;
@@ -2118,7 +2326,7 @@ declare module "@sanity/client" {
     '*[_type == "attorney"] | order(orderRank){\n  "label": name,\n  "slug": slug.current\n}': ATTORNEYS_NAV_QUERY_RESULT;
     '*[_type == "practiceArea"] | order(orderRank){\n  _id,\n  title,\n  "slug": slug.current,\n  "parentId": parent._ref\n}': PRACTICE_AREAS_NAV_QUERY_RESULT;
     '*[_type == "serviceCity"] | order(orderRank){\n  "city": city,\n  "citySlug": citySlug.current,\n  "pages": *[_type == "locationPage" && references(^._id)] | order(orderRank){\n    "navLabel": navLabel,\n    "slug": slug.current\n  }\n}': AREAS_WE_SERVE_NAV_QUERY_RESULT;
-    '*[_type == "locationPage"] | order(orderRank){\n  _id,\n  title,\n  navLabel,\n  heroTitle,\n  heroImage,\n  lede,\n  body,\n  faqs[]{ _key, question, answer },\n  "slug": slug.current,\n  "cityName": city->city,\n  "citySlug": city->citySlug.current,\n  _updatedAt,\n  seo{\n    metaTitle,\n    metaDescription,\n    canonicalUrl,\n    noIndex,\n    ogImage\n  }\n}': PATHS_QUERY_RESULT;
+    '*[_type == "locationPage"] | order(orderRank){\n  _id,\n  title,\n  navLabel,\n  heroTitle,\n  heroImage,\n  lede,\n  body[]{\n    ...,\n    _type == "bodyAttorney" => { attorney->{ name, photo, photoAlt } },\n    _type == "bodyQuoteCta" => { attorney->{ name, photo, photoAlt } },\n    _type == "bodyTestimonial" => { testimonial->{ quote, author, reviewedAt } }\n  },\n  faqs[]{ _key, question, answer },\n  "slug": slug.current,\n  "cityName": city->city,\n  "citySlug": city->citySlug.current,\n  _updatedAt,\n  seo{\n    metaTitle,\n    metaDescription,\n    canonicalUrl,\n    noIndex,\n    ogImage\n  }\n}': PATHS_QUERY_RESULT;
     '*[_type == "attorney"] | order(orderRank){\n  _id,\n  name,\n  role,\n  credential,\n  photo,\n  photoAlt,\n  "slug": slug.current\n}': ATTORNEY_CARDS_QUERY_RESULT;
     '*[_type == "attorney" && defined(slug.current)]{"slug": slug.current, _updatedAt, "noIndex": seo.noIndex}': ATTORNEY_SLUGS_QUERY_RESULT;
     '*[_type == "attorney" && slug.current == $slug][0]{\n  _id,\n  name,\n  role,\n  credential,\n  photo,\n  photoAlt,\n  phone,\n  email,\n  practiceTags,\n  bio,\n  education[]{\n    _key,\n    school,\n    location,\n    lines\n  },\n  barAdmissions,\n  honors,\n  classesSeminars,\n  publishedWorks,\n  associations,\n  pastPositions,\n  representativeCases,\n  "slug": slug.current,\n  _updatedAt,\n  seo{\n    metaTitle,\n    metaDescription,\n    canonicalUrl,\n    noIndex,\n    ogImage\n  }\n}': ATTORNEY_QUERY_RESULT;
@@ -2147,7 +2355,7 @@ declare module "@sanity/client" {
     '*[_type == "podcast" && slug.current == $slug][0]{\n  _id,\n  title,\n  episodeNumber,\n  tag,\n  summary,\n  "slug": slug.current,\n  "date": coalesce(publishedAt, _createdAt),\n  coverImage,\n  body,\n  spotifyUrl,\n  chapters,\n  _updatedAt,\n  seo{\n    metaTitle,\n    metaDescription,\n    canonicalUrl,\n    noIndex,\n    ogImage\n  }\n}': PODCAST_QUERY_RESULT;
     '*[_type == "podcast" && defined(slug.current)]{"slug": slug.current, _updatedAt, "noIndex": seo.noIndex}': PODCAST_SLUGS_QUERY_RESULT;
     '*[_id == "podcastPage"][0].hero{\n  eyebrow,\n  title,\n  subtitle\n}': PODCAST_HERO_QUERY_RESULT;
-    '*[_type == "practiceArea"] | order(orderRank){\n  _id,\n  title,\n  heroTitle,\n  heroImage,\n  cardSummary,\n  icon,\n  body,\n  faqs[]{ _key, question, answer },\n  "slug": slug.current,\n  "parentId": parent._ref,\n  _updatedAt,\n  seo{\n    metaTitle,\n    metaDescription,\n    canonicalUrl,\n    noIndex,\n    ogImage\n  }\n}': ALL_QUERY_RESULT;
+    '*[_type == "practiceArea"] | order(orderRank){\n  _id,\n  title,\n  heroTitle,\n  heroImage,\n  cardSummary,\n  icon,\n  body[]{\n    ...,\n    _type == "bodyAttorney" => { attorney->{ name, photo, photoAlt } },\n    _type == "bodyQuoteCta" => { attorney->{ name, photo, photoAlt } },\n    _type == "bodyTestimonial" => { testimonial->{ quote, author, reviewedAt } }\n  },\n  faqs[]{ _key, question, answer },\n  "slug": slug.current,\n  "parentId": parent._ref,\n  _updatedAt,\n  seo{\n    metaTitle,\n    metaDescription,\n    canonicalUrl,\n    noIndex,\n    ogImage\n  }\n}': ALL_QUERY_RESULT;
     "*[_id == $pageId][0].practiceAreas{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  description,\n  cards[]{\n    _key,\n    icon,\n    title,\n    desc\n  }\n}": PRACTICE_AREAS_BAND_QUERY_RESULT;
     "*[_id == $pageId][0].seo{\n  metaTitle,\n  metaDescription,\n  canonicalUrl,\n  noIndex,\n  ogImage\n}": PAGE_SEO_QUERY_RESULT;
     '*[_id in $ids]{\n  _id,\n  _updatedAt,\n  "noIndex": seo.noIndex\n}': STATIC_PAGE_SEO_QUERY_RESULT;

@@ -44,6 +44,13 @@ export const testimonial = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: "reviewedAt",
+      title: "Date given",
+      type: "date",
+      description:
+        'Optional. Shown as "3 months ago" wherever a testimonial is dropped into a page body (D16). Leave it empty and no date appears.',
+    }),
+    defineField({
       name: "tag",
       title: "Tag",
       type: "string",

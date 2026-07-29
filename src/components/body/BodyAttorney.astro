@@ -1,0 +1,199 @@
+---
+// The `bodyAttorney` block of a `pageBody` field (D16) — navy band, attorney
+// photo left, name + passage + two buttons right.
+//
+// Rendered through pageBodyComponents' `type` map, so it receives Portable Text
+// node props ({ node, index, isInline }) and never page props — which is why the
+// phone is fetched here rather than passed in.
+//
+// `node.attorney` arrives already dereferenced: both body queries project
+// `body[]{ ..., _type == "bodyAttorney" => { attorney->{…} } }`. Taken raw it
+// would be a bare `_ref` and this component would render an empty card.
+import { getFirmDetails } from "../../sanity/lib/firmDetails";
+import { urlFor } from "../../sanity/lib/image";
+
+interface CtaButton {
+  label?: string | null;
+  href?: string | null;
+}
+
+interface BodyAttorneyNode {
+  _type: "bodyAttorney";
+  _key: string;
+  body?: string;
+  primaryCta?: CtaButton;
+  secondaryCta?: CtaButton;
+  attorney?: {
+    name?: string;
+    photo?: Parameters<typeof urlFor>[0];
+    photoAlt?: string;
+  } | null;
+}
+
+interface Props {
+  node: BodyAttorneyNode;
+  index?: number;
+  isInline?: boolean;
+}
+
+const { node } = Astro.props;
+const attorney = node.attorney;
+
+const firm = await getFirmDetails();
+const phone = firm?.phone ?? "713-426-2244";
+const phoneHref = `tel:+1${phone.replace(/[^0-9]/g, "")}`; // matches Header/Footer
+
+// Tests both fields, not the object: an editor who types a label and then clears
+// it leaves a `{_type: "ctaButton"}` husk behind, which is truthy but unusable.
+const resolve = (button: CtaButton | undefined, fallback: Required<CtaButton>) =>
+  button?.label && button?.href
+    ? { label: button.label, href: button.href }
+    : fallback;
+
+const primary = resolve(node.primaryCta, {
+  label: "Schedule Consultation",
+  href: "/contact",
+});
+const secondary = resolve(node.secondaryCta, {
+  label: `Call Us ${phone}`,
+  href: phoneHref,
+});
+
+// Photos live in Sanity (D6), so they come off Sanity's CDN via urlFor rather
+// than the astro:assets pipeline — same as Attorneys.astro. Square crop: the
+// card's photo column is a square and the hotspot decides what stays in frame.
+// 190px square beside the copy on desktop, full column width once it stacks —
+// hence the wide end of the srcset, which desktop never asks for.
+const PHOTO = 190;
+const PHOTO_WIDTHS = [190, 380, 650, 900];
+const PHOTO_SIZES = "(max-width: 650px) 100vw, 190px";
+const photoUrl = attorney?.photo
+  ? urlFor(attorney.photo).width(PHOTO * 2).height(PHOTO * 2).fit("crop").url()
+  : null;
+const photoSrcset = attorney?.photo
+  ? PHOTO_WIDTHS.map(
+      (w) =>
+        `${urlFor(attorney.photo!).width(w).height(w).fit("crop").url()} ${w}w`,
+    ).join(", ")
+  : undefined;
+---
+
+<aside class:list={["bodyatty", { "bodyatty--nophoto": !photoUrl }]}>
+  {
+    photoUrl && (
+      <img
+        class="bodyatty__photo"
+        src={photoUrl}
+        srcset={photoSrcset}
+        sizes={PHOTO_SIZES}
+        alt={attorney?.photoAlt ?? attorney?.name ?? ""}
+        width={PHOTO}
+        height={PHOTO}
+        loading="lazy"
+        decoding="async"
+      />
+    )
+  }
+
+  <div class="bodyatty__body">
+    {/* A <p>, not a heading — same reasoning as BodyCta: this interrupts the
+        document, so it has no business in the page outline. */}
+    <p class="bodyatty__name">{attorney?.name}</p>
+
+    {node.body && <p class="bodyatty__copy">{node.body}</p>}
+
+    <div class="bodyatty__actions">
+      <a href={primary.href} class="btn btn--primary">
+        {primary.label}
+        <svg class="btn__icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+      </a>
+      <a href={secondary.href} class="btn btn--outline">
+        {secondary.label}
+        <svg class="btn__icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+      </a>
+    </div>
+  </div>
+</aside>
+
+<style>
+  /* Same ground, rule, padding and margins as BodyCta and BodyPhoneBar — the
+     three read as one family in a column. See F14: this markup is emitted by
+     this component, so plain scoped rules match it. */
+  .bodyatty {
+    display: grid;
+    grid-template-columns: 190px minmax(0, 1fr);
+    column-gap: var(--space-8);
+    align-items: start;
+    margin-block: var(--space-12);
+    padding: var(--space-10) var(--space-8);
+    background-color: var(--cog-navy-deep);
+    border-top: 3px solid var(--cog-accent);
+    color: var(--cog-white);
+  }
+  /* An attorney with no photo yet shouldn't leave a 190px hole. */
+  .bodyatty--nophoto {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .bodyatty:first-child {
+    margin-top: 0;
+  }
+  .bodyatty:last-child {
+    margin-bottom: 0;
+  }
+
+  .bodyatty__photo {
+    display: block;
+    width: 190px;
+    height: 190px;
+    object-fit: cover;
+  }
+
+  .bodyatty__name {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: clamp(1.5rem, 2.2vw, 1.875rem); /* 24 → 30px */
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    color: var(--cog-white);
+  }
+
+  /* A step under the page's own prose: the card is an aside, and sizing its copy
+     level with the body text made the two compete. */
+  .bodyatty__copy {
+    margin: var(--space-4) 0 0;
+    font-size: var(--text-md);
+    line-height: 1.7;
+    color: var(--cog-body);
+  }
+
+  .bodyatty__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-top: var(--space-8);
+  }
+
+  /* ---- Responsive ---- */
+  /* Stacks photo-over-copy and stays LEFT aligned, unlike its two siblings: they
+     carry a heading and a number, this carries a paragraph, and centred body
+     copy is harder to read. Buttons go full-width (global .btn rule at 650px). */
+  @media (max-width: 650px) {
+    .bodyatty {
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: var(--space-6);
+      padding: var(--space-6);
+    }
+    /* Full column width. `aspect-ratio` rather than a fixed height so it keeps
+       the square the crop already produced at whatever width the column is. */
+    .bodyatty__photo {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1;
+    }
+    .bodyatty__actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+</style>
