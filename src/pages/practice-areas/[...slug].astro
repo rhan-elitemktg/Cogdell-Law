@@ -6,6 +6,7 @@ import ProseBody from "../../components/prose/ProseBody.astro";
 import PracticeGrid from "../../components/practice/PracticeGrid.astro";
 import PracticeFaqs from "../../components/practice/PracticeFaqs.astro";
 import CtaBar from "../../components/CtaBar.astro";
+import FactCheck from "../../components/FactCheck.astro";
 import Consult from "../../components/Consult.astro";
 import { getPracticeAreaPaths, getPracticeAreaNode } from "../../sanity/lib/practiceAreas";
 import Rail from "../../components/rail/Rail.astro";
@@ -100,6 +101,10 @@ const heroImageAlt = hasCustomHero
           navItems={practiceAreaNav.children ?? []}
         />
       </div>
+
+      {/* Outside the grid, so it runs the full container width under both the
+          body column and the rail. */}
+      <FactCheck pageId={node._id} />
     </div>
   </section>
 

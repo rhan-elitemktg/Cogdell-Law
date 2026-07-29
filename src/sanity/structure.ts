@@ -20,6 +20,7 @@ export const SINGLETONS = [
   "podcastPage",
   "practiceAreasPage",
   "consult",
+  "factCheck",
 ];
 
 // Ordinary (non-singleton) document types that get their own curated list in the
@@ -200,6 +201,7 @@ export const structure: StructureResolver = (S, context) =>
               page(S, "firmDetails", "Firm Details", icons.cog),
               page(S, "ctaBar", "Call-to-Action Bar", icons.bell),
               page(S, "consult", "Consultation Form", icons.calendar),
+              page(S, "factCheck", "Fact-Checked Banner", icons["checkmark-circle"]),
               page(S, "globalSeo", "Global SEO Settings", icons.search),
             ]),
         ),

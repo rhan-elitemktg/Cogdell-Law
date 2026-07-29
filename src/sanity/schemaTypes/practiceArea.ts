@@ -1,6 +1,7 @@
 import { defineType, defineField, defineArrayMember } from "sanity";
 import { icons } from "@sanity/icons";
 import { orderRankField, orderRankOrdering } from "@sanity/orderable-document-list";
+import { factCheckField } from "./factCheckContent";
 import { PRACTICE_AREA_ICON_KEYS } from "../../lib/practiceAreaIcons";
 
 /**
@@ -120,6 +121,7 @@ export const practiceArea = defineType({
         }),
       ],
     }),
+    factCheckField("page"),
     // On its own tab the collapsible wrapper is just an extra click — the tab
     // already does the hiding.
     defineField({

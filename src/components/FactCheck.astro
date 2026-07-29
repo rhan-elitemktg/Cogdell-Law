@@ -1,0 +1,118 @@
+---
+// Fact-checked banner — the trust signal at the foot of every practice area and
+// location page (D17). Full width, under both the body column and the sidebar.
+//
+// Self-fetches rather than taking content props, like CtaBar: the wording is the
+// same on ~26 pages, and passing it in from two routes would be two chances to
+// drift. The page id is enough to resolve its toggle and its optional override.
+//
+// Emits no <section> or .container of its own — it's placed inside the page's
+// existing container, below the body/rail grid, so it spans both columns.
+//
+// Renders nothing when there's no content yet, rather than throwing the way
+// CtaBar does. The toggle ships ON for all ~26 existing pages, so a hard failure
+// would take the whole build down until someone seeded the singleton.
+import { PortableText } from "astro-portabletext";
+import { proseComponents } from "./prose/components";
+import FactCheckBody from "./factcheck/FactCheckBody.astro";
+import { getFactCheck } from "../sanity/lib/factCheck";
+
+interface Props {
+  /** Document id of the host page — resolves its toggle and override. */
+  pageId: string;
+}
+const { pageId } = Astro.props;
+
+const factCheck = await getFactCheck(pageId);
+
+const show = factCheck?.show !== false;
+const content = factCheck?.content;
+const hasBody = Array.isArray(content?.body) && content.body.length > 0;
+---
+
+{
+  show && hasBody && (
+    <aside class="factcheck">
+      <p class="factcheck__badge">
+        <svg class="factcheck__tick" viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <circle cx="12" cy="12" r="10.25" />
+          <path d="M7.75 12.4l2.9 2.9 5.6-6.1" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <span class="factcheck__label">{content.label}</span>
+      </p>
+
+      <div class="factcheck__body">
+        <PortableText
+          value={content.body}
+          components={{
+            ...proseComponents,
+            block: { ...proseComponents.block, normal: FactCheckBody },
+          }}
+        />
+      </div>
+    </aside>
+  )
+}
+
+<style>
+  .factcheck {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: var(--space-8);
+    margin-top: var(--space-16);
+    padding: var(--space-6) var(--space-8);
+    background-color: var(--cog-paper-card);
+  }
+
+  .factcheck__badge {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    /* The rule between badge and statement — a border on the badge rather than a
+       separate element, so there's nothing to hide when this stacks. */
+    padding-right: var(--space-8);
+    border-right: 1px solid var(--cog-line);
+    margin: 0;
+  }
+  .factcheck__tick {
+    flex-shrink: 0;
+    color: var(--cog-accent);
+  }
+  .factcheck__label {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: var(--text-xl);
+    line-height: 1.1;
+    color: var(--cog-ink);
+    white-space: nowrap;
+  }
+
+  /* Emitted by FactCheckBody.astro (a Portable Text renderer), so it carries no
+     scoping attribute of its own — the scoped parent bounds the :global (F14). */
+  .factcheck__body :global(.factcheck__text) {
+    margin: 0;
+    font-size: var(--text-md);
+    line-height: 1.6;
+    color: var(--cog-ink-body);
+  }
+  .factcheck__body :global(.factcheck__text + .factcheck__text) {
+    margin-top: var(--space-3);
+  }
+
+  /* ---- Responsive ---- */
+  @media (max-width: 860px) {
+    .factcheck {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-4);
+      padding: var(--space-6);
+    }
+    /* Stacked, the divider becomes a rule under the badge. */
+    .factcheck__badge {
+      padding-right: 0;
+      padding-bottom: var(--space-4);
+      border-right: 0;
+      border-bottom: 1px solid var(--cog-line);
+    }
+  }
+</style>
