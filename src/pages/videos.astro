@@ -15,8 +15,8 @@ const gridHeader = await getVideoGridHeader();
 if (!videos.length || !gridHeader) {
   throw new Error(
     "No videos or grid header found in Sanity.\n" +
-      "Seed with: npx sanity exec scripts/seed-hero.ts --with-user-token\n" +
-      "           npx sanity exec scripts/seed-videos-page.ts --with-user-token",
+      "Add them in the Studio at /admin → Videos Page, or seed with:\n" +
+      "  npx sanity exec scripts/seed-videos-page.ts --with-user-token",
   );
 }
 

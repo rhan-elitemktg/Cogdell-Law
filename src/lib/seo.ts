@@ -4,7 +4,7 @@
 // The fallbacks are the whole point: every SEO field is optional, so a page with
 // an empty SEO block must render exactly the title and description it rendered
 // before the fields existed. Nothing changes until an editor fills something in.
-import type { SanityImageSource } from "@sanity/image-url/lib/types/types";
+import type { SanityImageSource } from "@sanity/image-url";
 import { urlFor } from "../sanity/lib/image";
 
 export const SITE_NAME = "Cogdell Law";

@@ -72,6 +72,7 @@ const crop = (w: number) =>
     .width(w)
     .height(Math.round(w * RATIO))
     .fit("crop")
+    .auto("format")
     .url();
 const photoUrl = attorney?.photo ? crop(PHOTO * 2) : null;
 const photoSrcset = attorney?.photo

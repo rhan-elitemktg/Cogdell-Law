@@ -3,6 +3,9 @@ import { defineQuery } from "groq";
 
 // Shared projection: everything a card needs, plus the resolved link.
 // `date` is coalesce(publishedAt, _createdAt) — the effective "newest" date.
+// The logo's intrinsic dimensions ride along so the card can set a width on the
+// <img>: it's rendered at a fixed height with `width: auto`, and without a ratio
+// the browser reserves no width for it and the row jumps when it decodes.
 const CARD = `{
   _id,
   title,
@@ -14,7 +17,10 @@ const CARD = `{
   externalUrl,
   "slug": slug.current,
   "date": coalesce(publishedAt, _createdAt),
-  outletLogo
+  outletLogo{
+    ...,
+    "dimensions": asset->metadata.dimensions
+  }
 }`;
 
 const ALL_NEWS_QUERY = defineQuery(

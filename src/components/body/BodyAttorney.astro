@@ -67,14 +67,11 @@ const secondary = resolve(node.secondaryCta, {
 const PHOTO = 190;
 const PHOTO_WIDTHS = [190, 380, 650, 900];
 const PHOTO_SIZES = "(max-width: 650px) 100vw, 190px";
-const photoUrl = attorney?.photo
-  ? urlFor(attorney.photo).width(PHOTO * 2).height(PHOTO * 2).fit("crop").url()
-  : null;
+const crop = (w: number) =>
+  urlFor(attorney!.photo!).width(w).height(w).fit("crop").auto("format").url();
+const photoUrl = attorney?.photo ? crop(PHOTO * 2) : null;
 const photoSrcset = attorney?.photo
-  ? PHOTO_WIDTHS.map(
-      (w) =>
-        `${urlFor(attorney.photo!).width(w).height(w).fit("crop").url()} ${w}w`,
-    ).join(", ")
+  ? PHOTO_WIDTHS.map((w) => `${crop(w)} ${w}w`).join(", ")
   : undefined;
 ---
 

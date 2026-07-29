@@ -19,7 +19,12 @@ const pathname = Astro.url.pathname;
 const LOGO_HEIGHT = 56;
 const sanityLogo = firm?.logo?.asset ? firm.logo : null;
 const logoDimensions = sanityLogo?.dimensions;
-const logoSrc = sanityLogo ? urlFor(sanityLogo).height(LOGO_HEIGHT * 2).url() : null;
+const logoSrc = sanityLogo
+  ? urlFor(sanityLogo)
+      .height(LOGO_HEIGHT * 2)
+      .auto("format")
+      .url()
+  : null;
 const logoWidth = logoDimensions
   ? Math.round((logoDimensions.width / logoDimensions.height) * LOGO_HEIGHT)
   : undefined;

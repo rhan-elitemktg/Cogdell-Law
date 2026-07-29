@@ -39,8 +39,10 @@ const emailHref = attorney.email ? `mailto:${attorney.email}` : "#contact";
   <div class="container">
     <div class="a-profile__card">
       <img
-        src={urlFor(attorney.photo).width(520).url()}
-        srcset={[260, 400, 520].map((w) => `${urlFor(attorney.photo).width(w).url()} ${w}w`).join(", ")}
+        src={urlFor(attorney.photo).width(520).auto("format").url()}
+        srcset={[260, 400, 520]
+          .map((w) => `${urlFor(attorney.photo).width(w).auto("format").url()} ${w}w`)
+          .join(", ")}
         alt={attorney.photoAlt}
         sizes="(max-width: 860px) 220px, 260px"
         loading="eager"

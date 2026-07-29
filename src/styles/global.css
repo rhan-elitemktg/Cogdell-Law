@@ -1,7 +1,12 @@
 /* =============================================================
    Cogdell Law — global.css
-   Basic starting point: reset + design tokens + base styles.
-   Token values are placeholders to be tuned against the mockup.
+   The site's one unscoped stylesheet: design tokens, reset, base
+   elements, the shared `.prose__*` Portable Text styles, and the
+   `.container` / `.btn` / `.lazy-fade` / `.visually-hidden`
+   helpers. Everything else lives in a component's scoped <style>.
+
+   Change a token here and it moves site-wide — that is the point.
+   Add a --space-* step rather than hardcoding a one-off value.
    ============================================================= */
 
 /* ---- Design tokens ---------------------------------------- */
@@ -126,7 +131,16 @@ html {
   -webkit-text-size-adjust: 100%;
   -moz-text-size-adjust: 100%;
   text-size-adjust: 100%;
-  scroll-behavior: smooth;
+}
+
+/* In-page anchors glide rather than jump — but never for a visitor who has
+   asked the OS for reduced motion; a long smooth scroll is exactly the kind of
+   movement that setting exists to stop. Every other animation on the site is
+   already gated the same way. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 body {

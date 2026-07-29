@@ -15,8 +15,7 @@ const hero = await getHomeHero();
 if (!hero) {
   throw new Error(
     "No Home Page hero content found in Sanity.\n" +
-      "Add it in the Studio at /admin → Home Page, or seed it with:\n" +
-      "  npx sanity exec scripts/seed-hero.ts --with-user-token",
+      "Add it in the Studio at /admin → Home Page → Hero.",
   );
 }
 
