@@ -32,6 +32,7 @@ Create `.env` in the repo root:
 ```
 PUBLIC_SANITY_PROJECT_ID=<project id>
 PUBLIC_SANITY_DATASET=production
+PUBLIC_PAGEPROOFER_SITE_ID=<pageproofer embed id>   # optional, see "Before launch"
 ```
 
 Then:
@@ -131,6 +132,24 @@ be indexed.
 The consultation form is still on Resend's test mode: leads only reach the
 address the Resend account was created with. Verify the domain in Resend, then
 set `CONSULT_FROM_EMAIL` and `CONSULT_TO_EMAIL` in Vercel.
+
+**Delete `PUBLIC_PAGEPROOFER_SITE_ID` in Vercel.** It loads the PageProofer
+review widget at the end of every page's `<body>`. With the variable unset the
+script is not in the built HTML at all, so removing it in Vercel and redeploying
+is the whole job — no code change.
+
+### Third-party scripts
+
+`Layout.astro` is the only head on the site, so every tag goes there.
+
+- **Review/dev tools** (PageProofer): gate on an env var, as above, so they can
+  never outlive the phase they were added for.
+- **Marketing tags** (GA4, pixels, call tracking): these belong in **Google Tag
+  Manager**, not here. Add the GTM container once and every later tag is a GTM
+  change — no rebuild, no deploy. GTM is not installed yet.
+- **Never** add a free-form "paste a script" field in Sanity. It would be
+  injected with `set:html`, so one malformed paste takes down every page, and a
+  rebuild is needed either way — it buys nothing over a deploy.
 
 ## Conventions
 

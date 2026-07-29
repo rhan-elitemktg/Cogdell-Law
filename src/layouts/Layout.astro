@@ -48,6 +48,12 @@ const robotsNoIndex = meta.noIndex || globalSeo?.discourageCrawling === true;
 const siteUrl = (Astro.site?.href ?? "https://www.cogdell-law.com/").replace(/\/+$/, "");
 const logoUrl = firm?.logo ? urlFor(firm.logo).width(600).auto("format").url() : undefined;
 const organization = legalServiceSchema(firm, siteUrl, logoUrl);
+
+// PageProofer, the client-review annotation widget. Gated on the env var rather
+// than hardcoded so switching it off at launch is a Vercel settings change, not
+// a code change: unset PUBLIC_PAGEPROOFER_SITE_ID and the next build ships
+// without the tag at all. See "Before launch" in the README.
+const pageProoferSiteId = import.meta.env.PUBLIC_PAGEPROOFER_SITE_ID;
 ---
 
 <!doctype html>
@@ -97,6 +103,13 @@ const organization = legalServiceSchema(firm, siteUrl, logoUrl);
     <slot />
     <Footer />
     {videoEmbed && <VideoLightbox />}
+    {
+      /* Last in the body on purpose: a review-only widget shouldn't compete with
+         fonts, CSS or images for bandwidth during the initial load. */
+      pageProoferSiteId && (
+        <script is:inline async src={`https://app.pageproofer.com/embed/${pageProoferSiteId}`} />
+      )
+    }
     <script>
       // Fade each lazy image in once it decodes (covers the already-cached case).
       document
