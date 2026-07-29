@@ -54,7 +54,12 @@ const dateIso = isUpdated ? data?.updatedAt : data?.createdAt;
 
 const PHOTO = 72;
 const photoUrl = reviewer?.photo
-  ? urlFor(reviewer.photo).width(PHOTO * 2).height(PHOTO * 2).fit("crop").url()
+  ? urlFor(reviewer.photo)
+      .width(PHOTO * 2)
+      .height(PHOTO * 2)
+      .fit("crop")
+      .auto("format")
+      .url()
   : null;
 
 const href = reviewer?.slug ? `/attorney/${reviewer.slug}` : null;

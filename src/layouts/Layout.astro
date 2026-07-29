@@ -16,7 +16,13 @@ interface Props {
   description?: string;
   /** The page's Sanity `seo` block. Every field optional; blank → title/description above. */
   seo?: SeoInput | null;
-  videoEmbed?: boolean; // pages with a Wistia video → warm up the connections
+  /**
+   * Set on any page that renders a `data-video-id` trigger (today: the homepage
+   * hero and /videos). It does two things — warms up Wistia's DNS in the head,
+   * and renders the <VideoLightbox>. WITHOUT IT THE LIGHTBOX IS ABSENT and a
+   * video thumbnail click does nothing, so a new page with video must set it.
+   */
+  videoEmbed?: boolean;
 }
 
 const { title, description, seo, videoEmbed = false } = Astro.props;
@@ -90,7 +96,7 @@ const organization = legalServiceSchema(firm, siteUrl, logoUrl);
     <Header />
     <slot />
     <Footer />
-    <VideoLightbox />
+    {videoEmbed && <VideoLightbox />}
     <script>
       // Fade each lazy image in once it decodes (covers the already-cached case).
       document

@@ -2,10 +2,13 @@
 // Grid of press mentions / news. Paper-card cells with an accent top-rule wipe on
 // hover (same recipe as PracticeGrid, tuned for paper). External items link out in
 // a new tab with a ↗ affordance; owned posts link to /news/[slug] with an arrow.
+import type { SanityImageSource } from "@sanity/image-url";
 import Eyebrow from "../Eyebrow.astro";
 import { urlFor } from "../../sanity/lib/image";
 
 type NewsMedia = "article" | "video" | "podcast";
+/** The outlet logo, with the asset's intrinsic size projected alongside it. */
+type OutletLogo = { dimensions?: { width: number; height: number } | null } | null;
 interface NewsCard {
   _id: string;
   title: string;
@@ -16,7 +19,7 @@ interface NewsCard {
   linkType?: string | null;
   externalUrl?: string | null;
   slug?: string | null;
-  outletLogo?: unknown;
+  outletLogo?: OutletLogo;
 }
 
 interface Props {
@@ -28,6 +31,20 @@ interface Props {
 
 const { items, eyebrow, headingLead, headingStrong } = Astro.props;
 const hasHead = Boolean(eyebrow || headingLead);
+
+// Outlet logos render at a fixed 22px height with `width: auto`, so the <img>
+// needs a width for the browser to reserve the right box before it decodes.
+// Served at 2× off Sanity's CDN; `auto=format` gets WebP where it's supported.
+const LOGO_HEIGHT = 22;
+const logoSrc = (logo: OutletLogo) =>
+  urlFor(logo as SanityImageSource)
+    .height(LOGO_HEIGHT * 2)
+    .auto("format")
+    .url();
+const logoWidth = (logo: OutletLogo) => {
+  const d = logo?.dimensions;
+  return d ? Math.round((d.width / d.height) * LOGO_HEIGHT) : undefined;
+};
 
 // Lucide inner-paths (viewBox 0 0 24 24) + label + default action verb per medium.
 const MEDIA: Record<NewsMedia, { label: string; verb: string; icon: string }> = {
@@ -88,9 +105,12 @@ const arrowIcon = '<path d="M5 12h14M13 6l6 6-6 6"/>';
                   {item.outletLogo ? (
                     <img
                       class="ngrid__outlet-logo"
-                      src={urlFor(item.outletLogo).height(44).url()}
+                      src={logoSrc(item.outletLogo)}
                       alt={item.outlet}
-                      height={22}
+                      width={logoWidth(item.outletLogo)}
+                      height={LOGO_HEIGHT}
+                      loading="lazy"
+                      decoding="async"
                     />
                   ) : (
                     item.outlet

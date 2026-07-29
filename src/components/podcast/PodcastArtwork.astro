@@ -9,7 +9,7 @@
 import { urlFor } from "../../sanity/lib/image";
 import { getImage } from "astro:assets";
 import defaultCover from "../../assets/white-collar-defense.jpg";
-import type { SanityImageSource } from "@sanity/image-url/lib/types/types";
+import type { SanityImageSource } from "@sanity/image-url";
 
 interface Props {
   image?: SanityImageSource | null;
@@ -27,7 +27,15 @@ const src = image
 ---
 
 <div class:list={["pcast-art", className]}>
-  <img class="pcast-art__bg lazy-fade" src={src} alt="" loading={loading} width="880" height="495" />
+  <img
+    class="pcast-art__bg lazy-fade"
+    src={src}
+    alt=""
+    loading={loading}
+    decoding="async"
+    width="880"
+    height="495"
+  />
   <div class="pcast-art__scrim" aria-hidden="true"></div>
   <div class="pcast-art__lockup">
     <span class="pcast-art__the">The</span>

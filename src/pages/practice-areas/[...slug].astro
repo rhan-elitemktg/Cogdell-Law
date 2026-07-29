@@ -43,8 +43,8 @@ const childItems = (children ?? []).map((c: any) => ({
 }));
 
 // `body` is the whole page, opening paragraph included — the separate `lede`
-// field was folded into it (scripts/migrate-practice-lede-into-body.ts), so the
-// card summary is what stands in for a hand-written meta description.
+// field was folded into it, so the card summary is what stands in for a
+// hand-written meta description.
 const description = node.cardSummary ?? `${node.title} — Cogdell Law Firm.`;
 
 // Every area shares one firm photo unless an editor uploads its own (Page tab →

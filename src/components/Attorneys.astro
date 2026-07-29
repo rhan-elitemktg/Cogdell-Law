@@ -67,8 +67,8 @@ const { band, background = "paper" } = Astro.props;
           <a class="attorneys__card" href={`/attorney/${a.slug}`}>
             <div class="attorneys__photo">
               <img
-                src={urlFor(a.photo).width(790).url()}
-                srcset={PHOTO_WIDTHS.map((w) => `${urlFor(a.photo).width(w).url()} ${w}w`).join(", ")}
+                src={urlFor(a.photo).width(790).auto("format").url()}
+                srcset={PHOTO_WIDTHS.map((w) => `${urlFor(a.photo).width(w).auto("format").url()} ${w}w`).join(", ")}
                 alt={a.name}
                 sizes={PHOTO_SIZES}
                 loading="lazy"

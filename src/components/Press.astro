@@ -19,8 +19,12 @@ if (!logos?.length) {
   );
 }
 
-// Displayed at 42px tall; serve 2× for retina crispness.
+// Displayed at 42px tall; serve 2× for retina crispness. `auto=format` lets
+// Sanity hand back WebP/AVIF instead of the source PNGs — these are the only
+// images above the fold on the homepage that aren't already modern formats.
 const LOGO_RENDER_HEIGHT = 84;
+const logoSrc = (image: (typeof logos)[number]["image"]) =>
+  urlFor(image).height(LOGO_RENDER_HEIGHT).auto("format").url();
 ---
 
 <section class="press" aria-label="Featured in the press">
@@ -30,7 +34,7 @@ const LOGO_RENDER_HEIGHT = 84;
         logos.map((logo) => (
           <li class="press__item">
             <img
-              src={urlFor(logo.image).height(LOGO_RENDER_HEIGHT).url()}
+              src={logoSrc(logo.image)}
               alt={logo.alt}
               width={logo.dimensions?.width}
               height={logo.dimensions?.height}
@@ -46,7 +50,7 @@ const LOGO_RENDER_HEIGHT = 84;
         logos.map((logo) => (
           <li class="press__item" aria-hidden="true">
             <img
-              src={urlFor(logo.image).height(LOGO_RENDER_HEIGHT).url()}
+              src={logoSrc(logo.image)}
               alt=""
               width={logo.dimensions?.width}
               height={logo.dimensions?.height}

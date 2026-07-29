@@ -1769,7 +1769,7 @@ export type LEGAL_PAGE_QUERY_RESULT =
 
 // Source: src/sanity/lib/news.ts
 // Variable: ALL_NEWS_QUERY
-// Query: *[_type == "newsItem"] | order(coalesce(publishedAt, _createdAt) desc){  _id,  title,  outlet,  media,  summary,  ctaLabel,  linkType,  externalUrl,  "slug": slug.current,  "date": coalesce(publishedAt, _createdAt),  outletLogo}
+// Query: *[_type == "newsItem"] | order(coalesce(publishedAt, _createdAt) desc){  _id,  title,  outlet,  media,  summary,  ctaLabel,  linkType,  externalUrl,  "slug": slug.current,  "date": coalesce(publishedAt, _createdAt),  outletLogo{    ...,    "dimensions": asset->metadata.dimensions  }}
 export type ALL_NEWS_QUERY_RESULT = Array<{
   _id: string;
   title: string;
@@ -1787,12 +1787,13 @@ export type ALL_NEWS_QUERY_RESULT = Array<{
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
     _type: "image";
+    dimensions: SanityImageDimensions | null;
   } | null;
 }>;
 
 // Source: src/sanity/lib/news.ts
 // Variable: NEWS_BAND_QUERY
-// Query: *[_id == "homePage"][0].news{  eyebrow,  headingLead,  headingStrong,  lede,  "featured": featured->{  _id,  title,  outlet,  media,  summary,  ctaLabel,  linkType,  externalUrl,  "slug": slug.current,  "date": coalesce(publishedAt, _createdAt),  outletLogo},  "featuredId": featured._ref}
+// Query: *[_id == "homePage"][0].news{  eyebrow,  headingLead,  headingStrong,  lede,  "featured": featured->{  _id,  title,  outlet,  media,  summary,  ctaLabel,  linkType,  externalUrl,  "slug": slug.current,  "date": coalesce(publishedAt, _createdAt),  outletLogo{    ...,    "dimensions": asset->metadata.dimensions  }},  "featuredId": featured._ref}
 export type NEWS_BAND_QUERY_RESULT = {
   eyebrow: string;
   headingLead: string;
@@ -1815,6 +1816,7 @@ export type NEWS_BAND_QUERY_RESULT = {
       hotspot?: SanityImageHotspot;
       crop?: SanityImageCrop;
       _type: "image";
+      dimensions: SanityImageDimensions | null;
     } | null;
   };
   featuredId: string;
@@ -2425,8 +2427,8 @@ declare module "@sanity/client" {
     '*[_id == "homePage"][0].practiceReach{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  lede,\n  stats[]{\n    _key,\n    label,\n    value\n  }\n}': HOME_PRACTICE_REACH_QUERY_RESULT;
     '*[_id == "homePage"][0].press.logos[]{\n  _key,\n  alt,\n  image,\n  "dimensions": image.asset->metadata.dimensions\n}': HOME_PRESS_QUERY_RESULT;
     "*[_id == $id][0]{\n  title,\n  body,\n  _updatedAt,\n  seo{\n    metaTitle,\n    metaDescription,\n    canonicalUrl,\n    noIndex,\n    ogImage\n  }\n}": LEGAL_PAGE_QUERY_RESULT;
-    '*[_type == "newsItem"] | order(coalesce(publishedAt, _createdAt) desc){\n  _id,\n  title,\n  outlet,\n  media,\n  summary,\n  ctaLabel,\n  linkType,\n  externalUrl,\n  "slug": slug.current,\n  "date": coalesce(publishedAt, _createdAt),\n  outletLogo\n}': ALL_NEWS_QUERY_RESULT;
-    '*[_id == "homePage"][0].news{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  lede,\n  "featured": featured->{\n  _id,\n  title,\n  outlet,\n  media,\n  summary,\n  ctaLabel,\n  linkType,\n  externalUrl,\n  "slug": slug.current,\n  "date": coalesce(publishedAt, _createdAt),\n  outletLogo\n},\n  "featuredId": featured._ref\n}': NEWS_BAND_QUERY_RESULT;
+    '*[_type == "newsItem"] | order(coalesce(publishedAt, _createdAt) desc){\n  _id,\n  title,\n  outlet,\n  media,\n  summary,\n  ctaLabel,\n  linkType,\n  externalUrl,\n  "slug": slug.current,\n  "date": coalesce(publishedAt, _createdAt),\n  outletLogo{\n    ...,\n    "dimensions": asset->metadata.dimensions\n  }\n}': ALL_NEWS_QUERY_RESULT;
+    '*[_id == "homePage"][0].news{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  lede,\n  "featured": featured->{\n  _id,\n  title,\n  outlet,\n  media,\n  summary,\n  ctaLabel,\n  linkType,\n  externalUrl,\n  "slug": slug.current,\n  "date": coalesce(publishedAt, _createdAt),\n  outletLogo{\n    ...,\n    "dimensions": asset->metadata.dimensions\n  }\n},\n  "featuredId": featured._ref\n}': NEWS_BAND_QUERY_RESULT;
     '*[_type == "newsItem" && slug.current == $slug][0]{\n  _id,\n  title,\n  outlet,\n  summary,\n  body,\n  "slug": slug.current,\n  _updatedAt,\n  seo{\n    metaTitle,\n    metaDescription,\n    canonicalUrl,\n    noIndex,\n    ogImage\n  }\n}': NEWS_ITEM_QUERY_RESULT;
     '*[_type == "newsItem" && linkType == "article" && defined(slug.current)]{"slug": slug.current, _updatedAt, "noIndex": seo.noIndex}': OWNED_NEWS_SLUGS_QUERY_RESULT;
     '*[_id == "newsPage"][0].grid{\n  eyebrow,\n  headingLead,\n  headingStrong\n}': NEWS_GRID_HEADER_QUERY_RESULT;

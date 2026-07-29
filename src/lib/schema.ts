@@ -72,11 +72,13 @@ export function legalServiceSchema(
 }
 
 /**
- * The breadcrumb trail, built from the same `trail` the visible crumbs render.
+ * The breadcrumb trail, built from the `trail` the Sanity layer already returns
+ * for practice areas and location pages.
  *
- * Home is position 1 here even though the visible trail deliberately omits it
- * (Breadcrumb.astro: "Home is always one click away in the header nav") — the
- * markup describes the site's hierarchy, and Google expects it to start at root.
+ * There are no visible crumbs on the site any more — the rail panel replaced
+ * them — but the markup is worth keeping: it describes the page's place in the
+ * hierarchy for search engines. Home is position 1, because Google expects the
+ * list to start at root even when the page shows no trail at all.
  * Crumbs with no href — grouping labels like "Areas We Serve" — get no `item`,
  * which is valid and correctly says "this level has no page".
  */
