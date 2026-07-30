@@ -115,8 +115,33 @@ Three renderer maps, deliberately kept separate (`src/components/prose/`):
 Vercel builds from `master`. A Sanity publish fires a deploy webhook, so
 published content goes live on the next build without a code change.
 
-`vercel.json` holds the 301s from the old site's URLs. Redirects belong there,
-not in the app.
+### Redirects
+
+Redirects are content, not code. The SEO team adds them in the Studio under
+**Site Settings → Global SEO Settings → Redirects**, and they go live on the next
+build like any other publish — no developer, no commit.
+
+How that works: the site is a static build, so redirects can only be applied by
+Vercel at the edge, and `vercel.json` is read *before* the build runs — nothing
+generated during a build can land in it. Vercel's **bulk redirects** are the
+exception. `vercel.json` points `bulkRedirectsPath` at `dist/bulk-redirects.json`,
+and `src/pages/bulk-redirects.json.ts` writes that file from the `redirect`
+documents on every build.
+
+Two things stay in `vercel.json` because bulk redirects can't express them:
+
+- `trailingSlash: false` — site-wide URL canonicalisation.
+- The one **wildcard** rule (`/health-care-fraud-defense/:path*`). Bulk redirects
+  support no wildcards or header matching, so any future wildcard is a code change.
+
+Bulk redirects are evaluated **before the filesystem**, so a redirect whose source
+is a live page would take that page off the site. The generator drops any such
+rule and logs it in the build output; the Studio warns about it earlier. Both
+slash forms of every source are emitted, since bulk redirects match the path
+exactly and the inherited FindLaw URLs are canonically trailing-slash.
+
+Limits: Pro includes 1,000 bulk redirects. Redirects never fire on `astro dev` —
+verify on a deployed URL.
 
 `astro.config.mjs` sets `site: "https://www.cogdell-law.com"` — every canonical
 tag, `og:url` and sitemap entry is built from it, so it must match the domain

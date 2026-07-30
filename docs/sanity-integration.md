@@ -739,8 +739,21 @@ page carries two FAQPages (`PracticeFaqs` and the homepage's `Faq.astro` never c
 half-feature. The endpoint reuses `getPracticeAreaPaths()` / `getAreaPaths()` /
 `getAttorneySlugs()` / `getOwnedNewsSlugs()`, so it can't drift from the routes that actually
 build. Verified: 43 URLs = every built route except `/admin`, with `/404` excluded by design.
-⚠️ `DOCUMENT_BACKED` / `CODE_ONLY` in that file are the one hand-maintained list — **add new
-static routes there**.
+Route assembly has since moved into `src/sanity/lib/routes.ts` (`getSiteEntries()`), shared with
+the redirects generator; `sitemap.xml.ts` now only drops the `noIndex` pages and renders the XML.
+⚠️ `DOCUMENT_BACKED` / `CODE_ONLY_PATHS` / `RESERVED_PATHS` in **`src/lib/routePaths.ts`** are the
+one hand-maintained list — **add new static routes there**. That file is deliberately free of
+`sanity:client` imports so the `redirect` schema can share it (schemas are parsed by the Sanity
+CLI during `npm run typegen`, where the virtual module doesn't resolve).
+
+**Redirects (editor-managed)** — the `redirect` document type, surfaced in the Studio at
+**Site Settings → Global SEO Settings → Redirects**. `src/pages/bulk-redirects.json.ts` writes
+`dist/bulk-redirects.json` on every build, and `vercel.json` picks it up via `bulkRedirectsPath`.
+This is the only redirect surface a build can write to — `vercel.json` itself is read before the
+build. Bulk redirects run **before the filesystem**, so the generator drops any rule whose source
+is a live route (`getLivePaths()`), which is why `/admin` and the generated endpoints are in
+`RESERVED_PATHS`. Wildcards aren't supported by bulk redirects, so the one wildcard rule stays in
+`vercel.json`. See the README's "Redirects" section for the full rationale.
 
 **`site` is now set** in `astro.config.mjs` (`https://www.cogdell-law.com`) — canonical tags,
 `og:url` and the sitemap all build from it.

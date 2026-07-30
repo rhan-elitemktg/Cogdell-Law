@@ -341,6 +341,17 @@ export type CtaButton = {
   href: string;
 };
 
+export type Redirect = {
+  _id: string;
+  _type: "redirect";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  source: string;
+  destination: string;
+  permanent?: boolean;
+};
+
 export type ServiceCityReference = {
   _ref: string;
   _type: "reference";
@@ -1095,6 +1106,7 @@ export type AllSanitySchemaTypes =
   | BodyPhoneBar
   | BodyCta
   | CtaButton
+  | Redirect
   | ServiceCityReference
   | LocationPage
   | SanityImageCrop
@@ -2239,6 +2251,16 @@ export type PRACTICE_AREAS_BAND_QUERY_RESULT = {
   }>;
 } | null;
 
+// Source: src/sanity/lib/redirects.ts
+// Variable: REDIRECTS_QUERY
+// Query: *[_type == "redirect"] | order(source asc){  _id,  source,  destination,  permanent}
+export type REDIRECTS_QUERY_RESULT = Array<{
+  _id: string;
+  source: string;
+  destination: string;
+  permanent: boolean | null;
+}>;
+
 // Source: src/sanity/lib/reviewedBy.ts
 // Variable: REVIEWED_BY_QUERY
 // Query: {  "reviewer": coalesce(    *[_id == $pageId][0].reviewedBy->,    *[_id == "firmDetails"][0].defaultReviewer->,    *[_type == "attorney"] | order(orderRank)[0]  ){    name,    role,    photo,    photoAlt,    "slug": slug.current  },  "createdAt": *[_id == $pageId][0]._createdAt,  "updatedAt": *[_id == $pageId][0]._updatedAt}
@@ -2440,6 +2462,7 @@ declare module "@sanity/client" {
     '*[_id == "podcastPage"][0].hero{\n  eyebrow,\n  title,\n  subtitle\n}': PODCAST_HERO_QUERY_RESULT;
     '*[_type == "practiceArea"] | order(orderRank){\n  _id,\n  title,\n  heroTitle,\n  heroImage,\n  cardSummary,\n  icon,\n  body[]{\n    ...,\n    _type == "bodyAttorney" => { attorney->{ name, photo, photoAlt } },\n    _type == "bodyQuoteCta" => { attorney->{ name, photo, photoAlt } },\n    _type == "bodyTestimonial" => { testimonial->{ quote, author, reviewedAt } }\n  },\n  faqs[]{ _key, question, answer },\n  "slug": slug.current,\n  "parentId": parent._ref,\n  _updatedAt,\n  seo{\n    metaTitle,\n    metaDescription,\n    canonicalUrl,\n    noIndex,\n    ogImage\n  }\n}': ALL_QUERY_RESULT;
     "*[_id == $pageId][0].practiceAreas{\n  eyebrow,\n  headingLead,\n  headingStrong,\n  description,\n  cards[]{\n    _key,\n    icon,\n    title,\n    desc\n  }\n}": PRACTICE_AREAS_BAND_QUERY_RESULT;
+    '*[_type == "redirect"] | order(source asc){\n  _id,\n  source,\n  destination,\n  permanent\n}': REDIRECTS_QUERY_RESULT;
     '{\n  "reviewer": coalesce(\n    *[_id == $pageId][0].reviewedBy->,\n    *[_id == "firmDetails"][0].defaultReviewer->,\n    *[_type == "attorney"] | order(orderRank)[0]\n  ){\n    name,\n    role,\n    photo,\n    photoAlt,\n    "slug": slug.current\n  },\n  "createdAt": *[_id == $pageId][0]._createdAt,\n  "updatedAt": *[_id == $pageId][0]._updatedAt\n}': REVIEWED_BY_QUERY_RESULT;
     "*[_id == $pageId][0].seo{\n  metaTitle,\n  metaDescription,\n  canonicalUrl,\n  noIndex,\n  ogImage\n}": PAGE_SEO_QUERY_RESULT;
     '*[_id in $ids]{\n  _id,\n  _updatedAt,\n  "noIndex": seo.noIndex\n}': STATIC_PAGE_SEO_QUERY_RESULT;
