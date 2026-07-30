@@ -20,6 +20,20 @@ const { pageId } = Astro.props;
 
 const bar = await getCtaBar(pageId);
 
+/**
+ * Every page that renders this bar also renders the Consult band below it
+ * (11 of 11 today), so a link to the contact page is a link to a form already
+ * on screen — loading another page to reach it is a wasted round trip. Collapse
+ * it to the band's own anchor, which ConsultForm's script then focuses.
+ *
+ * Sanity still owns the href; only the contact-page value is rewritten, so an
+ * editor pointing the button anywhere else is left alone. If this bar is ever
+ * added to a page WITHOUT a Consult band, drop this and let the href stand.
+ */
+const CONTACT_PAGE = /^\/contact\/?(#contact)?$/;
+const ctaHref =
+  bar?.cta?.href && CONTACT_PAGE.test(bar.cta.href) ? "#contact" : bar?.cta?.href;
+
 if (!bar) {
   throw new Error(
     "No CTA Bar content found in Sanity.\n" +
@@ -44,7 +58,7 @@ if (!bar) {
         }} />
 
     <div class="ctabar__action">
-      <a href={bar.cta?.href} class="btn btn--light">
+      <a href={ctaHref} class="btn btn--light">
         {bar.cta?.label}
         <svg class="btn__icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
       </a>
