@@ -222,7 +222,18 @@ export const structure: StructureResolver = (S, context) =>
                         .child(
                           S.documentTypeList("redirect")
                             .title("Redirects")
-                            .defaultOrdering([{ field: "source", direction: "asc" }]),
+                            .defaultOrdering([{ field: "source", direction: "asc" }])
+                            // The open document is titled "Redirect", not the URL
+                            // it matches. Without this it inherits the preview
+                            // title, and the path is then shouted three times on
+                            // one screen — breadcrumb, heading, and the Old URL
+                            // field right below. The list keeps the full preview.
+                            .child((documentId) =>
+                              S.document()
+                                .documentId(documentId)
+                                .schemaType("redirect")
+                                .title("Redirect"),
+                            ),
                         ),
                     ]),
                 ),
