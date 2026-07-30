@@ -89,7 +89,10 @@ const EMAIL_TITLE = "Enter a complete email address, e.g. you@email.com";
   </div>
 </form>
 
-<p class="consult__thanks" hidden>{thankYou}</p>
+{/* `tabindex="-1"` so the script can move focus here once the form is gone.
+    Without it focus falls to <body> and keyboard and screen-reader users get
+    no signal that anything happened. Not keyboard-reachable otherwise. */}
+<p class="consult__thanks" tabindex="-1" hidden>{thankYou}</p>
 {/* Kept on one line: a newline before the <a> collapses away and the sentence
     renders as "call us at713-426-2244". */}
 <p class="consult__error" role="alert" hidden>
@@ -101,6 +104,13 @@ const EMAIL_TITLE = "Enter a complete email address, e.g. you@email.com";
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--space-4);
+  }
+  /* `hidden` is a UA rule (`[hidden] { display: none }`), and any author
+     `display` outranks it regardless of specificity — so the `display: grid`
+     above would keep the form on screen after submit, next to its own
+     thank-you message. Restate the intent at author level. */
+  .consult__form[hidden] {
+    display: none;
   }
   .consult__field {
     display: flex;
@@ -259,7 +269,12 @@ const EMAIL_TITLE = "Enter a complete email address, e.g. you@email.com";
           if (!res.ok) throw new Error(`Request failed: ${res.status}`);
 
           form.hidden = true;
-          if (thanks) thanks.hidden = false;
+          if (thanks) {
+            thanks.hidden = false;
+            // The submit button just went display:none, taking focus with it.
+            // Land the user on the confirmation instead of on <body>.
+            thanks.focus();
+          }
         } catch (err) {
           console.error("Consult submit failed:", err);
           if (errorEl) errorEl.hidden = false;
