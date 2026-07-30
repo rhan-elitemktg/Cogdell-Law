@@ -31,7 +31,7 @@ export const pathMatches = (href: string | undefined, current: string) =>
  * True when `current` sits at or beneath a non-root href stem (segment-aware, so
  * `/practice-areas` matches `/practice-areas/x/y` but never `/practice-areas-x`).
  * Lets deep pages (e.g. sub-topics not enumerated in the nav) highlight their
- * ancestor. The root `/` is excluded so Home doesn't match every page.
+ * ancestor. The root `/` is excluded so a home link can't match every page.
  */
 export const isUnder = (href: string | undefined, current: string) => {
   if (!href) return false;
@@ -155,7 +155,6 @@ export async function getNavItems(): Promise<NavItem[]> {
   ]);
 
   return [
-    { label: "Home", href: "/" },
     attorneysNav,
     {
       label: "Our Firm",
