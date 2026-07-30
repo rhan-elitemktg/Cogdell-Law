@@ -61,7 +61,7 @@ export const seo = defineType({
       title: "Social share image",
       type: "image",
       description:
-        "Shown when the page is shared on Facebook, LinkedIn or X. 1200×630 works best. Leave empty to use the site-wide default from Firm Details.",
+        "Shown when the page is shared on Facebook, LinkedIn or X. 1200×630 works best. Leave empty to use the site-wide default from Global SEO Settings.",
       options: { hotspot: true },
     }),
   ],

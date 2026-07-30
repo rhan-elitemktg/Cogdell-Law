@@ -45,9 +45,12 @@ const COLLECTIONS = [
 // page can't be spawned, and listed here so the catch-all leaves it alone.
 export const NON_CREATABLE = [...SINGLETONS, "legalPage"];
 
+// Document types that live under Site Settings rather than with the content.
+const SITE_SETTINGS = ["redirect"];
+
 // Every type placed explicitly below — anything NOT in here falls through to the
 // safety-net catch-all so a newly-added document type is never lost.
-const PLACED = [...NON_CREATABLE, ...COLLECTIONS];
+const PLACED = [...NON_CREATABLE, ...COLLECTIONS, ...SITE_SETTINGS];
 
 /** Pinned page singleton: one Studio entry per fixed-id document. */
 const page = (
@@ -202,7 +205,27 @@ export const structure: StructureResolver = (S, context) =>
               page(S, "ctaBar", "Call-to-Action Bar", icons.bell),
               page(S, "consult", "Consultation Form", icons.calendar),
               page(S, "factCheck", "Fact-Checked Banner", icons["checkmark-circle"]),
-              page(S, "globalSeo", "Global SEO Settings", icons.search),
+              // Global SEO is a folder rather than a single document: the
+              // singleton's two site-wide toggles sit alongside Redirects, which
+              // is a growing list the SEO team maintains on its own.
+              S.listItem()
+                .title("Global SEO Settings")
+                .icon(icons.search)
+                .child(
+                  S.list()
+                    .title("Global SEO Settings")
+                    .items([
+                      page(S, "globalSeo", "Defaults", icons["earth-globe"]),
+                      S.listItem()
+                        .title("Redirects")
+                        .icon(icons.transfer)
+                        .child(
+                          S.documentTypeList("redirect")
+                            .title("Redirects")
+                            .defaultOrdering([{ field: "source", direction: "asc" }]),
+                        ),
+                    ]),
+                ),
             ]),
         ),
 

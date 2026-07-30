@@ -26,6 +26,7 @@ import { serviceCity } from "./serviceCity";
 import { locationPage } from "./locationPage";
 import { testimonial } from "./testimonial";
 import { trialResult } from "./trialResult";
+import { redirect } from "./redirect";
 import { ctaButton } from "./ctaButton";
 import { sellingPoint } from "./sellingPoint";
 import { practiceAreaCard } from "./practiceAreaCard";
@@ -83,6 +84,7 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   practiceArea,
   serviceCity,
   locationPage,
+  redirect, // editor-managed 301s — collected into dist/bulk-redirects.json at build
   // Objects
   ctaButton,
   bodyCta, // a page-body block (D16) — wraps two ctaButtons
