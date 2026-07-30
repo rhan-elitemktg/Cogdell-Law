@@ -9,7 +9,7 @@ import FactCheck from "../../components/FactCheck.astro";
 import Consult from "../../components/Consult.astro";
 import { getPracticeAreaPaths, getPracticeAreaNode } from "../../sanity/lib/practiceAreas";
 import Rail from "../../components/rail/Rail.astro";
-import { getPracticeAreasNav } from "../../data/navigation";
+import { getPracticeAreasNav, getAreasWeServeNav } from "../../data/navigation";
 import { PRACTICE_AREA_ICONS } from "../../lib/practiceAreaIcons";
 import defaultHeroImage from "../../assets/firm-steps.jpg";
 
@@ -50,8 +50,13 @@ const description = node.cardSummary ?? `${node.title} — Cogdell Law Firm.`;
 // Every area shares one firm photo unless an editor uploads its own (Page tab →
 // Hero image). A custom upload gets an empty alt: it's a backdrop behind the H1
 // and we have no idea what it depicts, so announcing it would be noise.
-// The rail's tree is the same branch the header menu renders.
-const practiceAreaNav = await getPracticeAreasNav();
+// The rail's trees are the same branches the header menu renders. Practice
+// Areas leads here — it's the tree this page sits in, so it carries the active
+// trail — with Areas We Serve under it as the cross-link.
+const [practiceAreaNav, areasNav] = await Promise.all([
+  getPracticeAreasNav(),
+  getAreasWeServeNav(),
+]);
 
 const hasCustomHero = Boolean(node.heroImage);
 const heroImageAlt = hasCustomHero
@@ -96,8 +101,10 @@ const heroImageAlt = hasCustomHero
 
         <Rail
           pathname={Astro.url.pathname}
-          navHeading="Practice Areas"
-          navItems={practiceAreaNav.children ?? []}
+          navs={[
+            { heading: "Practice Areas", items: practiceAreaNav.children ?? [] },
+            { heading: "Areas We Serve", items: areasNav.children ?? [] },
+          ]}
           pageId={node._id}
         />
       </div>

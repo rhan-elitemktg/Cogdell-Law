@@ -1,7 +1,8 @@
 ---
-// The interior-page sidebar rail: consultation form, then a navigation tree.
-// Shared by practice-area pages (Practice Areas tree) and location pages
-// (Areas We Serve tree) — only `navHeading`/`navItems` differ.
+// The interior-page sidebar rail: consultation form, then one or more
+// navigation trees. Practice-area pages render the Practice Areas tree alone;
+// location pages render Practice Areas followed by Areas We Serve — only the
+// `navs` array differs.
 //
 // The form is the same one the bottom Consult band renders, reading the same
 // Consult singleton, so the firm edits its copy in one place. The rail skips
@@ -20,10 +21,19 @@ import ReviewedBy from "./ReviewedBy.astro";
 import { proseComponents } from "../prose/components";
 import { getConsult } from "../../sanity/lib/consult";
 
+/** One nav panel in the rail. */
+interface RailNavSection {
+  heading: string;
+  items: NavItem[];
+}
+
 interface Props {
   pathname: string;
-  navHeading: string;
-  navItems: NavItem[];
+  /**
+   * Nav panels, rendered in order directly under the form. Each becomes its own
+   * bordered panel, spaced by `.rail__inner`'s flex gap.
+   */
+  navs: RailNavSection[];
   /**
    * Document id of the host page. Pass it to head the rail with the "Reviewed
    * By" panel (D18); omit it and the rail opens on the form as before. Only the
@@ -33,7 +43,7 @@ interface Props {
   pageId?: string;
 }
 
-const { pathname, navHeading, navItems, pageId } = Astro.props;
+const { pathname, navs, pageId } = Astro.props;
 
 const consult = await getConsult();
 
@@ -74,7 +84,11 @@ if (!consult) {
       />
     </section>
 
-    <RailNav heading={navHeading} items={navItems} pathname={pathname} />
+    {
+      navs.map((nav) => (
+        <RailNav heading={nav.heading} items={nav.items} pathname={pathname} />
+      ))
+    }
   </div>
 </aside>
 

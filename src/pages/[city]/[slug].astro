@@ -12,7 +12,7 @@ import CtaBar from "../../components/CtaBar.astro";
 import FactCheck from "../../components/FactCheck.astro";
 import Consult from "../../components/Consult.astro";
 import { getAreaPaths, getLocationPage } from "../../sanity/lib/areasWeServe";
-import { getAreasWeServeNav } from "../../data/navigation";
+import { getAreasWeServeNav, getPracticeAreasNav } from "../../data/navigation";
 import defaultHeroImage from "../../assets/firm-steps.jpg";
 
 export async function getStaticPaths() {
@@ -46,8 +46,13 @@ const ledeBlock = page.lede
   : [];
 const bodyValue = [...ledeBlock, ...(page.body ?? [])];
 
-// The rail's tree is the same branch the header menu renders.
-const areasNav = await getAreasWeServeNav();
+// The rail's trees are the same branches the header menu renders. Practice
+// Areas leads: someone on a city page is picking a service, and its own city
+// is already the page they're on.
+const [practiceAreaNav, areasNav] = await Promise.all([
+  getPracticeAreasNav(),
+  getAreasWeServeNav(),
+]);
 
 // Every location shares one firm photo unless an editor uploads its own. A
 // custom upload gets an empty alt: it's a backdrop behind the H1 and we have no
@@ -95,8 +100,10 @@ const heroImageAlt = hasCustomHero
 
         <Rail
           pathname={Astro.url.pathname}
-          navHeading="Areas We Serve"
-          navItems={areasNav.children ?? []}
+          navs={[
+            { heading: "Practice Areas", items: practiceAreaNav.children ?? [] },
+            { heading: "Areas We Serve", items: areasNav.children ?? [] },
+          ]}
         />
       </div>
 
