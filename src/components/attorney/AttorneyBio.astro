@@ -29,7 +29,7 @@ const { attorney }: Props = Astro.props;
       }
 
       {
-        attorney.education.length > 0 && (
+        attorney.education?.length && (
           <div class="cred">
             <h2 class="cred__title">Education</h2>
             {attorney.education.map((edu) => (
@@ -79,7 +79,7 @@ const { attorney }: Props = Astro.props;
     <!-- RIGHT: admissions, associations, honors, positions, cases -->
     <div class="a-bio__col">
       {
-        attorney.barAdmissions.length > 0 && (
+        attorney.barAdmissions?.length && (
           <div class="cred">
             <h2 class="cred__title">Bar Admissions</h2>
             <ul class="cred__list">
@@ -105,7 +105,7 @@ const { attorney }: Props = Astro.props;
       }
 
       {
-        attorney.honors.length > 0 && (
+        attorney.honors?.length && (
           <div class="cred">
             <h2 class="cred__title">Honors</h2>
             <ul class="cred__list">

@@ -9,7 +9,7 @@ import { PortableText } from "astro-portabletext";
 import { proseComponents } from "./prose/components";
 import Eyebrow from "./Eyebrow.astro";
 import StatementBody from "./statement/StatementBody.astro";
-import teamPhoto from "../assets/team-group.png";
+import teamPhoto from "../assets/statement-team.jpg";
 import { getHomeStatement } from "../sanity/lib/homePage";
 
 // Homepage-only, so it fetches its own content (D9). The team photo is
@@ -29,7 +29,7 @@ if (!statement) {
   <div class="statement-band__media">
     <Image
       src={teamPhoto}
-      alt="The attorneys of Cogdell Law Firm"
+      alt="The Cogdell Law Firm team"
       widths={[900, 1300]}
       sizes="100vw"
       class="statement-band__bg lazy-fade"
@@ -89,7 +89,9 @@ if (!statement) {
   }
   /* Darken from the bottom up so the photo reads clear while the copy stays legible.
      The bottom 20px is fully solid navy before it feathers, so the band blends
-     seamlessly into the solid CTA bar below. */
+     seamlessly into the solid CTA bar below.
+     Nothing above 68%: the band sits mid-page rather than under the header, so a
+     tint up there only read as a shadow along the top edge. */
   .statement-band__overlay {
     position: absolute;
     inset: 0;
@@ -98,8 +100,7 @@ if (!statement) {
       rgba(7, 16, 29, 1) 0,
       rgba(7, 16, 29, 1) 20px,
       rgba(7, 16, 29, 0.6) 36%,
-      rgba(7, 16, 29, 0) 68%,
-      rgba(7, 16, 29, 0.15) 100%
+      rgba(7, 16, 29, 0) 68%
     );
   }
 

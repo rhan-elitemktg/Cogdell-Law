@@ -57,7 +57,8 @@ export const isOnTrail = (item: NavItem, current: string): boolean =>
 
 const ATTORNEYS_NAV_QUERY = defineQuery(`*[_type == "attorney"] | order(orderRank){
   "label": name,
-  "slug": slug.current
+  "slug": slug.current,
+  "group": teamGroup
 }`);
 
 const PRACTICE_AREAS_NAV_QUERY = defineQuery(`*[_type == "practiceArea"] | order(orderRank){
@@ -78,16 +79,47 @@ const AREAS_WE_SERVE_NAV_QUERY = defineQuery(`*[_type == "serviceCity"] | order(
   }
 }`);
 
-/** Attorneys submenu — bio pages under /attorney/*. */
+/**
+ * Our Team submenu — bio pages under /attorney/*, split into Attorneys and
+ * Paralegals.
+ *
+ * The document type is still `attorney` and the bio route is still
+ * /attorney/{slug}; only the landing page moved to /our-team, so the menu can
+ * cover paralegals and staff as well as attorneys.
+ *
+ * The two headings are grouping labels with no href of their own — the same
+ * shape Areas We Serve uses for its cities, so MenuList and the mobile drawer
+ * already render them as toggle-only rows. Order within each group is the
+ * Studio's drag order, since the query is ranked and filtered in place.
+ */
+const TEAM_GROUPS = [
+  { key: "attorney", label: "Attorneys" },
+  { key: "paralegal", label: "Paralegals" },
+] as const;
+
 async function getAttorneysNav(): Promise<NavItem> {
-  const attorneys = (await sanityClient.fetch(ATTORNEYS_NAV_QUERY)) ?? [];
+  const people = (await sanityClient.fetch(ATTORNEYS_NAV_QUERY)) ?? [];
+
   return {
-    label: "Attorneys",
-    href: "/attorneys",
-    children: attorneys.map((a) => ({
-      label: a.label!,
-      href: `/attorney/${a.slug}`,
-    })),
+    label: "Our Team",
+    href: "/our-team",
+    // flatMap so a group with nobody in it disappears rather than rendering an
+    // empty heading that opens onto nothing.
+    children: TEAM_GROUPS.flatMap(({ key, label }): NavItem[] => {
+      // Default to `attorney` so a document saved before `teamGroup` existed
+      // still appears somewhere instead of dropping out of the menu.
+      const members = people.filter((p) => (p.group ?? "attorney") === key);
+      if (!members.length) return [];
+      return [
+        {
+          label,
+          children: members.map((p) => ({
+            label: p.label!,
+            href: `/attorney/${p.slug}`,
+          })),
+        },
+      ];
+    }),
   };
 }
 
