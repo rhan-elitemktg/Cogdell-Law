@@ -42,7 +42,7 @@ export const isUnder = (href: string | undefined, current: string) => {
 /**
  * An item is on the "active trail" if it — or any descendant — is the current
  * page. Highlights the current item and all of its ancestors, even when child
- * URLs don't share the parent's path stem (e.g. /attorney/* → Attorneys), and
+ * URLs don't share the parent's path stem (e.g. /our-team/* → Our Team), and
  * via `isUnder` for deep pages under a stem (e.g. /practice-areas/*).
  */
 export const isOnTrail = (item: NavItem, current: string): boolean =>
@@ -80,11 +80,11 @@ const AREAS_WE_SERVE_NAV_QUERY = defineQuery(`*[_type == "serviceCity"] | order(
 }`);
 
 /**
- * Our Team submenu — bio pages under /attorney/*, split into Attorneys and
+ * Our Team submenu — bio pages under /our-team/*, split into Attorneys and
  * Paralegals.
  *
  * The document type is still `attorney` and the bio route is still
- * /attorney/{slug}; only the landing page moved to /our-team, so the menu can
+ * /our-team/{slug} now; the landing page is /our-team, so the menu can
  * cover paralegals and staff as well as attorneys.
  *
  * The two headings are grouping labels with no href of their own — the same
@@ -115,7 +115,7 @@ async function getAttorneysNav(): Promise<NavItem> {
           label,
           children: members.map((p) => ({
             label: p.label!,
-            href: `/attorney/${p.slug}`,
+            href: `/our-team/${p.slug}`,
           })),
         },
       ];

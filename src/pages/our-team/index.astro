@@ -1,16 +1,16 @@
 ---
-import { getPageHero } from "../sanity/lib/pageHero";
-import Layout from "../layouts/Layout.astro";
-import { getSeo } from "../sanity/lib/seo";
-import PageHero from "../components/PageHero.astro";
-import Attorneys from "../components/Attorneys.astro";
-import Testimonials from "../components/Testimonials.astro";
-import WhyChoose from "../components/WhyChoose.astro";
-import Consult from "../components/Consult.astro";
-import heroImage from "../assets/about-courthouse.jpg";
-import { getAttorneysBand } from "../sanity/lib/attorneys";
-import { getTestimonialsBand } from "../sanity/lib/testimonials";
-import { getWhyChooseBand } from "../sanity/lib/whyChoose";
+import { getPageHero } from "../../sanity/lib/pageHero";
+import Layout from "../../layouts/Layout.astro";
+import { getSeo } from "../../sanity/lib/seo";
+import PageHero from "../../components/PageHero.astro";
+import Attorneys from "../../components/Attorneys.astro";
+import Testimonials from "../../components/Testimonials.astro";
+import WhyChoose from "../../components/WhyChoose.astro";
+import Consult from "../../components/Consult.astro";
+import heroImage from "../../assets/about-courthouse.jpg";
+import { getAttorneysBand } from "../../sanity/lib/attorneys";
+import { getTestimonialsBand } from "../../sanity/lib/testimonials";
+import { getWhyChooseBand } from "../../sanity/lib/whyChoose";
 
 // This page holds its own copy of the band header, separate from the Home Page.
 const attorneysBand = await getAttorneysBand("attorneysPage");

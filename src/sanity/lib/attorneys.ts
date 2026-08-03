@@ -65,7 +65,7 @@ const ATTORNEY_QUERY = defineQuery(`*[_type == "attorney" && slug.current == $sl
   }
 }`);
 
-/** One attorney's full record, for /attorney/[slug]. */
+/** One attorney's full record, for /our-team/[slug]. */
 export async function getAttorney(slug: string) {
   return await sanityClient.fetch(ATTORNEY_QUERY, { slug });
 }

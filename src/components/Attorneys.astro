@@ -64,7 +64,7 @@ const { band, background = "paper" } = Astro.props;
     <div class="attorneys__grid">
       {
         attorneys.map((a) => (
-          <a class="attorneys__card" href={`/attorney/${a.slug}`}>
+          <a class="attorneys__card" href={`/our-team/${a.slug}`}>
             <div class="attorneys__photo">
               <img
                 src={urlFor(a.photo).width(790).auto("format").url()}
