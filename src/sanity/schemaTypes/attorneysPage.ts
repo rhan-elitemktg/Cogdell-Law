@@ -11,7 +11,8 @@ import { icons } from "@sanity/icons";
  */
 export const attorneysPage = defineType({
   name: "attorneysPage",
-  title: "Attorneys Page",
+  // Document id stays `attorneysPage`; only the label and the route moved.
+  title: "Team Members Page",
   type: "document",
   icon: icons.users,
   groups: [

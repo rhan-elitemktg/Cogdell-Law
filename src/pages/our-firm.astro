@@ -10,7 +10,6 @@ import OriginStory from "../components/about/OriginStory.astro";
 import Values from "../components/about/Values.astro";
 import Consult from "../components/Consult.astro";
 import heroImage from "../assets/about-courthouse.jpg";
-import consultBoardroom from "../assets/whychoose-bg.jpg";
 import { getOurFirm } from "../sanity/lib/ourFirm";
 
 const page = await getOurFirm();
@@ -74,5 +73,5 @@ const seo = await getSeo("ourFirmPage");
     headingStrong={page.values.headingStrong}
     items={page.values.items}
   />
-  <Consult photo={consultBoardroom} photoAlt="The Cogdell Law Firm team in the boardroom" />
+  <Consult />
 </Layout>

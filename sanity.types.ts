@@ -945,6 +945,7 @@ export type Attorney = {
   orderRank?: string;
   name: string;
   slug: Slug;
+  teamGroup: "attorney" | "paralegal";
   role: string;
   credential: string;
   photo: {
@@ -957,15 +958,15 @@ export type Attorney = {
   photoAlt: string;
   phone: string;
   email?: string;
-  practiceTags: Array<string>;
+  practiceTags?: Array<string>;
   bio?: BlockContent;
-  education: Array<
+  education?: Array<
     {
       _key: string;
     } & EducationEntry
   >;
-  barAdmissions: Array<string>;
-  honors: Array<string>;
+  barAdmissions?: Array<string>;
+  honors?: Array<string>;
   classesSeminars?: Array<string>;
   publishedWorks?: Array<string>;
   associations?: Array<string>;
@@ -1150,10 +1151,11 @@ export type AllSanitySchemaTypes =
 
 // Source: src/data/navigation.ts
 // Variable: ATTORNEYS_NAV_QUERY
-// Query: *[_type == "attorney"] | order(orderRank){  "label": name,  "slug": slug.current}
+// Query: *[_type == "attorney"] | order(orderRank){  "label": name,  "slug": slug.current,  "group": teamGroup}
 export type ATTORNEYS_NAV_QUERY_RESULT = Array<{
   label: string;
   slug: string;
+  group: "attorney" | "paralegal";
 }>;
 
 // Source: src/data/navigation.ts
@@ -1344,16 +1346,16 @@ export type ATTORNEY_QUERY_RESULT = {
   photoAlt: string;
   phone: string;
   email: string | null;
-  practiceTags: Array<string>;
+  practiceTags: Array<string> | null;
   bio: BlockContent | null;
   education: Array<{
     _key: string;
     school: string;
     location: string | null;
     lines: Array<string>;
-  }>;
-  barAdmissions: Array<string>;
-  honors: Array<string>;
+  }> | null;
+  barAdmissions: Array<string> | null;
+  honors: Array<string> | null;
   classesSeminars: Array<string> | null;
   publishedWorks: Array<string> | null;
   associations: Array<string> | null;
@@ -2427,7 +2429,7 @@ export type WHY_CHOOSE_BAND_QUERY_RESULT = {
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
-    '*[_type == "attorney"] | order(orderRank){\n  "label": name,\n  "slug": slug.current\n}': ATTORNEYS_NAV_QUERY_RESULT;
+    '*[_type == "attorney"] | order(orderRank){\n  "label": name,\n  "slug": slug.current,\n  "group": teamGroup\n}': ATTORNEYS_NAV_QUERY_RESULT;
     '*[_type == "practiceArea"] | order(orderRank){\n  _id,\n  title,\n  "slug": slug.current,\n  "parentId": parent._ref\n}': PRACTICE_AREAS_NAV_QUERY_RESULT;
     '*[_type == "serviceCity"] | order(orderRank){\n  "city": city,\n  "citySlug": citySlug.current,\n  "pages": *[_type == "locationPage" && references(^._id)] | order(orderRank){\n    "navLabel": navLabel,\n    "slug": slug.current\n  }\n}': AREAS_WE_SERVE_NAV_QUERY_RESULT;
     '*[_type == "locationPage"] | order(orderRank){\n  _id,\n  title,\n  navLabel,\n  heroTitle,\n  heroImage,\n  lede,\n  body[]{\n    ...,\n    _type == "bodyAttorney" => { attorney->{ name, photo, photoAlt } },\n    _type == "bodyQuoteCta" => { attorney->{ name, photo, photoAlt } },\n    _type == "bodyTestimonial" => { testimonial->{ quote, author, reviewedAt } }\n  },\n  faqs[]{ _key, question, answer },\n  "slug": slug.current,\n  "cityName": city->city,\n  "citySlug": city->citySlug.current,\n  _updatedAt,\n  seo{\n    metaTitle,\n    metaDescription,\n    canonicalUrl,\n    noIndex,\n    ogImage\n  }\n}': PATHS_QUERY_RESULT;

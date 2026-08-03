@@ -4,8 +4,11 @@
 // The copy is ONE shared Consult record used on every page (the per-page override
 // was removed at the firm's request).
 //
-// The photo stays a prop: it's art direction (D6), and /our-firm and /contact use
-// their own. The form's labels, placeholders and button text stay in code — only
+// The photo stays a prop for art direction (D6), but every page now takes the
+// default: the firm asked for the one team photo across all consult sections, so
+// /our-firm and /contact no longer pass their own.
+//
+// The form's labels, placeholders and button text stay in code — only
 // the fineprint and thank-you are editable, since they're client-facing legal
 // statements rather than UI chrome.
 import { Image } from "astro:assets";
@@ -15,7 +18,7 @@ import Eyebrow from "./Eyebrow.astro";
 import { proseComponents } from "./prose/components";
 import ConsultBody from "./consult/ConsultBody.astro";
 import ConsultForm from "./consult/ConsultForm.astro";
-import defaultPhoto from "../assets/consult-portrait.jpg";
+import defaultPhoto from "../assets/consult-team.jpg";
 import { getConsult } from "../sanity/lib/consult";
 
 interface Props {
@@ -25,7 +28,7 @@ interface Props {
 
 const {
   photo = defaultPhoto,
-  photoAlt = "Dan Cogdell seated in the firm's study",
+  photoAlt = "The Cogdell Law Firm team in a courthouse corridor",
 } = Astro.props;
 
 const consult = await getConsult();

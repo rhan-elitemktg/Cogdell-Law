@@ -5,7 +5,6 @@ import { getSeo } from "../sanity/lib/seo";
 import PageHero from "../components/PageHero.astro";
 import ContactMethods from "../components/ContactMethods.astro";
 import Consult from "../components/Consult.astro";
-import boardroom from "../assets/whychoose-bg.jpg";
 import heroImage from "../assets/firm-steps.jpg";
 
 const hero = await getPageHero("contactPage");
@@ -31,5 +30,5 @@ const seo = await getSeo("contactPage");
 
   <ContactMethods />
 
-  <Consult photo={boardroom} photoAlt="The Cogdell Law Firm team in the boardroom" />
+  <Consult />
 </Layout>

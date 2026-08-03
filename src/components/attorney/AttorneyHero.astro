@@ -70,7 +70,7 @@ const emailHref = attorney.email ? `mailto:${attorney.email}` : "#contact";
         </div>
         <div class="a-profile__rule" aria-hidden="true"></div>
         {
-          attorney.practiceTags.length > 0 && (
+          attorney.practiceTags?.length && (
             <ul class="a-profile__tags">
               {attorney.practiceTags.map((tag) => (
                 <li class="a-profile__tag">{tag}</li>

@@ -10,7 +10,9 @@
 export const DOCUMENT_BACKED: Record<string, string> = {
   homePage: "/",
   ourFirmPage: "/our-firm",
-  attorneysPage: "/attorneys",
+  // Document id stays `attorneysPage` — renaming it would be a data migration.
+  // The page is "Our Team" in the Studio and at /our-team.
+  attorneysPage: "/our-team",
   practiceAreasPage: "/practice-areas",
   trialExperiencePage: "/trial-experience",
   testimonialsPage: "/testimonials",

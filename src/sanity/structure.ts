@@ -95,7 +95,7 @@ export const structure: StructureResolver = (S, context) =>
               page(S, "homePage", "Home Page", icons.home),
               page(S, "trialExperiencePage", "Trial Experience Page", icons.case),
               page(S, "testimonialsPage", "Testimonials Page", icons.blockquote),
-              page(S, "attorneysPage", "Attorneys Page", icons.users),
+              page(S, "attorneysPage", "Team Members Page", icons.users),
               page(S, "ourFirmPage", "Our Firm Page", icons.book),
               page(S, "practiceAreasPage", "Practice Areas Page", icons["th-large"]),
               page(S, "newsPage", "News Page", icons.documents),
@@ -135,7 +135,7 @@ export const structure: StructureResolver = (S, context) =>
             .items([
               orderableDocumentListDeskItem({
                 type: "attorney",
-                title: "Attorney Bios",
+                title: "Team Member Bios",
                 icon: icons.user,
                 S,
                 context,

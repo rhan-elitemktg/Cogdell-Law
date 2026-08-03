@@ -29,7 +29,9 @@ const stringList = (name: string, title: string, description: string, required =
  */
 export const attorney = defineType({
   name: "attorney",
-  title: "Attorneys",
+  // Type name stays `attorney` — renaming it would migrate every document and
+  // every query. The label covers paralegals and staff too.
+  title: "Team Member Bios",
   type: "document",
   icon: icons.user,
   // Drag-to-reorder in the Studio (D2). Documents have no inherent order, and
@@ -55,6 +57,23 @@ export const attorney = defineType({
       group: "content",
       description: "The URL segment — /attorney/<slug>. Changing it breaks existing links.",
       options: { source: "name", maxLength: 96 },
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "teamGroup",
+      title: "Team group",
+      type: "string",
+      group: "content",
+      options: {
+        list: [
+          { title: "Attorney", value: "attorney" },
+          { title: "Paralegal", value: "paralegal" },
+        ],
+        layout: "radio",
+      },
+      initialValue: "attorney",
+      description:
+        'Which heading this person sits under in the "Our Team" menu. Separate from Role because Role is free text — "Of Counsel" and "Principal & Founder" are both attorneys, and grouping the menu by that string would misfile anyone whose title is worded differently.',
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -112,8 +131,7 @@ export const attorney = defineType({
     stringList(
       "practiceTags",
       "Practice tags",
-      "The practice areas listed on the bio page.",
-      true,
+      "Optional. The practice areas listed on the bio page.",
     ),
     defineField({
       name: "bio",
@@ -128,10 +146,17 @@ export const attorney = defineType({
       type: "array",
       group: "content",
       of: [defineArrayMember({ type: "educationEntry" })],
-      validation: (rule) => rule.required().min(1),
+      // Optional since this type covers paralegals and staff, not just
+      // attorneys — see the note on `barAdmissions` below.
+      description: "Optional. The section is omitted when empty.",
     }),
-    stringList("barAdmissions", "Bar admissions", "Courts and bars, one per line.", true),
-    stringList("honors", "Honors", "Awards and recognitions, one per line.", true),
+    // These three are attorney-only credentials. They were required back when
+    // every document here was an attorney; now that the type also covers
+    // paralegals and staff, requiring them would force an editor to invent a bar
+    // admission for someone who has none. The bio page already omits an empty
+    // section, so absent reads correctly.
+    stringList("barAdmissions", "Bar admissions", "Optional. Courts and bars, one per line."),
+    stringList("honors", "Honors", "Optional. Awards and recognitions, one per line."),
     stringList("classesSeminars", "Classes & seminars", "Optional."),
     stringList("publishedWorks", "Published works", "Optional."),
     stringList("associations", "Associations", "Optional."),
