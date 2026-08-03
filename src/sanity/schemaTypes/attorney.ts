@@ -16,8 +16,8 @@ const stringList = (name: string, title: string, description: string, required =
 /**
  * An attorney. The single source of truth for a person, used in four places:
  *
- *  - the homepage / /attorneys cards — name, role, photo, `credential`
- *  - /attorney/[slug] — the full bio page
+ *  - the homepage / /our-team cards — name, role, photo, `credential`
+ *  - /our-team/[slug] — the full bio page
  *
  * `role` is deliberately ONE field. The cards and the bio pages used to disagree
  * ("Founding Attorney" vs "Principal & Founder"; "Attorney" vs "Of Counsel"),
@@ -55,7 +55,7 @@ export const attorney = defineType({
       title: "Slug",
       type: "slug",
       group: "content",
-      description: "The URL segment — /attorney/<slug>. Changing it breaks existing links.",
+      description: "The URL segment — /our-team/<slug>. Changing it breaks existing links.",
       options: { source: "name", maxLength: 96 },
       validation: (rule) => rule.required(),
     }),

@@ -5,7 +5,7 @@ import { icons } from "@sanity/icons";
  * Consult singleton — the site-wide default for the consultation band, shown on
  * 13 pages: the homepage, /attorneys, /our-firm, /contact, /videos,
  * /trial-experience, /testimonials, /news and /news/*, /practice-areas and
- * /practice-areas/*, /attorney/* and every /{city}/* page.
+ * /practice-areas/*, /our-team/* and every /{city}/* page.
  *
  * Edit here and it changes everywhere. A page that wants its own wording sets its
  * optional `consult` override; the frontend coalesces override over default (D13).

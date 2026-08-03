@@ -7,6 +7,11 @@
       "source": "/health-care-fraud-defense/:path*",
       "destination": "/practice-areas/health-care-fraud-defense/:path*",
       "statusCode": 301
+    },
+    {
+      "source": "/attorney/:slug",
+      "destination": "/our-team/:slug",
+      "statusCode": 301
     }
   ]
 }

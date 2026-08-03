@@ -71,7 +71,7 @@ async function fetchSiteEntries(): Promise<SiteEntry[]> {
       noIndex: props.page.seo?.noIndex,
     })),
     ...(attorneys ?? []).map((attorney) => ({
-      path: `/attorney/${attorney.slug}`,
+      path: `/our-team/${attorney.slug}`,
       lastmod: attorney._updatedAt,
       noIndex: attorney.noIndex,
     })),
