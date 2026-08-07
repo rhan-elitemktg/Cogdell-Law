@@ -130,5 +130,25 @@ if (!story) {
   .firm-story__actions {
     margin-top: var(--space-8);
   }
+
+  /* ---- Responsive ---- */
+  /* Phones: drop the absolute positioning and let the photo sit in the flow
+     above the copy, the same way StatementBand stacks at ≤900px.
+     As a cropped backdrop the image had to cover a tall column of centred text,
+     so `cover` threw most of it away and the gradient hid what survived. In the
+     flow it keeps its own aspect ratio and stays legible. The overlay exists
+     only to make text readable ON the photo, so with them separated it goes. */
+  @media (max-width: 650px) {
+    .firm-story__bg {
+      position: static;
+      height: auto;
+    }
+    .firm-story__overlay {
+      display: none;
+    }
+    .firm-story__inner {
+      padding-block: var(--space-12);
+    }
+  }
 </style>
 

@@ -4,6 +4,7 @@ import { PortableText } from "astro-portabletext";
 import { proseComponents } from "./prose/components";
 import heroLandscape from "../assets/hero-boardroom.jpg";
 import heroPortrait from "../assets/cogdell-seated-portrait.jpg";
+import heroMobileCrop from "../assets/hero-mobile.jpg";
 import HeroLead from "./hero/HeroLead.astro";
 import { getHomeHero } from "../sanity/lib/homePage";
 import { getWistiaMeta } from "../lib/wistia";
@@ -35,10 +36,27 @@ const heroTablet = await getImage({
   widths: [420, 640, 738],
   format: "webp",
 });
+// Phones get a third crop. The full-length portrait puts Dan mid-frame, and
+// since the copy is bottom-aligned it landed straight across his face on a tall
+// narrow screen. This one is framed to head-and-torso so he reads at the small
+// size, and below 650px it sits as a band above the copy rather than behind it.
+const heroMobile = await getImage({
+  src: heroMobileCrop,
+  widths: [420, 640, 738],
+  format: "webp",
+});
 ---
 
 <section class="hero">
   <picture class="hero__picture">
+    {/* Narrowest first — <picture> takes the first matching source, so the
+        900px rule would otherwise swallow phones too. */}
+    <source
+      media="(max-width: 650px)"
+      srcset={heroMobile.srcSet.attribute}
+      sizes="100vw"
+      type="image/webp"
+    />
     <source
       media="(max-width: 900px)"
       srcset={heroTablet.srcSet.attribute}
@@ -362,7 +380,76 @@ const heroTablet = await getImage({
     }
   }
   @media (max-width: 650px) {
+    /* Phones: stack rather than overlay. Behind the copy, `cover` on a tall
+       narrow screen put Dan mid-frame while the bottom-aligned text ran across
+       his face — no scrim tuning fixes that, because the text itself is opaque.
+       As a band above the copy the two can't collide at any height, and the
+       hero grows with its content instead of cropping to fit.
+       Same approach as StatementBand and FirmStory at their breakpoints. */
+    .hero {
+      min-height: 0;
+    }
+    /* Becomes a positioned block so the gradient below can anchor to the photo's
+       own bottom edge — `display: contents` leaves it with no box to hang off. */
+    .hero__picture {
+      display: block;
+      position: relative;
+    }
+    /* Fades the foot of the photo into the section's navy so the copy reads as
+       emerging from the image rather than butting against a hard seam. Ends on
+       --cog-navy-deep, which is .hero's own background, so the join is seamless. */
+    .hero__picture::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0 0;
+      height: 45%;
+      background: linear-gradient(
+        to top,
+        var(--cog-navy-deep) 0%,
+        rgba(7, 16, 29, 0.72) 38%,
+        transparent 100%
+      );
+      pointer-events: none;
+    }
+    .hero__img {
+      position: static;
+      display: block;
+      width: 100%;
+      height: auto;
+      /* Matches the crop exactly, so `cover` never trims it further. */
+      aspect-ratio: 738 / 540;
+    }
+    /* The scrim exists only to hold text legible ON the photo. Nothing sits on
+       it now, and left in place it would tint the whole stacked section — the
+       ::after above does the blending instead. */
+    .hero__scrim {
+      display: none;
+    }
+    .hero__inner {
+      min-height: 0;
+      /* Tight to the top so the copy starts inside the fade rather than after a
+         gap, which is what makes the two read as one panel. */
+      padding-block: var(--space-6) var(--space-12);
+    }
+    .hero__content {
+      align-self: start;
+      max-width: none;
+    }
+    /* Keep the headline to its two authored lines.
+       Each .hero__title-line is already display:block, so the two-line split is
+       structural — the problem was the type size. The base clamp bottoms out at
+       44px, and "Other Lawyers Call." runs about 7.9em in Cormorant bold, so it
+       needs roughly (viewport - 48px of container padding) / 7.9 — about 43px at
+       390px wide. It was overflowing and wrapping to four lines.
+       Sizing off vw instead keeps both lines intact from 320px up, with ~8%
+       headroom. Deliberately no `white-space: nowrap`: the copy is editable in
+       Sanity, and a longer headline should wrap rather than run off-screen. */
+    .hero__title {
+      font-size: clamp(2rem, 10vw, 2.75rem);
+    }
+    /* Full width now that it isn't sharing the frame with the photo. */
     .hero__caption {
+      justify-self: stretch;
       flex-direction: column;
     }
     .hero__attribution,
