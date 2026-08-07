@@ -91,6 +91,29 @@ const { points } = Astro.props;
         }
       }
     }
-    
+
+    /* Phones: one per row. The 2×2 grid above leaves each value and its label
+       sharing a ~150px column, which wraps the longer labels onto three lines. */
+    @media (max-width: 600px) {
+      .inner {
+        flex-direction: column;
+      }
+      .selling-point {
+        flex-basis: auto;
+        /* Reset the 2×2 borders — in a single column only the horizontal rule
+           between rows makes sense. */
+        border-right: 0;
+        border-bottom: 1px solid var(--cog-navy-glow);
+        padding: var(--space-8);
+        &:first-child,
+        &:nth-child(3) {
+          border-right: 0;
+        }
+        &:last-child {
+          border-bottom: 0;
+        }
+      }
+    }
+
   }
 </style>

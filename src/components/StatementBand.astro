@@ -67,7 +67,13 @@ if (!statement) {
     position: relative;
     display: flex;
     align-items: flex-end;
-    min-height: clamp(560px, 72vh, 760px);
+    /* A fixed height, deliberately not tied to viewport height. This was
+       clamp(560px, 72vh, 760px), which collapsed toward 560px on a short laptop
+       window — and since the photo is `object-fit: cover` anchored to the top,
+       a shorter band shows less of it while the copy and its scrim stay pinned
+       to the bottom, riding up over the team's faces. Height now depends only
+       on the design, so a short window scrolls instead of cropping. */
+    min-height: 760px;
     overflow: hidden;
     background-color: var(--cog-navy-deep);
     color: var(--cog-white);

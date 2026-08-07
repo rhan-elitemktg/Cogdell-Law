@@ -61,6 +61,17 @@ const { band, background = "paper" } = Astro.props;
       </div>
     </div>
 
+    {/* Only ever visible while the row actually scrolls — the script hides them
+        on desktop, where all four cards fit. Same control pattern as WhyChoose. */}
+    <div class="attorneys__controls" hidden>
+      <button class="attorneys__arrow" data-dir="prev" type="button" aria-label="Previous attorneys">
+        <svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true"><path d="M10.5 2.5L5 8l5.5 5.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="attorneys__arrow" data-dir="next" type="button" aria-label="Next attorneys">
+        <svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true"><path d="M5.5 2.5L11 8l-5.5 5.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
     <div class="attorneys__grid">
       {
         attorneys.map((a) => (
@@ -144,6 +155,42 @@ const { band, background = "paper" } = Astro.props;
     font-size: var(--text-base);
     line-height: 1.7;
     color: var(--cog-ink-body);
+  }
+
+  /* ---- Carousel controls ---- */
+  /* Ink on paper, unlike WhyChoose's white-on-navy pair — this band sits on
+     --cog-paper. Same size and behaviour otherwise. */
+  .attorneys__controls {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-2);
+    margin-bottom: var(--space-6);
+  }
+  /* `hidden` is a UA rule and the author `display: flex` above outranks it, so
+     the attribute alone would leave the arrows on screen. */
+  .attorneys__controls[hidden] {
+    display: none;
+  }
+  .attorneys__arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border: 1px solid var(--cog-line-ink);
+    border-radius: 50%;
+    background-color: transparent;
+    color: var(--cog-ink);
+    cursor: pointer;
+    transition:
+      background-color var(--transition),
+      border-color var(--transition),
+      color var(--transition);
+  }
+  .attorneys__arrow:hover {
+    background-color: var(--cog-ink);
+    border-color: var(--cog-ink);
+    color: var(--cog-white);
   }
 
   /* ---- Card grid ---- */
@@ -292,3 +339,46 @@ const { band, background = "paper" } = Astro.props;
     }
   }
 </style>
+
+<script>
+  // Arrows for the tablet/mobile peek carousel. Mirrors WhyChoose's controls so
+  // the two rows behave identically.
+  //
+  // The band renders on the homepage AND /our-team, so bind every instance and
+  // scope each one to its own root.
+  document.querySelectorAll<HTMLElement>(".attorneys").forEach((root) => {
+    const scroller = root.querySelector<HTMLElement>(".attorneys__grid");
+    const controls = root.querySelector<HTMLElement>(".attorneys__controls");
+    if (!scroller || !controls) return;
+
+    // Read the gap from the computed style rather than hardcoding it, so
+    // changing the CSS can't silently leave the arrows scrolling by the wrong
+    // amount. `columnGap` is the flex gap once the carousel media query applies.
+    const step = () => {
+      const card = scroller.querySelector<HTMLElement>(".attorneys__card");
+      const gap = parseFloat(getComputedStyle(scroller).columnGap) || 0;
+      return card ? card.offsetWidth + gap : 320;
+    };
+
+    root
+      .querySelector('[data-dir="prev"]')
+      ?.addEventListener("click", () =>
+        scroller.scrollBy({ left: -step(), behavior: "smooth" }),
+      );
+    root
+      .querySelector('[data-dir="next"]')
+      ?.addEventListener("click", () =>
+        scroller.scrollBy({ left: step(), behavior: "smooth" }),
+      );
+
+    // Above 900px the grid is a static 4-up with nothing to scroll, so the
+    // arrows would be dead controls. They start hidden in the markup — showing
+    // them only once the row genuinely overflows avoids a flash of arrows on
+    // desktop before this runs.
+    const syncControls = () => {
+      controls.hidden = scroller.scrollWidth <= scroller.clientWidth + 1;
+    };
+    syncControls();
+    window.addEventListener("resize", syncControls);
+  });
+</script>
