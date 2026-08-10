@@ -17,7 +17,7 @@ interface Props {
 }
 const { band } = Astro.props;
 const features = band.features ?? [];
-import bgPhoto from "../assets/whychoose-bg.jpg";
+import bgPhoto from "../assets/meeting-room.jpg";
 
 // Lucide-style icon inner-paths (viewBox 0 0 24 24), rendered inline via set:html.
 // Presentation, so it stays in code — Sanity only stores the key. Keep in sync
@@ -38,7 +38,7 @@ const icons: Record<string, string> = {
   <Image
     src={bgPhoto}
     alt=""
-    widths={[1200, 1376]}
+    widths={[1200, 1672]}
     sizes="100vw"
     class="why-choose__bg lazy-fade"
   />
