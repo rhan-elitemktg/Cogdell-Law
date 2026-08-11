@@ -154,9 +154,11 @@ forces `noindex,nofollow` on every page and makes `/robots.txt` serve
 `Disallow: /`. Turn it off when the site moves to its real domain, or it will not
 be indexed.
 
-The consultation form is still on Resend's test mode: leads only reach the
-address the Resend account was created with. Verify the domain in Resend, then
-set `CONSULT_FROM_EMAIL` and `CONSULT_TO_EMAIL` in Vercel.
+The consultation form sends from `noreply@send.cogdell-law.com`. That sender is
+hardcoded in `api/consult.ts` — it has to stay on the `send.` subdomain, which is
+what is verified in Resend, and Resend rejects anything else. Set
+`CONSULT_TO_EMAIL` in Vercel to decide who receives the leads; it takes a
+comma-separated list for several recipients.
 
 **Delete `PUBLIC_PAGEPROOFER_SITE_ID` in Vercel.** It loads the PageProofer
 review widget at the end of every page's `<body>`. With the variable unset the
