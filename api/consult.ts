@@ -5,13 +5,17 @@
 // function at POST /api/consult.
 //
 // Env vars (set in Vercel → Settings → Environment Variables):
-//   RESEND_API_KEY     — your Resend API key (secret)
-//   CONSULT_TO_EMAIL   — where leads are sent. In Resend test mode this MUST be
-//                        the email you signed up to Resend with.
-//   CONSULT_FROM_EMAIL — optional. Defaults to Resend's test sender. Change to a
-//                        verified address (e.g. "Cogdell Law <website@cogdell-law.com>")
-//                        once the domain is verified.
+//   RESEND_API_KEY   — your Resend API key (secret)
+//   CONSULT_TO_EMAIL — where leads are sent. Comma-separate for several
+//                      recipients: "intake@firm.com, dan@firm.com".
 import { Resend } from "resend";
+
+// Hardcoded rather than an env var: this isn't an environment concern, it's a
+// property of the domain verified in Resend. It must stay on the `send.`
+// subdomain — that is what is verified, not the bare cogdell-law.com — and
+// Resend rejects anything else, so a stray dashboard value would break sending
+// with nothing in the code to explain why.
+const FROM = "Cogdell Law Firm <noreply@send.cogdell-law.com>";
 
 function json(body: Record<string, unknown>, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -22,9 +26,17 @@ function json(body: Record<string, unknown>, status = 200): Response {
 
 export async function POST(request: Request): Promise<Response> {
   const apiKey = process.env.RESEND_API_KEY;
-  const to = process.env.CONSULT_TO_EMAIL;
-  const from =
-    process.env.CONSULT_FROM_EMAIL || "Cogdell Law Website <onboarding@resend.dev>";
+
+  // One address or several: "a@firm.com, b@firm.com". The `?? ""` keeps an unset
+  // var from throwing here rather than at the guard below, and filter(Boolean)
+  // drops the empty segment a trailing comma leaves behind.
+  // `String(...)` rather than a bare `?? ""`: @types/node isn't installed, so
+  // `process.env.X` is `any` and the split/map below would infer `any` too,
+  // tripping noImplicitAny under astro's strict tsconfig.
+  const recipients = String(process.env.CONSULT_TO_EMAIL ?? "")
+    .split(",")
+    .map((address) => address.trim())
+    .filter(Boolean);
 
   // Read the submitted fields (the form posts JSON).
   let data: Record<string, string>;
@@ -49,7 +61,9 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   // Fail loudly in logs if the function isn't configured, but don't leak details.
-  if (!apiKey || !to) {
+  // Tests the parsed list, not the raw string: CONSULT_TO_EMAIL="," is non-empty
+  // but yields no usable recipient.
+  if (!apiKey || !recipients.length) {
     console.error("Consult form: missing RESEND_API_KEY or CONSULT_TO_EMAIL env var.");
     return json({ ok: false, error: "Email is not configured yet." }, 500);
   }
@@ -58,8 +72,8 @@ export async function POST(request: Request): Promise<Response> {
 
   try {
     const { error } = await resend.emails.send({
-      from,
-      to,
+      from: FROM,
+      to: recipients,
       replyTo: email, // hitting "reply" in the inbox replies to the prospect
       subject: `New consultation request — ${name}`,
       text: [
