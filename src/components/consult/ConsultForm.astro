@@ -234,6 +234,40 @@ const EMAIL_TITLE = "Enter a complete email address, e.g. you@email.com";
 </style>
 
 <script>
+  import { initBotId } from "botid/client/core";
+
+  // ---- Vercel BotID ----
+  //
+  // An invisible challenge: BotID runs in the browser, solves a challenge, and
+  // attaches headers to the fetch below, which `api/consult.ts` then validates
+  // with `checkBotId()`. There is nothing for a visitor to click.
+  //
+  // This runs FIRST in the script so the challenge has the longest possible head
+  // start — it needs to be solved by the time someone finishes typing and hits
+  // submit, and a real person takes several seconds over that.
+  //
+  // Declared here rather than in Layout.astro on purpose: the challenge should
+  // only load on the ~44 pages that actually carry a form, not on all 49. Astro
+  // bundles this script once per page no matter how many times the component
+  // renders, so the two-form practice-area pages still initialize exactly once.
+  //
+  // The path list is a CONTRACT with the server: `checkBotId()` fails for any
+  // route not named here, because this is what decides which requests get the
+  // headers. If /api/consult ever moves, this must move with it.
+  //
+  // `checkLevel: "basic"` pins us to the free tier. Deep Analysis is billed per
+  // call ($1/1000) and also has to be switched on in the dashboard — stating the
+  // level here means enabling it there can't silently start charging us.
+  initBotId({
+    protect: [
+      {
+        path: "/api/consult",
+        method: "POST",
+        advancedOptions: { checkLevel: "basic" },
+      },
+    ],
+  });
+
   // Submit to our /api/consult function (which emails the firm via Resend).
   // Native `required` validation still runs first; on success we swap the form
   // for the thank-you, on failure we surface an error and let them retry.

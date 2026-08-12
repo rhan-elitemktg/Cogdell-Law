@@ -7,47 +7,95 @@ inferred from the code.
 | | |
 | --- | --- |
 | Live site | `www.cogdell-law.com` — 200, apex 307s to `www` |
-| Repo | `rhan-elitemktg/Cogdell-Law`, `master` at `0b035ee` |
+| Repo | `rhan-elitemktg/Cogdell-Law`, `master` at `3b431f4` |
 | Vercel team | `elite-legal-marketing` |
 | Search engines | Crawling enabled, 47 URLs in the sitemap |
-| Consultation form | Needs one setting — see step 1 |
+| Consultation form | Live — delivers to three firm addresses |
+| Review widget | PageProofer **ON** in production — temporary, see below |
+| Bot protection | BotID **observing, not blocking** — one step left, see below |
 
 ---
 
-## Do these next — two things need a person
+## Open items
 
-### 1. Point the consultation form at real inboxes
+Two, both of them a Vercel environment variable plus a redeploy.
 
-The form now sends from the verified Resend domain, but it still delivers to whatever single
-address `CONSULT_TO_EMAIL` held before.
+### 1. BotID is observing, not enforcing
 
-In **Vercel → Settings → Environment Variables**, edit that variable to:
+BotID Basic is wired into the consultation form and **currently blocks nobody**. It runs on
+every submission and logs its verdict, but only turns a request away once `BOTID_ENFORCE=true`
+exists in Vercel. Until then the form has exactly the protection it had before: a honeypot.
+
+That default is deliberate — see "Bot protection" under *How the moving parts work* for why.
+
+**The wiring is already proven.** A real submission on the branch's preview deployment logged
+`isBot=false isHuman=true`, which means the rewrites, the client challenge and the server check
+all work end to end in a real browser. What's *not* proven is how BotID classifies other
+people's browsers — that's one data point from one machine, and it's the whole reason for the
+observation window below rather than enforcing immediately.
+
+Finishing the job:
+
+1. Watch a day or so of real submissions in `vercel logs`. Each one prints
+   `Consult form: BotID observed isBot=… isHuman=…`.
+2. If real people are consistently reading `isBot=false`, enforce it:
+
+   ```bash
+   vercel env add BOTID_ENFORCE production --value true --no-sensitive
+   ```
+
+3. Redeploy. The observe-mode log line goes quiet at that point and only flagged requests
+   are logged, which is the signal that the switch took.
+
+**If leads start disappearing, this is the first thing to suspect.** Removing the variable
+and redeploying reverts to observing without touching code.
+
+### 2. PageProofer is back on production
+
+**Re-enabled 12 August 2026 for a client review round. Deliberate, and meant to be
+temporary.** `PUBLIC_PAGEPROOFER_SITE_ID` was set on Production and the site redeployed;
+the widget is confirmed loading on the live homepage.
+
+It renders at the end of **every** page's `<body>` — including `/contact`, where visitors
+type descriptions of their legal situation into the consultation form. That is the reason
+it shouldn't stay on any longer than the review needs.
+
+To take it back off:
+
+```bash
+vercel env rm PUBLIC_PAGEPROOFER_SITE_ID production
+```
+
+Then redeploy — `vercel redeploy <current-production-url>` rebuilds from the same git
+commit rather than from a local working tree. `Layout.astro` renders the tag only when the
+variable is set, so unsetting it removes the script from the built HTML entirely. **There
+is no code change in either direction**, and the ID also lives in the repo's local `.env`,
+so removing it from Vercel loses nothing.
+
+One wrinkle: the CLI added the variable as **Sensitive**, so its value can't be read back
+out of Vercel. Harmless here — it's a `PUBLIC_` embed ID that ships in the page source
+anyway — but that's why the local `.env` copy matters.
+
+---
+
+## Settings that live only in Vercel
+
+Recorded here because neither is visible anywhere in the repo.
+
+**`CONSULT_TO_EMAIL` holds three firm addresses:**
 
 ```
-rhan@elitemktg.com, phillip@elitemktg.com
+dan@cogdell-law.com, laken@cogdell-law.com, paralegal@cogdell-law.com
 ```
 
-It is marked *Sensitive*, so the current value is hidden — replace it wholesale rather than
-appending. **Then redeploy.** Vercel bakes environment variables in at deploy time; changing
-one alone does nothing until a new deployment goes out.
+Delivery to all three is confirmed. `info@cogdell-law.com` was considered and deliberately
+not used. No agency address is on the list — the form asks people to describe their
+situation, so submissions are prospective-client communications and belong only in firm
+inboxes. Adding one back is a decision for the firm, not a convenience.
 
-Submit the form and confirm:
-
-- both addresses receive it
-- the sender reads `Cogdell Law Firm <noreply@send.cogdell-law.com>`
-- pressing Reply addresses the person who filled in the form, not the firm
-
-Once you're satisfied, change the same variable to `info@cogdell-law.com` and redeploy again.
-No code change is needed for that switch.
-
-### 2. Remove the PageProofer review widget
-
-The widget is still loading on the live site — confirmed present in the homepage HTML at
-`www.cogdell-law.com`. It was a review tool for the build and shouldn't be on a public site.
-
-Delete `PUBLIC_PAGEPROOFER_SITE_ID` in Vercel and redeploy. `Layout.astro` only renders the tag
-when that variable is set, so removing it takes the script out of the HTML entirely — no code
-change.
+The variable is marked *Sensitive*, so the dashboard hides its value — replace it wholesale
+rather than editing around what's there, and **redeploy afterwards or nothing changes.**
+That last point applies to every variable here: Vercel bakes them in at deploy time.
 
 ---
 
@@ -63,7 +111,8 @@ change.
 | Trailing-slash variants | Slashed legacy URLs redirect too, not 404 | Pass |
 | Team content | 4 attorneys + Laken Knox (Paralegal); no placeholder copy remains | Pass |
 | Demo practice area | Deleted from Sanity | Pass |
-| Email delivery | Not tested — would send a real message | See step 1 |
+| Email delivery | Reaches all three firm addresses | Pass |
+| PageProofer widget | Re-enabled 12 Aug for review — must come back off | Open |
 
 ---
 
@@ -120,7 +169,8 @@ code in the project that sends email.
 | Variable | Purpose |
 | --- | --- |
 | `RESEND_API_KEY` | Initializes the Resend client. Secret — never reaches the browser. |
-| `CONSULT_TO_EMAIL` | Who receives leads. Accepts a comma-separated list. |
+| `CONSULT_TO_EMAIL` | Who receives leads. Comma-separated; currently the three firm addresses above. |
+| `BOTID_ENFORCE` | `true` lets BotID actually block. Anything else (including unset) observes only. |
 
 The sender is hardcoded to `noreply@send.cogdell-law.com` rather than being a variable. That
 address has to sit on the `send.` subdomain — that's what's verified in Resend, and anything
@@ -130,6 +180,41 @@ silently.
 Reply-to is set to whatever the visitor typed, so staff reply straight to the prospect. A
 hidden honeypot field catches bots: if it's filled, the function returns success and sends
 nothing.
+
+### Bot protection
+
+The form is the site's only untrusted input, so it carries **Vercel BotID** on top of the
+honeypot. BotID is an invisible challenge — nothing to click, no puzzle — solved in the
+browser, whose result rides along on the request headers.
+
+It is **three pieces that must stay in step**:
+
+| Where | What |
+| --- | --- |
+| `vercel.json` | Two `rewrites` that proxy the challenge through our own domain, so ad-blockers can't neuter it. The UUID paths are BotID's, not ours — don't tidy them. |
+| `ConsultForm.astro` | `initBotId()`, naming `/api/consult` as protected. **This is what decides which requests get the headers** — `checkBotId()` fails for any route not listed here. |
+| `api/consult.ts` | `checkBotId()`, which reads the verdict. |
+
+It lives in `ConsultForm` rather than `Layout` so the challenge loads on the 44 pages with a
+form, not all 49. Both ends pin `checkLevel: "basic"` — the free tier. Deep Analysis is
+billed at $1 per 1000 calls and also needs switching on in the dashboard, so naming the level
+in code means enabling it there can't quietly start charging this endpoint.
+
+**Three deliberate choices worth not undoing:**
+
+- **It ships observing** (`BOTID_ENFORCE`, see Open items). The function can't be exercised
+  locally, and a visitor whose challenge fails to load reads as a bot — so enforcing on day
+  one risked binning real enquiries from hardened browsers, which this practice draws more of
+  than most.
+- **A flagged request gets a 403, not the honeypot's silent success.** The form's error branch
+  offers the phone number, so a false positive still reaches the firm; a fake thank-you would
+  strand someone who believes they've made contact.
+- **The check fails open.** If BotID throws, the submission goes through. Some spam is
+  recoverable; a law firm's contact form rejecting everyone because a bot checker had an
+  outage is not.
+
+The honeypot stays alongside it — free, needs no JavaScript, and rejects crude bots before a
+BotID call is spent on them.
 
 ### Photography
 
@@ -157,6 +242,12 @@ developer.
   Resend keys are only set in Vercel. Testing the form means deploying.
 - **Preview deployments are behind SSO.** Branch previews return a login redirect to anyone not
   signed in to Vercel, which makes them useless for sharing with a client. Production is public.
+  They are, however, very useful to *you*: a preview runs `api/` for real and has the Resend and
+  BotID variables, so the consultation form can be exercised end to end there before anything
+  merges. The SSO gate does not interfere with BotID's proxy paths — verified 12 August 2026.
+- **Testing the form means submitting the form.** BotID blocks direct hits on `/api/consult`
+  by design, so `curl` proves nothing except that BotID works. Use the real form on a real
+  page — and remember a submission sends a genuine email to all three firm addresses.
 - **`astro build` does not typecheck `api/`.** It isn't part of the Astro route tree. Also
   `@types/node` isn't installed, so `npx tsc --noEmit` reports dozens of pre-existing `process`
   errors across the repo — compare before and after a change rather than expecting a clean run.
