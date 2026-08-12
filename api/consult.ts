@@ -92,9 +92,20 @@ export async function POST(request: Request): Promise<Response> {
       advancedOptions: { checkLevel: "basic" },
     });
 
+    // While observing, log EVERY verdict rather than only the bot ones.
+    // Silence would otherwise be ambiguous: "no bots have tried" and "the check
+    // never ran" produce identical logs, and telling those two apart is the
+    // entire purpose of the observation window. Once enforcing, this goes quiet
+    // and only flagged requests are logged.
+    if (!ENFORCE_BOTID) {
+      console.info(
+        `Consult form: BotID observed isBot=${verification.isBot} ` +
+          `isHuman=${verification.isHuman} verifiedBot=${verification.isVerifiedBot} ` +
+          `bypassed=${verification.bypassed} — observe mode, nothing blocked.`,
+      );
+    }
+
     if (verification.isBot) {
-      // Logged either way — in observe mode this line IS the feature, and it's
-      // what tells you whether enforcing is safe yet.
       console.warn(
         `Consult form: BotID flagged a submission (enforcing=${ENFORCE_BOTID}, ` +
           `verifiedBot=${verification.isVerifiedBot}, bypassed=${verification.bypassed}).`,
