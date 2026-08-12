@@ -12,10 +12,45 @@ inferred from the code.
 | Search engines | Crawling enabled, 47 URLs in the sitemap |
 | Consultation form | Live — delivers to three firm addresses |
 | Review widget | PageProofer **ON** in production — temporary, see below |
+| Bot protection | BotID **observing, not blocking** — one step left, see below |
 
 ---
 
-## Open — PageProofer is back on production
+## Open items
+
+Two, both of them a Vercel environment variable plus a redeploy.
+
+### 1. BotID is observing, not enforcing
+
+BotID Basic is wired into the consultation form and **currently blocks nobody**. It runs on
+every submission and logs its verdict, but only turns a request away once `BOTID_ENFORCE=true`
+exists in Vercel. Until then the form has exactly the protection it had before: a honeypot.
+
+That default is deliberate — see "Bot protection" under *How the moving parts work* for why.
+
+**The wiring is already proven.** A real submission on the branch's preview deployment logged
+`isBot=false isHuman=true`, which means the rewrites, the client challenge and the server check
+all work end to end in a real browser. What's *not* proven is how BotID classifies other
+people's browsers — that's one data point from one machine, and it's the whole reason for the
+observation window below rather than enforcing immediately.
+
+Finishing the job:
+
+1. Watch a day or so of real submissions in `vercel logs`. Each one prints
+   `Consult form: BotID observed isBot=… isHuman=…`.
+2. If real people are consistently reading `isBot=false`, enforce it:
+
+   ```bash
+   vercel env add BOTID_ENFORCE production --value true --no-sensitive
+   ```
+
+3. Redeploy. The observe-mode log line goes quiet at that point and only flagged requests
+   are logged, which is the signal that the switch took.
+
+**If leads start disappearing, this is the first thing to suspect.** Removing the variable
+and redeploying reverts to observing without touching code.
+
+### 2. PageProofer is back on production
 
 **Re-enabled 12 August 2026 for a client review round. Deliberate, and meant to be
 temporary.** `PUBLIC_PAGEPROOFER_SITE_ID` was set on Production and the site redeployed;
@@ -135,6 +170,7 @@ code in the project that sends email.
 | --- | --- |
 | `RESEND_API_KEY` | Initializes the Resend client. Secret — never reaches the browser. |
 | `CONSULT_TO_EMAIL` | Who receives leads. Comma-separated; currently the three firm addresses above. |
+| `BOTID_ENFORCE` | `true` lets BotID actually block. Anything else (including unset) observes only. |
 
 The sender is hardcoded to `noreply@send.cogdell-law.com` rather than being a variable. That
 address has to sit on the `send.` subdomain — that's what's verified in Resend, and anything
@@ -144,6 +180,41 @@ silently.
 Reply-to is set to whatever the visitor typed, so staff reply straight to the prospect. A
 hidden honeypot field catches bots: if it's filled, the function returns success and sends
 nothing.
+
+### Bot protection
+
+The form is the site's only untrusted input, so it carries **Vercel BotID** on top of the
+honeypot. BotID is an invisible challenge — nothing to click, no puzzle — solved in the
+browser, whose result rides along on the request headers.
+
+It is **three pieces that must stay in step**:
+
+| Where | What |
+| --- | --- |
+| `vercel.json` | Two `rewrites` that proxy the challenge through our own domain, so ad-blockers can't neuter it. The UUID paths are BotID's, not ours — don't tidy them. |
+| `ConsultForm.astro` | `initBotId()`, naming `/api/consult` as protected. **This is what decides which requests get the headers** — `checkBotId()` fails for any route not listed here. |
+| `api/consult.ts` | `checkBotId()`, which reads the verdict. |
+
+It lives in `ConsultForm` rather than `Layout` so the challenge loads on the 44 pages with a
+form, not all 49. Both ends pin `checkLevel: "basic"` — the free tier. Deep Analysis is
+billed at $1 per 1000 calls and also needs switching on in the dashboard, so naming the level
+in code means enabling it there can't quietly start charging this endpoint.
+
+**Three deliberate choices worth not undoing:**
+
+- **It ships observing** (`BOTID_ENFORCE`, see Open items). The function can't be exercised
+  locally, and a visitor whose challenge fails to load reads as a bot — so enforcing on day
+  one risked binning real enquiries from hardened browsers, which this practice draws more of
+  than most.
+- **A flagged request gets a 403, not the honeypot's silent success.** The form's error branch
+  offers the phone number, so a false positive still reaches the firm; a fake thank-you would
+  strand someone who believes they've made contact.
+- **The check fails open.** If BotID throws, the submission goes through. Some spam is
+  recoverable; a law firm's contact form rejecting everyone because a bot checker had an
+  outage is not.
+
+The honeypot stays alongside it — free, needs no JavaScript, and rejects crude bots before a
+BotID call is spent on them.
 
 ### Photography
 
@@ -171,6 +242,12 @@ developer.
   Resend keys are only set in Vercel. Testing the form means deploying.
 - **Preview deployments are behind SSO.** Branch previews return a login redirect to anyone not
   signed in to Vercel, which makes them useless for sharing with a client. Production is public.
+  They are, however, very useful to *you*: a preview runs `api/` for real and has the Resend and
+  BotID variables, so the consultation form can be exercised end to end there before anything
+  merges. The SSO gate does not interfere with BotID's proxy paths — verified 12 August 2026.
+- **Testing the form means submitting the form.** BotID blocks direct hits on `/api/consult`
+  by design, so `curl` proves nothing except that BotID works. Use the real form on a real
+  page — and remember a submission sends a genuine email to all three firm addresses.
 - **`astro build` does not typecheck `api/`.** It isn't part of the Astro route tree. Also
   `@types/node` isn't installed, so `npx tsc --noEmit` reports dozens of pre-existing `process`
   errors across the repo — compare before and after a change rather than expecting a clean run.
