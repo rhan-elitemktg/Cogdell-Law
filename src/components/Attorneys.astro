@@ -1,6 +1,7 @@
 ---
-// Homepage "The Firm" attorneys section — header + four attorney cards.
-// Desktop: 4-up grid. Tablet/mobile: horizontal peek carousel (no scrollbar).
+// Homepage "The Firm" attorneys section — header + the attorney cards.
+// Desktop: 5-up grid, so the whole team sits on one row. Below 1200px:
+// horizontal peek carousel (no scrollbar).
 import Eyebrow from "./Eyebrow.astro";
 import { PortableText } from "astro-portabletext";
 import { proseComponents } from "./prose/components";
@@ -12,7 +13,8 @@ import { urlFor } from "../sanity/lib/image";
 // served from Sanity's CDN via urlFor rather than the astro:assets pipeline.
 // These widths and `sizes` match what <Image> emitted before the move.
 const PHOTO_WIDTHS = [300, 460, 600, 790];
-const PHOTO_SIZES = "(max-width: 650px) 80vw, (max-width: 900px) 44vw, 22vw";
+const PHOTO_SIZES =
+  "(max-width: 650px) 80vw, (max-width: 900px) 44vw, (max-width: 1200px) 30vw, 19vw";
 
 const attorneys = await getAttorneyCards();
 
@@ -62,7 +64,7 @@ const { band, background = "paper" } = Astro.props;
     </div>
 
     {/* Only ever visible while the row actually scrolls — the script hides them
-        on desktop, where all four cards fit. Same control pattern as WhyChoose. */}
+        on desktop, where the whole row fits. Same control pattern as WhyChoose. */}
     <div class="attorneys__controls" hidden>
       <button class="attorneys__arrow" data-dir="prev" type="button" aria-label="Previous attorneys">
         <svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true"><path d="M10.5 2.5L5 8l5.5 5.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -194,10 +196,14 @@ const { band, background = "paper" } = Astro.props;
   }
 
   /* ---- Card grid ---- */
+  /* Five columns, one row — the firm is five people and the band reads as a
+     team rather than a four-plus-a-straggler. The gap steps down from
+     --space-8 to --space-6 to buy back some of the width the fifth column
+     costs: at 1440px that is a 249px card instead of 242px. */
   .attorneys__grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--space-8);
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--space-6);
   }
 
   .attorneys__card {
@@ -298,12 +304,13 @@ const { band, background = "paper" } = Astro.props;
   }
 
   /* ---- Responsive: horizontal peek carousel (no scrollbar) ---- */
-  @media (max-width: 900px) {
-    .attorneys__head {
-      grid-template-columns: 1fr;
-      row-gap: var(--space-8);
-      margin-bottom: var(--space-8);
-    }
+
+  /* The card row hands over to the carousel at 1200px, NOT at 900px like the
+     header does. Five columns need that room: at 901px each card would be about
+     148px wide — a face too small to read and a name that wraps mid-word. 1200px
+     is where the nav already collapses, so this reuses an established breakpoint
+     rather than inventing one. */
+  @media (max-width: 1200px) {
     /* First card honors the container padding (left); the row bleeds to the right
        screen edge so the peek runs off-screen with no right gap mid-scroll, while
        the matching trailing padding lets the last card rest one padding in from the
@@ -321,9 +328,25 @@ const { band, background = "paper" } = Astro.props;
     .attorneys__grid::-webkit-scrollbar {
       display: none; /* Chrome, Safari */
     }
+    /* Deliberately narrower than the tablet card below, so leaving the 5-up grid
+       is a step rather than a lurch — roughly 3.3 cards visible here, against 5
+       above and 2.3 below. */
     .attorneys__card {
-      flex: 0 0 44%; /* tablet: next card peeks */
+      flex: 0 0 30%;
       scroll-snap-align: start;
+    }
+  }
+
+  /* The header keeps its own 900px breakpoint: its two columns still read fine at
+     1000px, where the card row has already given up. */
+  @media (max-width: 900px) {
+    .attorneys__head {
+      grid-template-columns: 1fr;
+      row-gap: var(--space-8);
+      margin-bottom: var(--space-8);
+    }
+    .attorneys__card {
+      flex-basis: 44%; /* tablet: next card peeks */
     }
   }
   @media (max-width: 650px) {
@@ -371,10 +394,11 @@ const { band, background = "paper" } = Astro.props;
         scroller.scrollBy({ left: step(), behavior: "smooth" }),
       );
 
-    // Above 900px the grid is a static 4-up with nothing to scroll, so the
+    // Above 1200px the grid is a static 5-up with nothing to scroll, so the
     // arrows would be dead controls. They start hidden in the markup — showing
     // them only once the row genuinely overflows avoids a flash of arrows on
-    // desktop before this runs.
+    // desktop before this runs. Measuring overflow rather than matching the
+    // breakpoint means this needs no edit if the column count changes again.
     const syncControls = () => {
       controls.hidden = scroller.scrollWidth <= scroller.clientWidth + 1;
     };
