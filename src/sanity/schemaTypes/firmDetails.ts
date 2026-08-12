@@ -176,7 +176,7 @@ export const firmDetails = defineType({
       type: "reference",
       to: [{ type: "attorney" }],
       description:
-        'Who the "Reviewed By" panel credits on practice area pages that don\'t name their own. Leave empty and the first attorney in Collections → Attorney Bios is used.',
+        'Who the "Reviewed By" panel credits on practice area pages that don\'t name their own. Leave empty and the first person in Collections → Team Member Bios is used.',
     }),
   ],
   preview: {

@@ -2,8 +2,8 @@ import { defineType, defineField } from "sanity";
 
 /**
  * Per-page search metadata (D15). One shared object attached to every routed
- * document — the 9 page singletons plus practiceArea, locationPage, legalPage,
- * newsItem and attorney — so the SEO team can tune any page in the Studio
+ * document — the 10 page singletons plus practiceArea, locationPage, legalPage,
+ * newsItem, podcast and attorney — so the SEO team can tune any page in the Studio
  * without a code change.
  *
  * EVERY FIELD IS OPTIONAL BY DESIGN. Left empty, a page renders exactly the

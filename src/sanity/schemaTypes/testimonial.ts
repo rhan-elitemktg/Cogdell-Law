@@ -9,7 +9,7 @@ export const MAX_FEATURED = 3;
  * A client testimonial. One pool, used in two places:
  *
  *  - /testimonials — the full wall, in the Studio's drag-set order
- *  - the homepage / /attorneys band — the ones toggled `featured` (max 3)
+ *  - the homepage / /our-team band — the ones toggled `featured` (max 3)
  *
  * There used to be two sets: 16 real quotes in data/testimonials.ts and 3 on the
  * homepage attributed to "Former Client" with a practice-area tag, with **zero
@@ -62,7 +62,7 @@ export const testimonial = defineType({
       title: "Feature on the homepage",
       type: "boolean",
       initialValue: false,
-      description: `Shows this in the homepage and /attorneys band. Up to ${MAX_FEATURED} — the grid is three across.`,
+      description: `Shows this in the homepage and /our-team band. Up to ${MAX_FEATURED} — the grid is three across.`,
       validation: (rule) =>
         rule.custom(async (featured, context) => {
           if (!featured) return true;

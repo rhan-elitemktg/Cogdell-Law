@@ -124,7 +124,7 @@ export const structure: StructureResolver = (S, context) =>
         ),
 
       // ── Collections ────────────────────────────────────────────────────────
-      // The repeatable records. The first six are drag-to-reorder (their order
+      // The repeatable records. The first seven are drag-to-reorder (their order
       // drives the site); the last three are plain lists.
       S.listItem()
         .title("Collections")
@@ -175,11 +175,18 @@ export const structure: StructureResolver = (S, context) =>
                 S,
                 context,
               }),
+              // Ordered because both testimonial queries sort by orderRank —
+              // the featured band and the /testimonials wall. As a plain list
+              // this rendered an order no editor could reach.
+              orderableDocumentListDeskItem({
+                type: "testimonial",
+                title: "Testimonials",
+                icon: icons["double-quote"],
+                S,
+                context,
+              }),
               // Plain lists (not drag-ordered) — placed explicitly rather than
               // left to fall through the catch-all, so they sit with their peers.
-              S.documentTypeListItem("testimonial")
-                .title("Testimonials")
-                .icon(icons["double-quote"]),
               S.documentTypeListItem("newsItem")
                 .title("News Articles")
                 .icon(icons["document-text"]),

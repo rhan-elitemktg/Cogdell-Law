@@ -79,7 +79,40 @@ src/
   styles/global.css     Design tokens, reset, `.prose__*`, `.btn`, `.container`
 scripts/                Sanity CLI scripts — content seeds + two dev tools
 docs/                   sanity-integration.md — the build's decision record
+                        The Studio guide PDF, plus the scripts that build it
 ```
+
+### The Studio guide
+
+`docs/Cogdell-Law-Studio-Guide.pdf` is the guide for everyone who uses the
+Studio — **Part One** for the people who write the words, **Part Two** for the
+people who look after search. It replaces the two separate guides that came
+before it; two PDFs for one Studio meant whoever opened the wrong one got half
+an answer.
+
+| File | What |
+| --- | --- |
+| `build-studio-guide.py` | The guide's words. Run it to rebuild the PDF. |
+| `guide_kit.py` | Layout engine — palette, page furniture, `Guide` helpers, and a `GuideConfig` holding every per-site value. |
+
+```bash
+python3 -m venv /tmp/guide-venv && /tmp/guide-venv/bin/pip install reportlab
+/tmp/guide-venv/bin/python docs/build-studio-guide.py
+```
+
+**Rebuild it after any schema change**, and re-verify the quoted strings. The
+guide quotes Studio field labels, descriptions and validation messages verbatim,
+because editors read those exact strings on screen — so a change to `seo.ts`,
+`redirect.ts`, `globalSeo.ts`, `firmDetails.ts` or `structure.ts` can silently
+make the guide wrong. A rename is the dangerous case: when the attorney list
+became **Team Member Bios** and `/attorneys` became `/our-team`, the old guide
+went on telling readers to open a menu item that no longer existed.
+
+The guide deliberately carries **no live content counts and no current-state
+readings** — no "20 practice areas", no "the crawl switch is currently off". Those
+are true for about a week. Where a count was doing real work it is replaced by the
+check that produces it. Don't add one back without asking whether it will still be
+true in six months.
 
 ### Studio organisation
 
@@ -147,12 +180,14 @@ verify on a deployed URL.
 tag, `og:url` and sitemap entry is built from it, so it must match the domain
 Vercel serves as primary (www, with the apex redirecting to it).
 
-### Before launch
+### Launch settings
 
-The **Global SEO Settings → Discourage crawling** switch is currently **on**. It
-forces `noindex,nofollow` on every page and makes `/robots.txt` serve
-`Disallow: /`. Turn it off when the site moves to its real domain, or it will not
-be indexed.
+The **Global SEO Settings → Discourage crawling** switch is **off**, which is
+correct for a live site — `/robots.txt` serves `Allow: /` and only `/admin` is
+blocked. It was turned off at launch. Switching it back on forces
+`noindex,nofollow` on every page and makes `/robots.txt` serve `Disallow: /`, so
+on a production site it is an emergency lever, not a setting. Turn it **on** only
+for a new site sitting on a temporary `*.vercel.app` address.
 
 The consultation form sends from `noreply@send.cogdell-law.com`. That sender is
 hardcoded in `api/consult.ts` — it has to stay on the `send.` subdomain, which is
