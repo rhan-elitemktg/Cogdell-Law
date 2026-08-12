@@ -2,7 +2,7 @@ import { defineType, defineField } from "sanity";
 import { icons } from "@sanity/icons";
 
 /**
- * Attorneys page singleton (/attorneys).
+ * Team Members page singleton (/our-team).
  *
  * Only the attorney band's header so far — the cards come from `attorney`
  * documents, and the rest of the page (PageHero, Testimonials, WhyChoose) is
@@ -57,6 +57,6 @@ export const attorneysPage = defineType({
     }),
   ],
   preview: {
-    prepare: () => ({ title: "Attorneys Page" }),
+    prepare: () => ({ title: "Team Members Page" }),
   },
 });

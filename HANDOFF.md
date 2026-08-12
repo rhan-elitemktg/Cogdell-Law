@@ -282,3 +282,9 @@ developer.
 
 See also `README.md` for local setup and `docs/sanity-integration.md` for the content model and
 the decisions behind it.
+
+`docs/Cogdell-Law-Studio-Guide.pdf` covers the Studio for the people who use it — Part One for
+writers, Part Two for the SEO team (metadata fields, the redirect table, sitemap and robots
+rules, the structured data actually emitted, and the pages they can create). It is **generated**
+from `docs/build-studio-guide.py`; don't edit the PDF by hand, and rebuild it after any schema
+change. See "The Studio guide" in `README.md`.

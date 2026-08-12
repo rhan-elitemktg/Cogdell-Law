@@ -24,6 +24,9 @@ pnpm-debug.log*
 # macOS-specific files
 .DS_Store
 
+# Python bytecode — docs/build-studio-guide.py imports docs/guide_kit.py
+__pycache__/
+
 # jetbrains setting folder
 .idea/
 .vercel
