@@ -9,6 +9,7 @@
 //   CONSULT_TO_EMAIL — where leads are sent. Comma-separate for several
 //                      recipients: "intake@firm.com, dan@firm.com".
 import { Resend } from "resend";
+import { checkBotId } from "botid/server";
 
 // Hardcoded rather than an env var: this isn't an environment concern, it's a
 // property of the domain verified in Resend. It must stay on the `send.`
@@ -16,6 +17,26 @@ import { Resend } from "resend";
 // Resend rejects anything else, so a stray dashboard value would break sending
 // with nothing in the code to explain why.
 const FROM = "Cogdell Law Firm <noreply@send.cogdell-law.com>";
+
+// Whether a BotID verdict of "bot" actually turns anyone away.
+//
+// **Observe-only until someone sets `BOTID_ENFORCE=true` in Vercel**, and that
+// default is deliberate rather than lazy. This function cannot be exercised
+// locally — `astro dev` doesn't run `api/`, and BotID returns `isBot: false` in
+// development regardless — so the first time this code meets a real browser is
+// in production, on the firm's only inbound lead path. If the client-side
+// challenge fails to load for someone (a hardened browser, an aggressive content
+// blocker — and a criminal-defense practice draws more of those than most sites),
+// `checkBotId()` reports them as a bot. Enforcing that on day one would silently
+// bin real enquiries.
+//
+// So: ship it observing, read a day of real classifications in the logs, then
+// set the variable. Forgetting leaves the site unprotected, which is recoverable;
+// the opposite default fails toward lost clients, which isn't.
+//
+// It doubles as the emergency switch — an env change plus a redeploy, rather
+// than a code change, a review, a merge and a deploy.
+const ENFORCE_BOTID = String(process.env.BOTID_ENFORCE ?? "") === "true";
 
 function json(body: Record<string, unknown>, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -52,8 +73,52 @@ export async function POST(request: Request): Promise<Response> {
   const message = (data.message || "").trim();
 
   // Honeypot: a hidden field no human sees. If it's filled, it's a bot — quietly
-  // report success and send nothing.
+  // report success and send nothing. Kept alongside BotID rather than replaced by
+  // it: it costs nothing, needs no JavaScript, and catches the crude scripted
+  // posts before we spend a BotID call on them.
   if ((data.company || "").trim()) return json({ ok: true });
+
+  // Vercel BotID — an invisible challenge solved in the visitor's browser, whose
+  // result rides along on this request's headers. The `initBotId()` call in
+  // ConsultForm.astro is what marks this route as protected and attaches them;
+  // drop that and every check here fails, so the two must stay in step.
+  //
+  // `checkLevel: "basic"` matches the client and pins us to the free tier —
+  // Deep Analysis is $1 per 1000 calls and must also be enabled in the dashboard,
+  // so naming the level in both places means switching it on there can't quietly
+  // start billing this endpoint.
+  try {
+    const verification = await checkBotId({
+      advancedOptions: { checkLevel: "basic" },
+    });
+
+    if (verification.isBot) {
+      // Logged either way — in observe mode this line IS the feature, and it's
+      // what tells you whether enforcing is safe yet.
+      console.warn(
+        `Consult form: BotID flagged a submission (enforcing=${ENFORCE_BOTID}, ` +
+          `verifiedBot=${verification.isVerifiedBot}, bypassed=${verification.bypassed}).`,
+      );
+
+      // A 403, not a silent `{ ok: true }` like the honeypot. The form's error
+      // branch tells the visitor to call 713-426-2244, so a false positive still
+      // reaches the firm by phone — whereas a fake thank-you would strand a real
+      // client who believes they've made contact. Denying a bot the satisfaction
+      // of knowing it was caught is worth less than that.
+      if (ENFORCE_BOTID) {
+        return json(
+          { ok: false, error: "Could not send. Please try again or call us." },
+          403,
+        );
+      }
+    }
+  } catch (err) {
+    // Fail OPEN, on purpose. If BotID is misconfigured, rate-limited or simply
+    // down, the worst case of letting the message through is some spam in an
+    // inbox; the worst case of the alternative is a law firm's contact form
+    // quietly rejecting everyone because of an outage in a bot checker.
+    console.error("Consult form: BotID check failed, allowing submission:", err);
+  }
 
   // Server-side validation (never trust the browser alone).
   if (!name || !email) {
