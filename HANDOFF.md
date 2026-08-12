@@ -7,47 +7,60 @@ inferred from the code.
 | | |
 | --- | --- |
 | Live site | `www.cogdell-law.com` — 200, apex 307s to `www` |
-| Repo | `rhan-elitemktg/Cogdell-Law`, `master` at `0b035ee` |
+| Repo | `rhan-elitemktg/Cogdell-Law`, `master` at `3b431f4` |
 | Vercel team | `elite-legal-marketing` |
 | Search engines | Crawling enabled, 47 URLs in the sitemap |
-| Consultation form | Needs one setting — see step 1 |
+| Consultation form | Live — delivers to three firm addresses |
+| Review widget | PageProofer **ON** in production — temporary, see below |
 
 ---
 
-## Do these next — two things need a person
+## Open — PageProofer is back on production
 
-### 1. Point the consultation form at real inboxes
+**Re-enabled 12 August 2026 for a client review round. Deliberate, and meant to be
+temporary.** `PUBLIC_PAGEPROOFER_SITE_ID` was set on Production and the site redeployed;
+the widget is confirmed loading on the live homepage.
 
-The form now sends from the verified Resend domain, but it still delivers to whatever single
-address `CONSULT_TO_EMAIL` held before.
+It renders at the end of **every** page's `<body>` — including `/contact`, where visitors
+type descriptions of their legal situation into the consultation form. That is the reason
+it shouldn't stay on any longer than the review needs.
 
-In **Vercel → Settings → Environment Variables**, edit that variable to:
+To take it back off:
+
+```bash
+vercel env rm PUBLIC_PAGEPROOFER_SITE_ID production
+```
+
+Then redeploy — `vercel redeploy <current-production-url>` rebuilds from the same git
+commit rather than from a local working tree. `Layout.astro` renders the tag only when the
+variable is set, so unsetting it removes the script from the built HTML entirely. **There
+is no code change in either direction**, and the ID also lives in the repo's local `.env`,
+so removing it from Vercel loses nothing.
+
+One wrinkle: the CLI added the variable as **Sensitive**, so its value can't be read back
+out of Vercel. Harmless here — it's a `PUBLIC_` embed ID that ships in the page source
+anyway — but that's why the local `.env` copy matters.
+
+---
+
+## Settings that live only in Vercel
+
+Recorded here because neither is visible anywhere in the repo.
+
+**`CONSULT_TO_EMAIL` holds three firm addresses:**
 
 ```
-rhan@elitemktg.com, phillip@elitemktg.com
+dan@cogdell-law.com, laken@cogdell-law.com, paralegal@cogdell-law.com
 ```
 
-It is marked *Sensitive*, so the current value is hidden — replace it wholesale rather than
-appending. **Then redeploy.** Vercel bakes environment variables in at deploy time; changing
-one alone does nothing until a new deployment goes out.
+Delivery to all three is confirmed. `info@cogdell-law.com` was considered and deliberately
+not used. No agency address is on the list — the form asks people to describe their
+situation, so submissions are prospective-client communications and belong only in firm
+inboxes. Adding one back is a decision for the firm, not a convenience.
 
-Submit the form and confirm:
-
-- both addresses receive it
-- the sender reads `Cogdell Law Firm <noreply@send.cogdell-law.com>`
-- pressing Reply addresses the person who filled in the form, not the firm
-
-Once you're satisfied, change the same variable to `info@cogdell-law.com` and redeploy again.
-No code change is needed for that switch.
-
-### 2. Remove the PageProofer review widget
-
-The widget is still loading on the live site — confirmed present in the homepage HTML at
-`www.cogdell-law.com`. It was a review tool for the build and shouldn't be on a public site.
-
-Delete `PUBLIC_PAGEPROOFER_SITE_ID` in Vercel and redeploy. `Layout.astro` only renders the tag
-when that variable is set, so removing it takes the script out of the HTML entirely — no code
-change.
+The variable is marked *Sensitive*, so the dashboard hides its value — replace it wholesale
+rather than editing around what's there, and **redeploy afterwards or nothing changes.**
+That last point applies to every variable here: Vercel bakes them in at deploy time.
 
 ---
 
@@ -63,7 +76,8 @@ change.
 | Trailing-slash variants | Slashed legacy URLs redirect too, not 404 | Pass |
 | Team content | 4 attorneys + Laken Knox (Paralegal); no placeholder copy remains | Pass |
 | Demo practice area | Deleted from Sanity | Pass |
-| Email delivery | Not tested — would send a real message | See step 1 |
+| Email delivery | Reaches all three firm addresses | Pass |
+| PageProofer widget | Re-enabled 12 Aug for review — must come back off | Open |
 
 ---
 
@@ -120,7 +134,7 @@ code in the project that sends email.
 | Variable | Purpose |
 | --- | --- |
 | `RESEND_API_KEY` | Initializes the Resend client. Secret — never reaches the browser. |
-| `CONSULT_TO_EMAIL` | Who receives leads. Accepts a comma-separated list. |
+| `CONSULT_TO_EMAIL` | Who receives leads. Comma-separated; currently the three firm addresses above. |
 
 The sender is hardcoded to `noreply@send.cogdell-law.com` rather than being a variable. That
 address has to sit on the `send.` subdomain — that's what's verified in Resend, and anything
