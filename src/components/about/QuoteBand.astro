@@ -1,7 +1,7 @@
 ---
 // Our Firm quote band — centered promise quote over a darkened boardroom photo.
 import { Image } from "astro:assets";
-import quoteBg from "../../assets/quote-boardroom.webp";
+import quoteBg from "../../assets/meeting-room.jpg";
 
 interface Props { lead: string; accent: string; attribution: string }
 const { lead, accent, attribution } = Astro.props;
@@ -11,7 +11,7 @@ const { lead, accent, attribution } = Astro.props;
   <Image
     src={quoteBg}
     alt=""
-    widths={[900, 1376]}
+    widths={[900, 1672]}
     sizes="100vw"
     class="quote-band__bg lazy-fade"
   />
