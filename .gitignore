@@ -31,3 +31,6 @@ __pycache__/
 .idea/
 .vercel
 .env*
+
+# Sanity dataset exports — rollback points, far too big for git
+backups/
