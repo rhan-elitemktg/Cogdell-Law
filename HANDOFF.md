@@ -7,10 +7,11 @@ inferred from the code.
 | | |
 | --- | --- |
 | Live site | `www.cogdell-law.com` — 200, apex 307s to `www` |
-| Repo | `rhan-elitemktg/Cogdell-Law`, `master` at `3b431f4` |
+| Repo | `rhan-elitemktg/Cogdell-Law`, `master` at `2cf8372` |
 | Vercel team | `elite-legal-marketing` |
-| Search engines | Crawling enabled, 47 URLs in the sitemap |
+| Search engines | Crawling enabled, **127 URLs** in the sitemap |
 | Consultation form | Live — delivers to three firm addresses |
+| Podcast | 82 YouTube episodes at `/podcast` — rebuilt off Spotify 14 Aug |
 | Review widget | PageProofer **ON** in production — temporary, see below |
 | Bot protection | BotID **observing, not blocking** — one step left, see below |
 
@@ -216,6 +217,50 @@ in code means enabling it there can't quietly start charging this endpoint.
 The honeypot stays alongside it — free, needs no JavaScript, and rejects crude bots before a
 BotID call is spent on them.
 
+### The podcast
+
+**Rebuilt on YouTube, 14 August 2026.** The firm dropped Spotify; every episode is
+recorded as video on the `@cogdelllawuncensored` channel, and the show is now *The
+Cogdell Law Uncensored*. Eighty-two episodes were imported in one pass. The Spotify
+player, the chapter list and the tag filters are gone, along with `spotifyUrl`,
+`chapters`, `episodeNumber` and `tag` on the schema.
+
+**An episode is a title, a `youtubeId` and a date.** Everything else about the video —
+runtime, thumbnail, the player — stays YouTube's, per decision D8. The id is the
+11-character string from a watch URL, validated by regex in the Studio and again in the
+component before it reaches an iframe src, plus an async check that no two episodes claim
+the same video.
+
+**Adding an episode is manual and needs no developer:** create a Podcast Episode in the
+Studio and paste the id. Title, date and summary are yours to write.
+
+| Where | What |
+| --- | --- |
+| `/podcast` | Card grid with fuzzy search and a 9-at-a-time "Load More". No tag filters. |
+| `/podcast/<slug>` | The artwork carries the page's `<h1>` and a play button, and swaps itself for the player when clicked. |
+
+**Nothing loads from YouTube until someone presses play.** The artwork is a facade; the
+iframe is injected on click and points at `youtube-nocookie.com`, so a visitor who never
+watches is never handed a YouTube cookie. Card and episode thumbnails are hotlinked from
+`i.ytimg.com` — pure string construction from the id, deliberately *not* routed through
+`astro:assets`, which would download 82 images per build and make YouTube a hard
+build-time dependency alongside Wistia.
+
+Two videos were never uploaded above 720p and have no `maxresdefault` thumbnail, so both
+artwork components carry an `error` listener that falls back to `hqdefault`. Don't remove
+it, and don't merge the two listeners into one global selector — each component scoping
+to its own images is what keeps the episode page working on a page that renders no
+related cards.
+
+**The `coverImage` field still wins where set.** Today that's only the two hand-authored
+episodes, which is why they look different from the other 80 in the grid.
+
+**Re-importing is safe.** `scripts/fetch-youtube-episodes.mjs` harvests the channel to
+`scripts/data/youtube-episodes.json` (committed, so the import is reproducible), and
+`scripts/import-youtube-podcasts.ts` writes documents under deterministic ids — so a
+re-run after new uploads adds only what's new. **Disable the Sanity Publish webhook
+first** if importing in bulk; each write otherwise fires a Vercel build.
+
 ### Photography
 
 Section images are art-directed and live in the repo, not Sanity, because the crops are design
@@ -248,6 +293,13 @@ developer.
 - **Testing the form means submitting the form.** BotID blocks direct hits on `/api/consult`
   by design, so `curl` proves nothing except that BotID works. Use the real form on a real
   page — and remember a submission sends a genuine email to all three firm addresses.
+- **The Studio breaks after a schema change until you hard-reload.** `/admin` loads but
+  opening a document throws `Failed to fetch dynamically imported module: …/.vite/deps/
+  pane-XXXX.js`. It is a Vite cache artefact, not a fault: changing the schema rewrites
+  the dep chunk names and the browser holds an immutable-cached module pointing at one
+  that no longer exists. Hard-reload (Cmd+Shift+R); a soft reload can't escape it. If it
+  persists, `rm -rf node_modules/.vite` and restart. Expect it on every schema change —
+  finding F12 in `docs/sanity-integration.md`.
 - **`astro build` does not typecheck `api/`.** It isn't part of the Astro route tree. Also
   `@types/node` isn't installed, so `npx tsc --noEmit` reports dozens of pre-existing `process`
   errors across the repo — compare before and after a change rather than expecting a clean run.
@@ -268,13 +320,25 @@ developer.
   height and cropped at the *sides*, which clips whoever is standing at the ends of the frame.
   Fix if it bothers you: `min-height: min(760px, 56.25vw)`, which ties the band's height to
   width instead. It makes the band shorter on narrow desktops, so it's a design call.
-- **Team grid leaves a ragged row.** The band is a four-column grid and there are five people,
-  so desktop shows four across and one alone. Either a three-column grid, or capping the
-  homepage at four with a "view all" link, would tidy it.
+- **"Principal & Founder" wraps to two lines** on Dan's card in the attorneys band. The
+  band went to five columns so the whole team fits one row, and that role sets wider than
+  the resulting text column at every desktop width. No letter-spacing value fixes it
+  without gutting the tracking the mockup specifies, so it was accepted rather than
+  bodged. Shortening the role in Sanity would also do it — but that wording was settled
+  deliberately (finding F15), so it's the firm's call, not a developer's.
+- **Imported podcast titles need an editorial pass.** All 82 were derived from YouTube.
+  Three are fully capitalised (`HUNG JURY`, `MY SADDEST CASE`, `GHISLAINE MAXWELL
+  PARDON???`) — deliberately not auto-title-cased, because that would have mangled `FBI`,
+  `DWI`, `ICE`, `AZA` and `SCOTUS` across the rest. Also, **searching for a guest only
+  works if the guest is in the title**: 32 of 82 carry a `| Guest Name` segment, but the
+  two hand-authored episodes had theirs stripped by their original author, so "deguerin"
+  finds nothing despite that being the DeGuerin episode.
 - **Unused image assets.** `statement-team.jpg`, `whychoose-bg.jpg` and `team-group.png` are no
   longer referenced — roughly 2.5MB of dead weight in the repo.
-- **Stale branches.** `qa`, `contact_form_bug`, `email_setup` and `docs` are all merged or
-  superseded and can be deleted.
+- **Stale branches — 36 of them.** Every remote branch except `master` is merged into
+  `master` and can be deleted. `git branch -r --merged origin/master` lists them. This
+  was four when the doc was written; it grows every time a branch ships, and nothing
+  prunes it.
 - **No test suite.** There's no test framework in the project. Verification is a build plus
   checking the deployed site.
 
