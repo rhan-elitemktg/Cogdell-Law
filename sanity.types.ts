@@ -2012,10 +2012,11 @@ export type PAGE_HERO_QUERY_RESULT =
 
 // Source: src/sanity/lib/podcast.ts
 // Variable: ALL_PODCASTS_QUERY
-// Query: *[_type == "podcast"] | order(coalesce(publishedAt, _createdAt) desc){  _id,  title,  "slug": slug.current,  "date": coalesce(publishedAt, _createdAt),  coverImage}
+// Query: *[_type == "podcast"] | order(coalesce(publishedAt, _createdAt) desc){  _id,  title,  youtubeId,  "slug": slug.current,  "date": coalesce(publishedAt, _createdAt),  coverImage}
 export type ALL_PODCASTS_QUERY_RESULT = Array<{
   _id: string;
   title: string;
+  youtubeId: string;
   slug: string;
   date: string;
   coverImage: {
@@ -2426,7 +2427,7 @@ declare module "@sanity/client" {
     '*[_id == "newsPage"][0].grid{\n  eyebrow,\n  headingLead,\n  headingStrong\n}': NEWS_GRID_HEADER_QUERY_RESULT;
     '*[_id == "ourFirmPage"][0]{\n  hero,\n  intro{ eyebrow, headingLead, headingStrong, body },\n  stats{ items[]{ _key, value, label } },\n  quote{ lead, accent, attribution },\n  foundingAttorney{ eyebrow, headingLead, headingStrong, body },\n  originStory{ eyebrow, headingLead, headingStrong, body, milestones[]{ _key, key, title, desc } },\n  values{ eyebrow, headingLead, headingStrong, items[]{ _key, icon, title, body } }\n}': OUR_FIRM_QUERY_RESULT;
     "*[_id == $pageId][0].hero{\n  eyebrow,\n  titleLead,\n  titleStrong,\n  lede\n}": PAGE_HERO_QUERY_RESULT;
-    '*[_type == "podcast"] | order(coalesce(publishedAt, _createdAt) desc){\n  _id,\n  title,\n  "slug": slug.current,\n  "date": coalesce(publishedAt, _createdAt),\n  coverImage\n}': ALL_PODCASTS_QUERY_RESULT;
+    '*[_type == "podcast"] | order(coalesce(publishedAt, _createdAt) desc){\n  _id,\n  title,\n  youtubeId,\n  "slug": slug.current,\n  "date": coalesce(publishedAt, _createdAt),\n  coverImage\n}': ALL_PODCASTS_QUERY_RESULT;
     '*[_type == "podcast" && slug.current == $slug][0]{\n  _id,\n  title,\n  youtubeId,\n  summary,\n  "slug": slug.current,\n  "date": coalesce(publishedAt, _createdAt),\n  coverImage,\n  body,\n  _updatedAt,\n  seo{\n    metaTitle,\n    metaDescription,\n    canonicalUrl,\n    noIndex,\n    ogImage\n  }\n}': PODCAST_QUERY_RESULT;
     '*[_type == "podcast" && defined(slug.current)]{"slug": slug.current, _updatedAt, "noIndex": seo.noIndex}': PODCAST_SLUGS_QUERY_RESULT;
     '*[_id == "podcastPage"][0].hero{\n  eyebrow,\n  title,\n  subtitle\n}': PODCAST_HERO_QUERY_RESULT;
