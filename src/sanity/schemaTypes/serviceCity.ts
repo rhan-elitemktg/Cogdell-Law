@@ -30,7 +30,7 @@ export const serviceCity = defineType({
       type: "array",
       of: [{ type: "reference", to: [{ type: "practiceArea" }] }],
       description:
-        "Fleshes out this city's submenu under Areas We Frequently Serve. These link to the firm-wide practice area page, not a city-specific one — use them for services this city has no page of its own for. Its real location pages are listed first automatically; anything here that duplicates one is skipped.",
+        "The services shown under this city in the Areas We Frequently Serve menu, in the order they appear. List every service you want, not just the ones lacking a page: where this city has its own location page for a service, the menu links to that page instead of the firm-wide one. Keep the list the same across cities and they all read in the same order. A location page you forget to list still gets a link, at the end.",
     }),
   ],
   preview: { select: { title: "city", subtitle: "citySlug.current" } },
