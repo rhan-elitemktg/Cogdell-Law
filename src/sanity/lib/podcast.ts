@@ -6,6 +6,7 @@ import { defineQuery } from "groq";
 const CARD = `{
   _id,
   title,
+  youtubeId,
   "slug": slug.current,
   "date": coalesce(publishedAt, _createdAt),
   coverImage

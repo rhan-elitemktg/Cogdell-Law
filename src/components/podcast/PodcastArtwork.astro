@@ -1,32 +1,34 @@
 ---
-// The Cogdell Law Uncensored episode artwork — a code-rendered brand lockup over
-// the episode's background photo. Used by the index and related-episode CARDS, so
-// every episode looks on-brand from one uploaded photo (no pre-made image files).
+// An episode's 16:9 artwork — the video's own YouTube thumbnail. Used by the
+// index and related-episode cards.
 //
-// The episode page does NOT use this: there the artwork carries the title and a
-// play button and becomes the video — see YouTubeArtwork.astro. Putting the title
-// on the card artwork too would render it twice, since the card already prints it
-// underneath.
+// It used to be a code-rendered brand lockup over a stock photo, which meant all
+// 82 cards looked identical and the grid was impossible to scan. Real thumbnails
+// are the whole point now, so there is no scrim and no lockup over them.
 //
-// Text scales with the artwork's own width (container-query units), so the lockup
-// reads correctly at any card size.
+// Source order: the editor's coverImage if they've uploaded one, then the
+// YouTube thumbnail, then the firm default. That last branch is close to
+// unreachable — youtubeId is required — but renders something rather than a hole
+// if an id is ever malformed.
 import { urlFor } from "../../sanity/lib/image";
 import { getImage } from "astro:assets";
 import defaultCover from "../../assets/white-collar-defense.jpg";
 import type { SanityImageSource } from "@sanity/image-url";
+import { youtubeThumbnail } from "../../lib/youtube";
 
 interface Props {
   image?: SanityImageSource | null;
+  youtubeId?: string | null;
   loading?: "eager" | "lazy";
   class?: string;
 }
 
-const { image, loading = "lazy", class: className } = Astro.props;
+const { image, youtubeId, loading = "lazy", class: className } = Astro.props;
 
-// The editor's uploaded photo when present; otherwise the firm-wide default.
+const thumb = youtubeThumbnail(youtubeId);
 const src = image
   ? urlFor(image).width(880).height(495).fit("crop").auto("format").url()
-  : (await getImage({ src: defaultCover, width: 880, height: 495 })).src;
+  : (thumb?.src ?? (await getImage({ src: defaultCover, width: 880, height: 495 })).src);
 ---
 
 <div class:list={["pcast-art", className]}>
@@ -38,19 +40,12 @@ const src = image
     decoding="async"
     width="880"
     height="495"
+    data-fallback={thumb?.fallback}
   />
-  <div class="pcast-art__scrim" aria-hidden="true"></div>
-  <div class="pcast-art__lockup">
-    <span class="pcast-art__the">The</span>
-    <span class="pcast-art__name">Cogdell Law</span>
-    <span class="pcast-art__kicker">Uncensored</span>
-    <span class="pcast-art__rule" aria-hidden="true"></span>
-  </div>
 </div>
 
 <style>
   .pcast-art {
-    container-type: inline-size;
     position: relative;
     aspect-ratio: 16 / 9;
     overflow: hidden;
@@ -63,60 +58,33 @@ const src = image
     inset: 0;
     width: 100%;
     height: 100%;
+    /* `cover` matters for the fallback rung: hqdefault is 4:3 with letterbox
+       bars baked in, and cropping to 16:9 removes exactly those bars. */
     object-fit: cover;
   }
-  .pcast-art__scrim {
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(120% 120% at 50% 40%, rgba(7, 16, 29, 0.72) 0%, rgba(7, 16, 29, 0.92) 100%),
-      linear-gradient(180deg, rgba(7, 16, 29, 0.55) 0%, rgba(7, 16, 29, 0.85) 100%);
-  }
-  .pcast-art__lockup {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 6cqw;
-    color: var(--cog-white);
-  }
-  .pcast-art__the {
-    font-family: var(--font-heading);
-    font-style: italic;
-    font-size: 2.8cqw;
-    line-height: 1;
-    color: var(--cog-cream);
-  }
-  .pcast-art__name {
-    margin-top: 0.4cqw;
-    font-family: var(--font-heading);
-    font-weight: 600;
-    font-size: 6.6cqw;
-    line-height: 1;
-    letter-spacing: 0.01em;
-    color: var(--cog-white);
-  }
-  .pcast-art__kicker {
-    margin-top: 1.6cqw;
-    font-family: var(--font-body);
-    font-weight: 700;
-    font-size: 2.3cqw;
-    /* Eased from 0.42em, which was set for the 7-character "PODCAST".
-       "UNCENSORED" is 10 and overruns the lockup at the old tracking. */
-    letter-spacing: 0.34em;
-    /* letter-spacing pushes the block right; nudge it back to stay centered. */
-    text-indent: 0.34em;
-    text-transform: uppercase;
-    color: var(--cog-navlink);
-  }
-  .pcast-art__rule {
-    width: 5cqw;
-    height: 2px;
-    margin-top: 2cqw;
-    background-color: var(--cog-accent);
-  }
 </style>
+
+<script>
+  // Two of the channel's videos were never uploaded above 720p, so they have no
+  // maxresdefault thumbnail and YouTube will not backfill one. Swap those to the
+  // rung that always exists rather than shipping a broken image.
+  //
+  // A listener rather than an inline onerror attribute: same progressive
+  // enhancement the rest of the site uses, and it catches the cards the grid
+  // reveals later too.
+  //
+  // Scoped to this component's own images. A bare `img[data-fallback]` would
+  // also pick up YouTubeArtwork's, which works only for as long as an episode
+  // page happens to render related cards — a coupling that would break silently
+  // the day one doesn't.
+  document.querySelectorAll<HTMLImageElement>(".pcast-art__bg[data-fallback]").forEach((img) => {
+    img.addEventListener(
+      "error",
+      () => {
+        const fallback = img.dataset.fallback;
+        if (fallback && img.src !== fallback) img.src = fallback;
+      },
+      { once: true },
+    );
+  });
+</script>

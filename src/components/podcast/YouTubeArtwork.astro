@@ -15,6 +15,7 @@ import { urlFor } from "../../sanity/lib/image";
 import { getImage } from "astro:assets";
 import defaultCover from "../../assets/white-collar-defense.jpg";
 import type { SanityImageSource } from "@sanity/image-url";
+import { isYoutubeId, youtubeThumbnail, youtubeWatchUrl } from "../../lib/youtube";
 
 interface Props {
   title: string;
@@ -27,11 +28,14 @@ const { title, youtubeId, image } = Astro.props;
 // Re-checked here, not just in the Studio. Schema validation only guards the
 // editing UI — the API accepts anything, and this value is about to be
 // interpolated into a URL.
-const id = youtubeId && /^[A-Za-z0-9_-]{11}$/.test(youtubeId) ? youtubeId : null;
+const id = isYoutubeId(youtubeId) ? youtubeId : null;
 
+// Same order as the cards: the editor's upload wins, else the video's own
+// thumbnail, else the firm default.
+const thumb = youtubeThumbnail(id);
 const src = image
   ? urlFor(image).width(1640).height(923).fit("crop").auto("format").url()
-  : (await getImage({ src: defaultCover, width: 1640, height: 923 })).src;
+  : (thumb?.src ?? (await getImage({ src: defaultCover, width: 1640, height: 923 })).src);
 
 // Titles run from 9 to 97 characters, so one size can't serve them all. The
 // bucket picks between three CSS rules — a data attribute rather than an inline
@@ -48,6 +52,7 @@ const lengthBucket = title.length <= 30 ? "s" : title.length <= 62 ? "m" : "l";
     decoding="async"
     width="1640"
     height="923"
+    data-fallback={thumb?.fallback}
   />
   <div class="ytart__scrim" aria-hidden="true"></div>
 
@@ -61,7 +66,7 @@ const lengthBucket = title.length <= 30 ? "s" : title.length <= 62 ? "m" : "l";
            enhancement the Wistia lightbox triggers use. */
         <a
           class="ytart__play"
-          href={`https://www.youtube.com/watch?v=${id}`}
+          href={youtubeWatchUrl(id)}
           aria-label={`Play: ${title}`}
         >
           <svg class="ytart__play-icon" viewBox="0 0 24 24" width="34" height="34" aria-hidden="true">
@@ -99,10 +104,16 @@ const lengthBucket = title.length <= 30 ? "s" : title.length <= 62 ? "m" : "l";
     height: 100%;
     object-fit: cover;
   }
+  /* Bottom-weighted rather than a full-frame wash: the image is now the video's
+     own thumbnail and worth seeing, but the title sits over it and has to stay
+     readable. The gradient is heaviest where the type is. */
   .ytart__scrim {
-    background:
-      radial-gradient(120% 120% at 50% 45%, rgba(7, 16, 29, 0.62) 0%, rgba(7, 16, 29, 0.9) 100%),
-      linear-gradient(180deg, rgba(7, 16, 29, 0.45) 0%, rgba(7, 16, 29, 0.88) 100%);
+    background: linear-gradient(
+      180deg,
+      rgba(7, 16, 29, 0.25) 0%,
+      rgba(7, 16, 29, 0.55) 45%,
+      rgba(7, 16, 29, 0.88) 100%
+    );
   }
 
   .ytart__lockup {
@@ -203,6 +214,22 @@ const lengthBucket = title.length <= 30 ? "s" : title.length <= 62 ? "m" : "l";
 </style>
 
 <script>
+  // Two of the channel's videos have no maxresdefault thumbnail — they were
+  // never uploaded above 720p. Fall back to the rung that always exists rather
+  // than showing a hole. Duplicated from PodcastArtwork rather than shared: each
+  // component owning its own images is what keeps this working on a page that
+  // renders one and not the other.
+  document.querySelectorAll<HTMLImageElement>(".ytart__bg[data-fallback]").forEach((img) => {
+    img.addEventListener(
+      "error",
+      () => {
+        const fallback = img.dataset.fallback;
+        if (fallback && img.src !== fallback) img.src = fallback;
+      },
+      { once: true },
+    );
+  });
+
   // Swap the facade for the real player on click. One listener per artwork; the
   // page only ever has one, but scoping to the root keeps it honest.
   document.querySelectorAll<HTMLElement>(".ytart").forEach((root) => {
