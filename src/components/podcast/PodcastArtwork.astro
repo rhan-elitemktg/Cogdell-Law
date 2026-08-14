@@ -1,11 +1,15 @@
 ---
-// The Cogdell Counsel episode artwork — a code-rendered brand lockup over the
-// episode's background photo, with the episode number printed on it. Shared by
-// the index/related cards and the episode page, so every episode looks on-brand
-// from one uploaded photo + a number (no pre-made image files).
+// The Cogdell Law Uncensored episode artwork — a code-rendered brand lockup over
+// the episode's background photo. Used by the index and related-episode CARDS, so
+// every episode looks on-brand from one uploaded photo (no pre-made image files).
 //
-// Text scales with the artwork's own width (container-query units), so the same
-// component reads correctly at card size and at the larger episode-page size.
+// The episode page does NOT use this: there the artwork carries the title and a
+// play button and becomes the video — see YouTubeArtwork.astro. Putting the title
+// on the card artwork too would render it twice, since the card already prints it
+// underneath.
+//
+// Text scales with the artwork's own width (container-query units), so the lockup
+// reads correctly at any card size.
 import { urlFor } from "../../sanity/lib/image";
 import { getImage } from "astro:assets";
 import defaultCover from "../../assets/white-collar-defense.jpg";
@@ -13,12 +17,11 @@ import type { SanityImageSource } from "@sanity/image-url";
 
 interface Props {
   image?: SanityImageSource | null;
-  episodeNumber?: number;
   loading?: "eager" | "lazy";
   class?: string;
 }
 
-const { image, episodeNumber, loading = "lazy", class: className } = Astro.props;
+const { image, loading = "lazy", class: className } = Astro.props;
 
 // The editor's uploaded photo when present; otherwise the firm-wide default.
 const src = image
@@ -39,10 +42,9 @@ const src = image
   <div class="pcast-art__scrim" aria-hidden="true"></div>
   <div class="pcast-art__lockup">
     <span class="pcast-art__the">The</span>
-    <span class="pcast-art__name">Cogdell Counsel</span>
-    <span class="pcast-art__kicker">Podcast</span>
+    <span class="pcast-art__name">Cogdell Law</span>
+    <span class="pcast-art__kicker">Uncensored</span>
     <span class="pcast-art__rule" aria-hidden="true"></span>
-    {episodeNumber != null && <span class="pcast-art__ep">Episode {episodeNumber}</span>}
   </div>
 </div>
 
@@ -103,25 +105,18 @@ const src = image
     font-family: var(--font-body);
     font-weight: 700;
     font-size: 2.3cqw;
-    letter-spacing: 0.42em;
+    /* Eased from 0.42em, which was set for the 7-character "PODCAST".
+       "UNCENSORED" is 10 and overruns the lockup at the old tracking. */
+    letter-spacing: 0.34em;
     /* letter-spacing pushes the block right; nudge it back to stay centered. */
-    text-indent: 0.42em;
+    text-indent: 0.34em;
     text-transform: uppercase;
     color: var(--cog-navlink);
   }
   .pcast-art__rule {
     width: 5cqw;
     height: 2px;
-    margin: 2cqw 0;
+    margin-top: 2cqw;
     background-color: var(--cog-accent);
-  }
-  .pcast-art__ep {
-    font-family: var(--font-body);
-    font-weight: 700;
-    font-size: 2cqw;
-    letter-spacing: 0.3em;
-    text-indent: 0.3em;
-    text-transform: uppercase;
-    color: var(--cog-accent);
   }
 </style>

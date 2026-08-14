@@ -1,0 +1,234 @@
+---
+// The episode page's artwork — the episode title and a play button over the
+// background photo, which swaps itself for the YouTube player when clicked.
+//
+// This replaces BOTH the old `.episode__art` (which showed the brand lockup) and
+// the old `h1.episode__title` above it: the page's one <h1> now lives in here.
+// Cards keep the lockup version (PodcastArtwork.astro) because they print the
+// title underneath already.
+//
+// A FACADE, deliberately: nothing from YouTube loads until someone presses play.
+// That keeps a near-zero JS budget on a page whose primary content is a video,
+// and means a visitor who never plays it is never handed a YouTube cookie. The
+// iframe points at youtube-nocookie.com for the same reason.
+import { urlFor } from "../../sanity/lib/image";
+import { getImage } from "astro:assets";
+import defaultCover from "../../assets/white-collar-defense.jpg";
+import type { SanityImageSource } from "@sanity/image-url";
+
+interface Props {
+  title: string;
+  youtubeId?: string | null;
+  image?: SanityImageSource | null;
+}
+
+const { title, youtubeId, image } = Astro.props;
+
+// Re-checked here, not just in the Studio. Schema validation only guards the
+// editing UI — the API accepts anything, and this value is about to be
+// interpolated into a URL.
+const id = youtubeId && /^[A-Za-z0-9_-]{11}$/.test(youtubeId) ? youtubeId : null;
+
+const src = image
+  ? urlFor(image).width(1640).height(923).fit("crop").auto("format").url()
+  : (await getImage({ src: defaultCover, width: 1640, height: 923 })).src;
+
+// Titles run from 9 to 97 characters, so one size can't serve them all. The
+// bucket picks between three CSS rules — a data attribute rather than an inline
+// style, which the house rules forbid.
+const lengthBucket = title.length <= 30 ? "s" : title.length <= 62 ? "m" : "l";
+---
+
+<div class="ytart" data-youtube-id={id}>
+  <img
+    class="ytart__bg lazy-fade"
+    src={src}
+    alt=""
+    loading="eager"
+    decoding="async"
+    width="1640"
+    height="923"
+  />
+  <div class="ytart__scrim" aria-hidden="true"></div>
+
+  <div class="ytart__lockup" data-len={lengthBucket}>
+    <span class="ytart__brand">Cogdell Law Uncensored</span>
+    <h1 class="ytart__title">{title}</h1>
+    {
+      id && (
+        /* An <a>, not a <button>: with no JS this is still a working link to the
+           video. The script calls preventDefault() — the same progressive
+           enhancement the Wistia lightbox triggers use. */
+        <a
+          class="ytart__play"
+          href={`https://www.youtube.com/watch?v=${id}`}
+          aria-label={`Play: ${title}`}
+        >
+          <svg class="ytart__play-icon" viewBox="0 0 24 24" width="34" height="34" aria-hidden="true">
+            <path d="M8 5.5v13l11-6.5z" fill="currentColor" />
+          </svg>
+          <span class="ytart__play-label">Watch Episode</span>
+        </a>
+      )
+    }
+  </div>
+
+  {/* The iframe is injected here on click. Empty until then. */}
+  <div class="ytart__frame"></div>
+</div>
+
+<style>
+  .ytart {
+    container-type: inline-size;
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background-color: var(--cog-navy-deep);
+    /* The same orange top rule the cards carry. */
+    border-top: 3px solid var(--cog-accent);
+  }
+  .ytart__bg,
+  .ytart__scrim,
+  .ytart__lockup,
+  .ytart__frame {
+    position: absolute;
+    inset: 0;
+  }
+  .ytart__bg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .ytart__scrim {
+    background:
+      radial-gradient(120% 120% at 50% 45%, rgba(7, 16, 29, 0.62) 0%, rgba(7, 16, 29, 0.9) 100%),
+      linear-gradient(180deg, rgba(7, 16, 29, 0.45) 0%, rgba(7, 16, 29, 0.88) 100%);
+  }
+
+  .ytart__lockup {
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 6cqw;
+    color: var(--cog-white);
+  }
+  .ytart__brand {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 1.9cqw;
+    letter-spacing: 0.34em;
+    text-indent: 0.34em;
+    text-transform: uppercase;
+    color: var(--cog-cream);
+  }
+  .ytart__title {
+    margin-top: 2.4cqw;
+    max-width: 88%;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    color: var(--cog-white);
+  }
+  /* Three steps rather than one clamp — a 9-character title and a 97-character
+     one cannot share a size and still fill the frame. */
+  .ytart__lockup[data-len="s"] .ytart__title { font-size: 7.4cqw; }
+  .ytart__lockup[data-len="m"] .ytart__title { font-size: 5.6cqw; }
+  .ytart__lockup[data-len="l"] .ytart__title { font-size: 4.2cqw; }
+
+  .ytart__play {
+    display: inline-flex;
+    align-items: center;
+    gap: 1.4cqw;
+    margin-top: 3.4cqw;
+    padding: 1.6cqw 3cqw;
+    border: 1px solid var(--cog-line-strong);
+    background-color: rgba(7, 16, 29, 0.45);
+    color: var(--cog-white);
+    text-decoration: none;
+    transition:
+      background-color var(--transition),
+      border-color var(--transition);
+  }
+  .ytart__play:hover {
+    background-color: var(--cog-accent);
+    border-color: var(--cog-accent);
+  }
+  .ytart__play-icon {
+    width: 3.4cqw;
+    height: 3.4cqw;
+    color: var(--cog-accent);
+    transition: color var(--transition);
+  }
+  .ytart__play:hover .ytart__play-icon {
+    color: var(--cog-white);
+  }
+  .ytart__play-label {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 1.8cqw;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  /* ---- Playing ---- */
+  .ytart__frame {
+    z-index: 2;
+  }
+  .ytart__frame:empty {
+    display: none;
+  }
+  .ytart__frame :global(iframe) {
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+  /* Once the player is in, the facade underneath is inert and must not be
+     reachable by keyboard. */
+  .ytart.is-playing .ytart__lockup,
+  .ytart.is-playing .ytart__scrim {
+    display: none;
+  }
+
+  /* The lockup is sized in container units so it holds together at any width; on
+     very narrow screens the play label is the first thing to become cramped. */
+  @media (max-width: 480px) {
+    .ytart__play-label {
+      font-size: 2.6cqw;
+    }
+  }
+</style>
+
+<script>
+  // Swap the facade for the real player on click. One listener per artwork; the
+  // page only ever has one, but scoping to the root keeps it honest.
+  document.querySelectorAll<HTMLElement>(".ytart").forEach((root) => {
+    const trigger = root.querySelector<HTMLAnchorElement>(".ytart__play");
+    const frame = root.querySelector<HTMLElement>(".ytart__frame");
+    const id = root.dataset.youtubeId;
+    if (!trigger || !frame || !id) return;
+
+    trigger.addEventListener("click", (e) => {
+      // Let modified clicks (new tab, new window) fall through to the href.
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+      e.preventDefault();
+
+      const iframe = document.createElement("iframe");
+      // youtube-nocookie: no cookie is set until the visitor actually plays.
+      // `rel=0` no longer hides related videos — since 2018 it only restricts
+      // them to the same channel, which is the behaviour we want anyway.
+      iframe.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1&playsinline=1`;
+      iframe.title = trigger.getAttribute("aria-label") ?? "Episode video";
+      iframe.allow =
+        "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+      iframe.allowFullscreen = true;
+
+      frame.replaceChildren(iframe);
+      root.classList.add("is-playing");
+      iframe.focus();
+    });
+  });
+</script>

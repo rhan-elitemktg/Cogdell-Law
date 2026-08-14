@@ -23,9 +23,15 @@ interface Props {
    * video thumbnail click does nothing, so a new page with video must set it.
    */
   videoEmbed?: boolean;
+  /**
+   * Set on pages that embed a YouTube video (today: the podcast episode pages).
+   * Deliberately NOT folded into `videoEmbed` — that one also renders the Wistia
+   * <VideoLightbox>, which these pages must not get. This only warms up DNS.
+   */
+  youtubeEmbed?: boolean;
 }
 
-const { title, description, seo, videoEmbed = false } = Astro.props;
+const { title, description, seo, videoEmbed = false, youtubeEmbed = false } = Astro.props;
 
 const firm = await getFirmDetails();
 const globalSeo = await getGlobalSeo();
@@ -74,6 +80,16 @@ const pageProoferSiteId = import.meta.env.PUBLIC_PAGEPROOFER_SITE_ID;
           <link rel="dns-prefetch" href="https://embed-ssl.wistia.com" />
           <link rel="dns-prefetch" href="https://fast.wistia.com" />
           <link rel="dns-prefetch" href="https://distillery.wistia.com" />
+        </Fragment>
+      )
+    }
+    {
+      youtubeEmbed && (
+        <Fragment>
+          {/* DNS-only, like the Wistia hints above: the player itself loads on
+              click, so there is nothing to preconnect to until then. */}
+          <link rel="dns-prefetch" href="https://www.youtube-nocookie.com" />
+          <link rel="dns-prefetch" href="https://i.ytimg.com" />
         </Fragment>
       )
     }

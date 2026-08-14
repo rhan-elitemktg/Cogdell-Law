@@ -486,17 +486,8 @@ export type Podcast = {
   _updatedAt: string;
   _rev: string;
   title: string;
-  episodeNumber: number;
+  youtubeId: string;
   slug: Slug;
-  tag:
-    | "white-collar"
-    | "federal-defense"
-    | "trial-strategy"
-    | "grand-jury"
-    | "health-care-fraud"
-    | "securities-fraud"
-    | "appeals"
-    | "the-firm";
   publishedAt?: string;
   coverImage?: {
     asset?: SanityImageAssetReference;
@@ -505,10 +496,8 @@ export type Podcast = {
     crop?: SanityImageCrop;
     _type: "image";
   };
-  summary: string;
-  body: BlockContent;
-  spotifyUrl?: string;
-  chapters?: string;
+  summary?: string;
+  body?: BlockContent;
   seo?: Seo;
 };
 
@@ -2023,20 +2012,10 @@ export type PAGE_HERO_QUERY_RESULT =
 
 // Source: src/sanity/lib/podcast.ts
 // Variable: ALL_PODCASTS_QUERY
-// Query: *[_type == "podcast"] | order(coalesce(publishedAt, _createdAt) desc){  _id,  title,  episodeNumber,  tag,  "slug": slug.current,  "date": coalesce(publishedAt, _createdAt),  coverImage}
+// Query: *[_type == "podcast"] | order(coalesce(publishedAt, _createdAt) desc){  _id,  title,  "slug": slug.current,  "date": coalesce(publishedAt, _createdAt),  coverImage}
 export type ALL_PODCASTS_QUERY_RESULT = Array<{
   _id: string;
   title: string;
-  episodeNumber: number;
-  tag:
-    | "appeals"
-    | "federal-defense"
-    | "grand-jury"
-    | "health-care-fraud"
-    | "securities-fraud"
-    | "the-firm"
-    | "trial-strategy"
-    | "white-collar";
   slug: string;
   date: string;
   coverImage: {
@@ -2050,21 +2029,12 @@ export type ALL_PODCASTS_QUERY_RESULT = Array<{
 
 // Source: src/sanity/lib/podcast.ts
 // Variable: PODCAST_QUERY
-// Query: *[_type == "podcast" && slug.current == $slug][0]{  _id,  title,  episodeNumber,  tag,  summary,  "slug": slug.current,  "date": coalesce(publishedAt, _createdAt),  coverImage,  body,  spotifyUrl,  chapters,  _updatedAt,  seo{    metaTitle,    metaDescription,    canonicalUrl,    noIndex,    ogImage  }}
+// Query: *[_type == "podcast" && slug.current == $slug][0]{  _id,  title,  youtubeId,  summary,  "slug": slug.current,  "date": coalesce(publishedAt, _createdAt),  coverImage,  body,  _updatedAt,  seo{    metaTitle,    metaDescription,    canonicalUrl,    noIndex,    ogImage  }}
 export type PODCAST_QUERY_RESULT = {
   _id: string;
   title: string;
-  episodeNumber: number;
-  tag:
-    | "appeals"
-    | "federal-defense"
-    | "grand-jury"
-    | "health-care-fraud"
-    | "securities-fraud"
-    | "the-firm"
-    | "trial-strategy"
-    | "white-collar";
-  summary: string;
+  youtubeId: string;
+  summary: string | null;
   slug: string;
   date: string;
   coverImage: {
@@ -2074,9 +2044,7 @@ export type PODCAST_QUERY_RESULT = {
     crop?: SanityImageCrop;
     _type: "image";
   } | null;
-  body: BlockContent;
-  spotifyUrl: string | null;
-  chapters: string | null;
+  body: BlockContent | null;
   _updatedAt: string;
   seo: {
     metaTitle: string | null;
@@ -2458,8 +2426,8 @@ declare module "@sanity/client" {
     '*[_id == "newsPage"][0].grid{\n  eyebrow,\n  headingLead,\n  headingStrong\n}': NEWS_GRID_HEADER_QUERY_RESULT;
     '*[_id == "ourFirmPage"][0]{\n  hero,\n  intro{ eyebrow, headingLead, headingStrong, body },\n  stats{ items[]{ _key, value, label } },\n  quote{ lead, accent, attribution },\n  foundingAttorney{ eyebrow, headingLead, headingStrong, body },\n  originStory{ eyebrow, headingLead, headingStrong, body, milestones[]{ _key, key, title, desc } },\n  values{ eyebrow, headingLead, headingStrong, items[]{ _key, icon, title, body } }\n}': OUR_FIRM_QUERY_RESULT;
     "*[_id == $pageId][0].hero{\n  eyebrow,\n  titleLead,\n  titleStrong,\n  lede\n}": PAGE_HERO_QUERY_RESULT;
-    '*[_type == "podcast"] | order(coalesce(publishedAt, _createdAt) desc){\n  _id,\n  title,\n  episodeNumber,\n  tag,\n  "slug": slug.current,\n  "date": coalesce(publishedAt, _createdAt),\n  coverImage\n}': ALL_PODCASTS_QUERY_RESULT;
-    '*[_type == "podcast" && slug.current == $slug][0]{\n  _id,\n  title,\n  episodeNumber,\n  tag,\n  summary,\n  "slug": slug.current,\n  "date": coalesce(publishedAt, _createdAt),\n  coverImage,\n  body,\n  spotifyUrl,\n  chapters,\n  _updatedAt,\n  seo{\n    metaTitle,\n    metaDescription,\n    canonicalUrl,\n    noIndex,\n    ogImage\n  }\n}': PODCAST_QUERY_RESULT;
+    '*[_type == "podcast"] | order(coalesce(publishedAt, _createdAt) desc){\n  _id,\n  title,\n  "slug": slug.current,\n  "date": coalesce(publishedAt, _createdAt),\n  coverImage\n}': ALL_PODCASTS_QUERY_RESULT;
+    '*[_type == "podcast" && slug.current == $slug][0]{\n  _id,\n  title,\n  youtubeId,\n  summary,\n  "slug": slug.current,\n  "date": coalesce(publishedAt, _createdAt),\n  coverImage,\n  body,\n  _updatedAt,\n  seo{\n    metaTitle,\n    metaDescription,\n    canonicalUrl,\n    noIndex,\n    ogImage\n  }\n}': PODCAST_QUERY_RESULT;
     '*[_type == "podcast" && defined(slug.current)]{"slug": slug.current, _updatedAt, "noIndex": seo.noIndex}': PODCAST_SLUGS_QUERY_RESULT;
     '*[_id == "podcastPage"][0].hero{\n  eyebrow,\n  title,\n  subtitle\n}': PODCAST_HERO_QUERY_RESULT;
     '*[_type == "practiceArea"] | order(orderRank){\n  _id,\n  title,\n  heroTitle,\n  heroImage,\n  cardSummary,\n  icon,\n  body[]{\n    ...,\n    _type == "bodyAttorney" => { attorney->{ name, photo, photoAlt } },\n    _type == "bodyQuoteCta" => { attorney->{ name, photo, photoAlt } },\n    _type == "bodyTestimonial" => { testimonial->{ quote, author, reviewedAt } }\n  },\n  faqs[]{ _key, question, answer },\n  "slug": slug.current,\n  "parentId": parent._ref,\n  _updatedAt,\n  seo{\n    metaTitle,\n    metaDescription,\n    canonicalUrl,\n    noIndex,\n    ogImage\n  }\n}': ALL_QUERY_RESULT;
