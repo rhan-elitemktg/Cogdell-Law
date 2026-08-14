@@ -181,29 +181,49 @@ export async function getAreasWeServeNav(): Promise<NavItem> {
   return {
     label: "Areas We Frequently Serve",
     children: cities.map((city): NavItem => {
-      // A city's own location pages come first — they're the pages written for
-      // that city, and every one of them is the destination of an inherited
-      // FindLaw redirect, so they must keep their internal links.
-      const own: NavItem[] = (city.pages ?? []).map((page) => ({
-        label: page.navLabel!,
-        href: `/${city.citySlug}/${page.slug}`,
-      }));
+      // The city's practice-area list drives BOTH order and membership, so every
+      // city can read in the same service order regardless of which of them
+      // happen to have a page of their own.
+      //
+      // For each entry: if this city has a location page for that service, link
+      // to it; otherwise link to the firm-wide practice area. Matching is on the
+      // label, which is why a location page's Nav label is worth keeping equal
+      // to its practice area's title.
+      const pages = city.pages ?? [];
+      const byLabel = new Map(
+        pages.map((page) => [(page.navLabel ?? "").toLowerCase(), page]),
+      );
+      const used = new Set<string>();
 
-      // Then the firm-wide practice areas the editor has added, to flesh the
-      // submenu out for services this city has no page of its own for. Labels
-      // come from the practice area document rather than being retyped here, so
-      // the menu can't drift from the page it points at.
-      const taken = new Set(own.map((item) => item.label.toLowerCase()));
-      const extra: NavItem[] = (city.practiceAreaLinks ?? [])
-        .filter((area) => area?.slug && !taken.has((area.title ?? "").toLowerCase()))
-        .map((area) => ({
-          label: area.title!,
-          href: area.parentSlug
-            ? `/practice-areas/${area.parentSlug}/${area.slug}`
-            : `/practice-areas/${area.slug}`,
+      const children: NavItem[] = (city.practiceAreaLinks ?? [])
+        .filter((area) => area?.slug)
+        .map((area) => {
+          const key = (area.title ?? "").toLowerCase();
+          const page = byLabel.get(key);
+          if (page) {
+            used.add(key);
+            return { label: page.navLabel!, href: `/${city.citySlug}/${page.slug}` };
+          }
+          return {
+            label: area.title!,
+            href: area.parentSlug
+              ? `/practice-areas/${area.parentSlug}/${area.slug}`
+              : `/practice-areas/${area.slug}`,
+          };
+        });
+
+      // Safety net: a location page the list doesn't mention still gets a link.
+      // Every one of them is the destination of an inherited FindLaw redirect,
+      // so none may be dropped from the menu just because someone forgot to add
+      // its service to the list.
+      const orphans = pages
+        .filter((page) => !used.has((page.navLabel ?? "").toLowerCase()))
+        .map((page) => ({
+          label: page.navLabel!,
+          href: `/${city.citySlug}/${page.slug}`,
         }));
 
-      return { label: city.city!, children: [...own, ...extra] };
+      return { label: city.city!, children: [...children, ...orphans] };
     }),
   };
 }

@@ -24,13 +24,29 @@ import { getCliClient } from "sanity/cli";
 const client = getCliClient();
 const DRY = process.argv.includes("--dry");
 
-/** citySlug → practice-area slugs, in the order they should appear. */
+/**
+ * citySlug → practice-area slugs, in the order the submenu should read.
+ *
+ * Every city gets the SAME list, which is what makes them all read in the same
+ * order. The list is the full set of services, not just the ones lacking a page:
+ * `getAreasWeServeNav()` swaps in a city's own location page wherever it has one
+ * for that service, so Fort Worth and Houston no longer sort differently just
+ * because they happen to own different pages.
+ */
+const SERVICES = [
+  "federal-criminal-cases",
+  "health-care-fraud-defense",
+  "white-collar-crimes",
+  "fraud",
+  "appeals",
+];
+
 const LINKS: Record<string, string[]> = {
-  beaumont: ["health-care-fraud-defense", "white-collar-crimes", "fraud", "appeals"],
-  dallas: ["white-collar-crimes", "fraud", "appeals"],
-  "fort-worth": ["white-collar-crimes", "fraud", "appeals"],
-  houston: ["federal-criminal-cases", "white-collar-crimes", "fraud", "appeals"],
-  sherman: ["health-care-fraud-defense", "white-collar-crimes", "fraud", "appeals"],
+  beaumont: SERVICES,
+  dallas: SERVICES,
+  "fort-worth": SERVICES,
+  houston: SERVICES,
+  sherman: SERVICES,
 };
 
 async function main() {
