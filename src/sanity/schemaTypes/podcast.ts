@@ -55,9 +55,13 @@ export const podcast = defineType({
         // pasted by hand, and a mis-paste is the likeliest way it happens.
         rule.custom(async (value, context) => {
           if (!value) return true;
-          const { getClient } = context;
-          const client = getClient({ apiVersion: "2025-08-15" });
-          const id = context.document?._id.replace(/^drafts\./, "");
+          // `drafts.x` and `x` are one document, so both forms have to be
+          // excluded or an episode reports itself as a duplicate. Bail if there
+          // is no id yet rather than passing undefined into GROQ, which errors
+          // rather than returning nothing.
+          const id = context.document?._id?.replace(/^drafts\./, "");
+          if (!id) return true;
+          const client = context.getClient({ apiVersion: "2025-08-15" });
           const taken = await client.fetch(
             `count(*[_type == "podcast" && youtubeId == $value && !(_id in [$id, "drafts." + $id])]) > 0`,
             { value, id },
