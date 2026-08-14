@@ -202,19 +202,15 @@ export async function getNavItems(): Promise<NavItem[]> {
         areasWeServeNav,
         { label: "Testimonials", href: "/testimonials" },
         { label: "Videos", href: "/videos" },
-        // Hidden from the menu at the firm's request, 2026-08-14 — temporary.
-        // The podcast itself is untouched: /podcast and every episode still
-        // build, are still in sitemap.xml, and stay reachable to anyone with
-        // the link or a search result. This only takes the entry out of the
-        // menu (and out of /site-map, which renders from getNavItems). To hide
-        // it from search too, set "Hide from search engines" on the Podcast
-        // page in the Studio — that is an editor switch, not a code change.
-        // { label: "The Cogdell Law Uncensored", href: "/podcast" },
+        { label: "News", href: "/news" },
       ],
     },
     practiceAreasNav,
     { label: "Trial Experience", href: "/trial-experience" },
-    { label: "News", href: "/news" },
+    // Took News's top-level slot when the podcast relaunched on YouTube. The
+    // podcast was briefly hidden from the menu entirely (2026-08-14) while it
+    // was being rebuilt; this is that entry returning, promoted.
+    { label: "Podcasts", href: "/podcast" },
     { label: "Contact", href: "/contact" },
   ];
 }
