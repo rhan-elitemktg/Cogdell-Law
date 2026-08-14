@@ -233,7 +233,7 @@ export async function getNavItems(): Promise<NavItem[]> {
     // Took News's top-level slot when the podcast relaunched on YouTube. The
     // podcast was briefly hidden from the menu entirely (2026-08-14) while it
     // was being rebuilt; this is that entry returning, promoted.
-    { label: "Podcasts", href: "/podcast" },
+    { label: "Podcast", href: "/podcast" },
     { label: "Contact", href: "/contact" },
   ];
 }
