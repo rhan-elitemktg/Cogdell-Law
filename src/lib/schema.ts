@@ -127,3 +127,38 @@ export function faqSchema(faqs: FaqInput[] | null | undefined) {
     })),
   };
 }
+
+/**
+ * VideoObject for a podcast episode.
+ *
+ * Most episodes carry little or no show-notes copy, so without this an episode
+ * page is a heading, a date and an embed — thin by any measure. The structured
+ * data is what tells search engines the page is a video and makes it eligible
+ * for video results.
+ *
+ * `thumbnailUrl` is pure string construction from the id: no fetch, nothing
+ * stored, so D8 is satisfied rather than bent. `maxresdefault` exists only for
+ * sources uploaded at 720p or better, which every episode on this channel is.
+ */
+export function videoObjectSchema(input: {
+  name: string | null | undefined;
+  description: string | null | undefined;
+  youtubeId: string | null | undefined;
+  uploadDate: string | null | undefined;
+  pageUrl: URL;
+}) {
+  const id = input.youtubeId?.trim();
+  if (!input.name || !id || !/^[A-Za-z0-9_-]{11}$/.test(id)) return undefined;
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    name: input.name,
+    description: input.description ?? input.name,
+    thumbnailUrl: `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`,
+    embedUrl: `https://www.youtube-nocookie.com/embed/${id}`,
+    contentUrl: `https://www.youtube.com/watch?v=${id}`,
+    url: input.pageUrl.href,
+    ...(input.uploadDate ? { uploadDate: input.uploadDate } : {}),
+  };
+}

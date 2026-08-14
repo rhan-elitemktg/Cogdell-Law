@@ -1,16 +1,15 @@
 ---
-// One episode card: brand artwork + date • tag + title + "Listen Now".
+// One episode card: brand artwork + date + title + "Listen Now".
 // The whole card links to the episode page; the button is a visual affordance
-// (a span, not a nested link) so there's a single accessible target. Carries
-// `data-tag` so PodcastGrid's filter can show/hide it.
+// (a span, not a nested link) so there's a single accessible target.
+//
+// `data-search` is the pre-normalised haystack PodcastGrid's search reads —
+// built here, server-side, so the matcher never touches the DOM for text.
 import PodcastArtwork from "./PodcastArtwork.astro";
-import { PODCAST_TAG_LABEL } from "../../lib/podcastTags";
 
 interface Props {
   item: {
     title: string | null;
-    episodeNumber: number | null;
-    tag: string | null;
     slug: string | null;
     date: string | null;
     coverImage: unknown;
@@ -22,20 +21,28 @@ interface Props {
 
 const { item, loading = "lazy", hidden = false } = Astro.props;
 
-const tagLabel = item.tag ? (PODCAST_TAG_LABEL[item.tag] ?? item.tag) : "";
-const dateLabel = item.date
-  ? new Date(item.date).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+const date = item.date ? new Date(item.date) : null;
+const dateLabel = date
+  ? date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
   : "";
-const title = item.episodeNumber != null ? `${item.title} | Ep. ${item.episodeNumber}` : item.title;
+const title = item.title ?? "";
+
+// Title plus the written date and year, so "deguerin", "rusty hardin", "march"
+// and "2026" all find something. Normalised the same way the query will be:
+// lowercased, accents folded, punctuation collapsed to single spaces.
+const haystack = `${title} ${dateLabel}`
+  .toLowerCase()
+  .normalize("NFKD")
+  .replace(/[̀-ͯ]/g, "")
+  .replace(/[^a-z0-9]+/g, " ")
+  .trim();
 ---
 
-<a class="pcard" href={`/podcast/${item.slug}`} data-tag={item.tag ?? ""} hidden={hidden}>
-  <PodcastArtwork image={item.coverImage} episodeNumber={item.episodeNumber ?? undefined} loading={loading} />
+<a class="pcard" href={`/podcast/${item.slug}`} data-search={haystack} hidden={hidden}>
+  <PodcastArtwork image={item.coverImage} loading={loading} />
   <div class="pcard__body">
     <p class="pcard__meta">
       {dateLabel && <span class="pcard__date">{dateLabel}</span>}
-      {dateLabel && tagLabel && <span class="pcard__dot" aria-hidden="true">•</span>}
-      {tagLabel && <span class="pcard__tag">{tagLabel}</span>}
     </p>
     <h3 class="pcard__title">{title}</h3>
     <span class="pcard__listen">

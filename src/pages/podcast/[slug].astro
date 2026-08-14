@@ -1,17 +1,20 @@
 ---
-// Episode page at /podcast/[slug]: meta + title + brand artwork, the show-notes
-// body, a hashtag row, the audio player with its chapter list, then a
-// related-episodes grid. Layout matches the episode mockup.
+// Episode page at /podcast/[slug]: a date line, then the artwork — which carries
+// the episode's <h1> and a play button, and becomes the YouTube player when
+// clicked — then the show-notes body and a related-episodes grid.
+//
+// There is no separate title heading above the artwork any more, and no audio
+// player below it: the video IS the episode, so it sits where the artwork was.
 import Layout from "../../layouts/Layout.astro";
 import { PortableText } from "astro-portabletext";
 import { proseBodyComponents } from "../../components/prose/bodyComponents";
-import PodcastArtwork from "../../components/podcast/PodcastArtwork.astro";
-import SpotifyPlayer from "../../components/podcast/SpotifyPlayer.astro";
+import YouTubeArtwork from "../../components/podcast/YouTubeArtwork.astro";
 import RelatedPodcasts from "../../components/podcast/RelatedPodcasts.astro";
+import JsonLd from "../../components/seo/JsonLd.astro";
 import CtaBar from "../../components/CtaBar.astro";
 import Consult from "../../components/Consult.astro";
 import { getPodcast, getPodcastSlugs } from "../../sanity/lib/podcast";
-import { PODCAST_TAG_LABEL } from "../../lib/podcastTags";
+import { videoObjectSchema } from "../../lib/schema";
 
 export async function getStaticPaths() {
   const slugs = await getPodcastSlugs();
@@ -25,35 +28,37 @@ if (!episode) {
   throw new Error(`No podcast episode found in Sanity for slug "${slug}".`);
 }
 
-const tagLabel = episode.tag ? (PODCAST_TAG_LABEL[episode.tag] ?? episode.tag) : "";
+const title = episode.title ?? "";
 const dateLabel = episode.date
   ? new Date(episode.date).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
   : "";
-const displayTitle =
-  episode.episodeNumber != null ? `${episode.title} | Ep. ${episode.episodeNumber}` : (episode.title ?? "");
-const playerLabel =
-  episode.episodeNumber != null ? `Ep. ${episode.episodeNumber} — ${episode.title}` : (episode.title ?? "");
 const hasBody = Array.isArray(episode.body) && episode.body.length > 0;
-const description = episode.summary ?? `${episode.title} — The Cogdell Counsel podcast.`;
+const description = episode.summary ?? `${title} — the Cogdell Law Uncensored podcast.`;
+
+// Most episodes carry little or no body copy, so the structured data is doing
+// real work here: it's what makes these pages legible to search as video rather
+// than as thin text pages.
+const videoSchema = videoObjectSchema({
+  name: title,
+  description,
+  youtubeId: episode.youtubeId,
+  uploadDate: episode.date,
+  pageUrl: Astro.url,
+});
 ---
 
-<Layout title={displayTitle} description={description} seo={episode.seo}>
+<Layout title={title} description={description} seo={episode.seo} youtubeEmbed>
+  {videoSchema && <JsonLd data={videoSchema} />}
   <article class="episode">
     <div class="container">
       <div class="episode__col">
         <p class="episode__meta">
           {dateLabel && <span class="episode__date">{dateLabel}</span>}
-          {dateLabel && tagLabel && <span class="episode__dot" aria-hidden="true">•</span>}
-          {tagLabel && <span class="episode__tag">{tagLabel}</span>}
         </p>
-        <h1 class="episode__title">{displayTitle}</h1>
 
+        {/* Carries the page's one <h1>. */}
         <div class="episode__art">
-          <PodcastArtwork
-            image={episode.coverImage}
-            episodeNumber={episode.episodeNumber ?? undefined}
-            loading="eager"
-          />
+          <YouTubeArtwork title={title} youtubeId={episode.youtubeId} image={episode.coverImage} />
         </div>
 
         {
@@ -63,10 +68,6 @@ const description = episode.summary ?? `${episode.title} — The Cogdell Counsel
             </div>
           )
         }
-
-        <div class="episode__player">
-          <SpotifyPlayer url={episode.spotifyUrl} title={playerLabel} chapters={episode.chapters} />
-        </div>
       </div>
     </div>
   </article>
@@ -98,27 +99,14 @@ const description = episode.summary ?? `${episode.title} — The Cogdell Counsel
     letter-spacing: 0.14em;
     text-transform: uppercase;
   }
-  .episode__date,
-  .episode__dot {
+  .episode__date {
     color: var(--cog-ink-muted);
   }
-  .episode__tag {
-    color: var(--cog-accent);
-  }
 
-  .episode__title {
-    margin-top: var(--space-4);
-    text-align: left;
-    font-family: var(--font-heading);
-    font-weight: 700;
-    font-size: clamp(2rem, 3.6vw, 3rem);
-    line-height: 1.1;
-    letter-spacing: -0.01em;
-    color: var(--cog-ink);
-  }
-
+  /* The artwork now carries the page's <h1>, so it sits tighter to the date line
+     than it did when a separate heading came between them. */
   .episode__art {
-    margin: var(--space-8) 0 var(--space-12);
+    margin: var(--space-4) 0 var(--space-12);
   }
 
   /* ---- Body copy ---- */
@@ -141,10 +129,5 @@ const description = episode.summary ?? `${episode.title} — The Cogdell Counsel
   .episode__prose :global(.prose__p:first-child) {
     /* An italic lead line often opens the notes; keep it snug to the artwork. */
     margin-top: 0;
-  }
-
-  /* ---- Player ---- */
-  .episode__player {
-    margin-top: var(--space-8);
   }
 </style>

@@ -1,19 +1,19 @@
 import { defineType, defineField } from "sanity";
 import { icons } from "@sanity/icons";
-import { PODCAST_TAGS } from "../../lib/podcastTags";
-import { badChapterLines, parseChapters } from "../../lib/podcastChapters";
 
 /**
- * A podcast episode — "The Cogdell Counsel". The single source of truth for an
- * episode, shown on /podcast (the filterable index grid) and /podcast/<slug>
- * (the full episode page).
+ * A podcast episode — "The Cogdell Law Uncensored". The single source of truth
+ * for an episode, shown on /podcast (the searchable index grid) and
+ * /podcast/<slug> (the full episode page).
  *
- * The card + episode-page artwork is a code-rendered brand lockup over
- * `coverImage` (see PodcastArtwork.astro) with the episode number printed on it,
- * so editors only upload a background photo and set the number.
+ * The card artwork is a code-rendered brand lockup over `coverImage` (see
+ * PodcastArtwork.astro), so editors only upload a background photo. On the
+ * episode page the artwork carries the title and a play button instead, and
+ * swaps itself for the YouTube player when clicked (YouTubeArtwork.astro).
  *
- * Audio comes from Spotify: paste the episode's Spotify link into `spotifyUrl`
- * and the page embeds Spotify's player (which pulls the audio + controls).
+ * The video comes from YouTube: paste the 11-character id from the watch URL
+ * into `youtubeId`. Nothing else about the video is stored here — runtime,
+ * thumbnail and the player itself are YouTube's to own (D8).
  *
  * NOTE (do not reintroduce): no field `groups`/tabs, and the Studio list preview
  * stays text-only with a single ordering — selecting `coverImage` in the preview
@@ -34,16 +34,37 @@ export const podcast = defineType({
       title: "Episode title",
       type: "string",
       group: "content",
-      description: 'No need to add "| Ep. N" — that\'s added automatically from the number below.',
       validation: (rule) => rule.required(),
     }),
     defineField({
-      name: "episodeNumber",
-      title: "Episode number",
-      type: "number",
+      name: "youtubeId",
+      title: "YouTube video ID",
+      type: "string",
       group: "content",
-      description: 'Printed on the artwork ("EPISODE 12") and after the title ("| Ep. 12").',
-      validation: (rule) => rule.required().integer().positive(),
+      description:
+        'The 11-character id from the video\'s URL — in "youtube.com/watch?v=0srbD2hn2vM" that is 0srbD2hn2vM. This is what loads the player; without it the episode page shows artwork with no play button.',
+      validation: (rule) => [
+        rule
+          .required()
+          .regex(/^[A-Za-z0-9_-]{11}$/, {
+            name: "YouTube video ID",
+            invert: false,
+          }),
+        // Two episodes pointing at one video would build two pages of the same
+        // thing, and nothing else would complain. Worth the async check: ids are
+        // pasted by hand, and a mis-paste is the likeliest way it happens.
+        rule.custom(async (value, context) => {
+          if (!value) return true;
+          const { getClient } = context;
+          const client = getClient({ apiVersion: "2025-08-15" });
+          const id = context.document?._id.replace(/^drafts\./, "");
+          const taken = await client.fetch(
+            `count(*[_type == "podcast" && youtubeId == $value && !(_id in [$id, "drafts." + $id])]) > 0`,
+            { value, id },
+          );
+          return taken ? "Another episode already uses this YouTube video." : true;
+        }),
+      ],
     }),
     defineField({
       name: "slug",
@@ -52,15 +73,6 @@ export const podcast = defineType({
       group: "content",
       description: "URL segment — /podcast/<slug>.",
       options: { source: "title", maxLength: 96 },
-      validation: (rule) => rule.required(),
-    }),
-    defineField({
-      name: "tag",
-      title: "Tag",
-      type: "string",
-      group: "content",
-      description: "The category badge on the card, and the filter button that reveals it on /podcast.",
-      options: { list: PODCAST_TAGS.map((t) => ({ ...t })) },
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -78,7 +90,7 @@ export const podcast = defineType({
       group: "content",
       options: { hotspot: true },
       description:
-        'The photo behind the "Cogdell Counsel" lockup on the card + episode page. Optional — leave empty to use the firm default; upload one to override it.',
+        'The photo behind the "Cogdell Law Uncensored" lockup on the card, and behind the title on the episode page. Optional — leave empty to use the firm default; upload one to override it.',
     }),
     defineField({
       name: "summary",
@@ -86,52 +98,15 @@ export const podcast = defineType({
       type: "text",
       group: "content",
       rows: 3,
-      description: "A short blurb — used for search/social metadata when no SEO description is set.",
-      validation: (rule) => rule.required(),
+      description:
+        "A short blurb for search results and social shares. Leave blank and the episode title is used instead.",
     }),
     defineField({
       name: "body",
       title: "Episode content",
       type: "blockContent",
       group: "content",
-      description: "The show notes / write-up shown on the episode page.",
-      validation: (rule) => rule.required().min(1),
-    }),
-    defineField({
-      name: "spotifyUrl",
-      title: "Spotify episode link",
-      type: "url",
-      group: "content",
-      description:
-        "Paste the episode's Spotify URL (e.g. https://open.spotify.com/episode/…). The page embeds Spotify's player from this.",
-      validation: (rule) => rule.uri({ scheme: ["https"] }),
-    }),
-    defineField({
-      name: "chapters",
-      title: "Chapters",
-      type: "text",
-      group: "content",
-      rows: 8,
-      description:
-        'One chapter per line — timestamp, then title: "02:14 Meeting Dick DeGuerin". Shown under the player, and clicking one jumps the episode to that point. Paste the same block into Buzzsprout so Spotify shows the same chapters.',
-      validation: (rule) => [
-        // An error, not a warning: a line we can't read is silently missing from
-        // the page, and the editor would never find out.
-        rule.custom((value?: string) => {
-          const bad = badChapterLines(value);
-          if (bad.length === 0) return true;
-          return `Start every line with a timestamp, e.g. "02:14 Meeting Dick DeGuerin". Check ${
-            bad.length === 1 ? `line ${bad[0]}` : `lines ${bad.join(", ")}`
-          }.`;
-        }),
-        rule
-          .custom((value?: string) => {
-            const chapters = parseChapters(value);
-            const backwards = chapters.some((c, i) => i > 0 && c.seconds <= chapters[i - 1].seconds);
-            return backwards ? "Timestamps aren't in order — chapters are listed exactly as typed." : true;
-          })
-          .warning(),
-      ],
+      description: "Show notes shown under the video. Optional — leave blank and nothing renders.",
     }),
     defineField({
       name: "seo",
@@ -153,12 +128,6 @@ export const podcast = defineType({
   preview: {
     // Text-only list preview — no image select (see NOTE above). Rows show the
     // document icon.
-    select: { title: "title", episodeNumber: "episodeNumber", tag: "tag" },
-    prepare({ title, episodeNumber, tag }) {
-      return {
-        title: episodeNumber ? `${title} | Ep. ${episodeNumber}` : title,
-        subtitle: tag,
-      };
-    },
+    select: { title: "title", subtitle: "youtubeId" },
   },
 });

@@ -1,17 +1,19 @@
 ---
-// Filterable, paginated episode grid. Mechanics (filter buttons, grid spacing,
-// staggered entrance animation) match /trial-experience's TrialResults; the new
-// piece is "Load More", which reveals the next batch and cooperates with the
-// active tag filter (changing the filter resets the page).
+// Searchable, paginated episode grid.
+//
+// The tag filter row this replaced made sense for a handful of curated episodes;
+// with 80+ it did not, and half the catalogue didn't fit the taxonomy anyway.
+// A search box scales instead, and every card is already in the HTML — the grid
+// server-renders all of them and hides the overflow — so searching costs no
+// extra fetch and no extra markup beyond one `data-search` attribute per card.
+//
+// "Load More" is unchanged: typing resets the page exactly as changing filter did.
 import PodcastCard from "./PodcastCard.astro";
-import { PODCAST_TAGS } from "../../lib/podcastTags";
 
 interface Props {
   items: Array<{
     _id: string;
     title: string | null;
-    episodeNumber: number | null;
-    tag: string | null;
     slug: string | null;
     date: string | null;
     coverImage: unknown;
@@ -22,31 +24,30 @@ const { items } = Astro.props;
 
 // First page size — the rest are revealed by "Load More".
 const BATCH = 9;
-
-// "All" reset + one button per tag that's actually in use (in PODCAST_TAGS order,
-// so unused tags don't show a dead filter).
-const usedTags = new Set(items.map((i) => i.tag).filter(Boolean));
-const filters = [
-  { id: "all", label: "All Episodes" },
-  ...PODCAST_TAGS.filter((t) => usedTags.has(t.value)).map((t) => ({ id: t.value, label: t.title })),
-];
 ---
 
 <section class="pgrid" data-batch={BATCH}>
   <div class="container pgrid__inner">
-    <div class="pgrid__filters" role="group" aria-label="Filter episodes by topic">
-      {
-        filters.map((f, i) => (
-          <button class="pgrid__filter" type="button" data-filter={f.id} aria-pressed={i === 0 ? "true" : "false"}>
-            {f.label}
-          </button>
-        ))
-      }
+    {/* Hidden server-side and revealed by the script below. Stronger than a
+        `html.js` class: if the script FAILS rather than merely being disabled,
+        the field stays hidden instead of sitting there dead. */}
+    <div class="pgrid__search" hidden>
+      <label class="pgrid__search-label" for="podcast-search">Search episodes</label>
+      <input
+        class="pgrid__search-input"
+        id="podcast-search"
+        type="search"
+        autocomplete="off"
+        placeholder="Search by title, guest or year…"
+      />
+      <p class="pgrid__count" role="status" aria-live="polite"></p>
     </div>
 
     <div class="pgrid__grid">
       {items.map((item, i) => <PodcastCard item={item} hidden={i >= BATCH} loading={i < 3 ? "eager" : "lazy"} />)}
     </div>
+
+    <p class="pgrid__empty" hidden>No episodes match that search.</p>
 
     <button class="pgrid__more" type="button" hidden={items.length <= BATCH}>
       Load More Episodes
@@ -57,7 +58,7 @@ const filters = [
 
 <noscript>
   <style>
-    /* No JS: reveal every episode (the filter/paging enhancements are off). */
+    /* No JS: reveal every episode (search and paging are enhancements). */
     .pgrid .pcard[hidden] { display: flex !important; }
     .pgrid__more { display: none !important; }
   </style>
@@ -71,38 +72,53 @@ const filters = [
     padding-block: var(--space-section);
   }
 
-  /* ---- Filters (matches TrialResults) ---- */
-  .pgrid__filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2);
+  /* ---- Search ---- */
+  .pgrid__search {
     margin-bottom: var(--space-8);
     padding-bottom: var(--space-6);
     border-bottom: 1px solid var(--cog-line-ink);
   }
-  .pgrid__filter {
-    padding: var(--space-2) var(--space-4);
+  .pgrid__search[hidden] {
+    display: none;
+  }
+  .pgrid__search-label {
+    display: block;
+    margin-bottom: var(--space-2);
+    font-family: var(--font-body);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--cog-ink-muted);
+  }
+  .pgrid__search-input {
+    width: 100%;
+    max-width: 520px;
+    height: 56px;
+    padding: 14px 16px;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    color: var(--cog-ink);
+    background-color: var(--cog-white);
+    border: 1px solid var(--cog-line-ink);
+    border-radius: 0;
+    transition: border-color var(--transition);
+  }
+  .pgrid__search-input::placeholder {
+    color: var(--cog-ink-muted);
+  }
+  .pgrid__search-input:focus {
+    outline: none;
+    border-color: var(--cog-accent);
+  }
+  .pgrid__count {
+    margin-top: var(--space-3);
+    min-height: 1.2em; /* reserve the line so results don't jump the grid */
     font-family: var(--font-body);
     font-size: var(--text-xs);
-    font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--cog-ink-body);
-    background-color: transparent;
-    border: 1px solid var(--cog-line-ink);
-    cursor: pointer;
-    transition:
-      color var(--transition),
-      background-color var(--transition),
-      border-color var(--transition);
-  }
-  .pgrid__filter:hover {
-    border-color: var(--cog-ink-muted);
-  }
-  .pgrid__filter[aria-pressed="true"] {
-    color: var(--cog-white);
-    background-color: var(--cog-navy);
-    border-color: var(--cog-navy);
+    color: var(--cog-ink-muted);
   }
 
   /* ---- Grid (matches TrialResults spacing) ---- */
@@ -111,6 +127,17 @@ const filters = [
     grid-template-columns: repeat(3, 1fr);
     gap: var(--space-6);
     align-items: stretch;
+  }
+
+  .pgrid__empty {
+    margin-top: var(--space-12);
+    text-align: center;
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    color: var(--cog-ink-muted);
+  }
+  .pgrid__empty[hidden] {
+    display: none;
   }
 
   /* ---- Load more ---- */
@@ -163,33 +190,103 @@ const filters = [
 </style>
 
 <script>
+  // Fuzzy search over the episode cards.
+  //
+  // Hand-rolled rather than a library: this runs over ~82 pre-normalised strings
+  // that are already in the DOM, which is sub-millisecond work, and a search
+  // dependency would be the largest script on a site that otherwise ships almost
+  // none. No debounce for the same reason — there is nothing to defer.
   document.querySelectorAll<HTMLElement>(".pgrid").forEach((root) => {
-    const filterButtons = root.querySelectorAll<HTMLButtonElement>(".pgrid__filter");
-    const cards = Array.from(root.querySelectorAll<HTMLElement>(".pcard"));
+    const searchWrap = root.querySelector<HTMLElement>(".pgrid__search");
+    const input = root.querySelector<HTMLInputElement>(".pgrid__search-input");
+    const count = root.querySelector<HTMLElement>(".pgrid__count");
+    const empty = root.querySelector<HTMLElement>(".pgrid__empty");
+    const grid = root.querySelector<HTMLElement>(".pgrid__grid");
     const loadMore = root.querySelector<HTMLButtonElement>(".pgrid__more");
+    const cards = Array.from(root.querySelectorAll<HTMLElement>(".pcard"));
     const BATCH = Number(root.dataset.batch) || 9;
 
-    let filter = "all";
-    let limit = BATCH;
+    if (!grid) return;
+    // The script is alive, so the field is usable.
+    if (searchWrap) searchWrap.hidden = false;
 
-    const matches = (card: HTMLElement) => filter === "all" || card.dataset.tag === filter;
+    let limit = BATCH;
+    let tokens: string[] = [];
+
+    /** Chars of `needle` appear in `hay` in order, gaps allowed. */
+    const isSubsequence = (hay: string, needle: string) => {
+      let i = 0;
+      for (let h = 0; h < hay.length && i < needle.length; h++) {
+        if (hay[h] === needle[i]) i++;
+      }
+      return i === needle.length;
+    };
+
+    /** Tolerate one mistyped/extra character — "durts" should still find "durst". */
+    const nearSubsequence = (hay: string, needle: string) => {
+      for (let k = 0; k < needle.length; k++) {
+        if (isSubsequence(hay, needle.slice(0, k) + needle.slice(k + 1))) return true;
+      }
+      return false;
+    };
+
+    // Higher is better. 0 means "no match", and one unmatched token rejects the
+    // whole card — searching two words should narrow, not widen.
+    function tokenScore(hay: string, t: string): number {
+      const at = hay.indexOf(t);
+      if (at === 0 || (at > 0 && hay[at - 1] === " ")) return 100 + t.length; // word start
+      if (at > 0) return 60 + t.length; // mid-word substring
+      if (isSubsequence(hay, t)) return 25;
+      if (t.length >= 4 && nearSubsequence(hay, t)) return 12;
+      return 0;
+    }
+
+    function scoreOf(card: HTMLElement): number {
+      if (!tokens.length) return 1; // no query — everything matches equally
+      const hay = card.dataset.search ?? "";
+      let total = 0;
+      for (const t of tokens) {
+        const s = tokenScore(hay, t);
+        if (!s) return 0;
+        total += s;
+      }
+      return total;
+    }
+
+    const normalise = (s: string) =>
+      s
+        .toLowerCase()
+        .normalize("NFKD")
+        .replace(/[̀-ͯ]/g, "")
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim();
 
     // Render the visible set. `animateFrom` = the visible position at/after which
-    // to run the entrance animation (0 = animate all, e.g. on filter change;
+    // to run the entrance animation (0 = animate all, e.g. on a new search;
     // old-limit = only the freshly revealed batch; null = no animation, initial).
     function render(animateFrom: number | null) {
       const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const totalInFilter = cards.filter(matches).length;
 
+      const scored = cards.map((card, i) => ({ card, i, score: scoreOf(card) }));
+      const hits = scored.filter((s) => s.score > 0);
+
+      // Relevance order while searching, newest-first otherwise. Ordering matters
+      // because only the first `limit` are shown — the best match has to land in
+      // the first batch. Real DOM moves, since `style.order` would be an inline
+      // style and the house rules forbid those.
+      if (tokens.length) {
+        hits.sort((a, b) => b.score - a.score || a.i - b.i);
+        for (const h of hits) grid!.append(h.card);
+      } else if (scored.some((s, i) => s.i !== i)) {
+        for (const s of scored) grid!.append(s.card);
+      }
+
+      const visible = new Set(hits.slice(0, limit).map((h) => h.card));
       let pos = 0;
-      cards.forEach((card) => {
-        if (!matches(card)) {
-          card.hidden = true;
-          return;
-        }
-        const visible = pos < limit;
-        card.hidden = !visible;
-        if (visible && !reduce && animateFrom != null && pos >= animateFrom) {
+      for (const { card } of scored) {
+        const show = visible.has(card);
+        card.hidden = !show;
+        if (show && !reduce && animateFrom != null && pos >= animateFrom) {
           card.animate(
             [
               { opacity: 0, transform: "translateY(14px)" },
@@ -203,20 +300,22 @@ const filters = [
             },
           );
         }
-        pos++;
-      });
+        if (show) pos++;
+      }
 
-      if (loadMore) loadMore.hidden = limit >= totalInFilter;
+      if (loadMore) loadMore.hidden = limit >= hits.length;
+      if (empty) empty.hidden = hits.length > 0;
+      if (count) {
+        count.textContent = !tokens.length
+          ? ""
+          : `${hits.length} ${hits.length === 1 ? "episode" : "episodes"}`;
+      }
     }
 
-    filterButtons.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        filterButtons.forEach((b) => b.setAttribute("aria-pressed", "false"));
-        btn.setAttribute("aria-pressed", "true");
-        filter = btn.dataset.filter ?? "all";
-        limit = BATCH;
-        render(0);
-      });
+    input?.addEventListener("input", () => {
+      tokens = normalise(input.value).split(" ").filter(Boolean);
+      limit = BATCH;
+      render(0);
     });
 
     loadMore?.addEventListener("click", () => {

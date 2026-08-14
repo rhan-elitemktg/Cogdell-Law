@@ -6,8 +6,6 @@ import { defineQuery } from "groq";
 const CARD = `{
   _id,
   title,
-  episodeNumber,
-  tag,
   "slug": slug.current,
   "date": coalesce(publishedAt, _createdAt),
   coverImage
@@ -17,26 +15,39 @@ const ALL_PODCASTS_QUERY = defineQuery(
   `*[_type == "podcast"] | order(coalesce(publishedAt, _createdAt) desc)${CARD}`,
 );
 
-/** Every episode, newest first — for the /podcast index grid. */
-export async function getAllPodcasts() {
+/**
+ * Every episode, newest first — for the /podcast index grid.
+ *
+ * Memoized in PROD, and that is load-bearing rather than a nicety: getPodcast()
+ * calls this to derive related episodes, so at 82 episode pages an unmemoized
+ * version is ~164 round-trips with `useCdn: false` where there were 4. Same
+ * pattern as getSiteEntries() and getFirmDetails(). DEV stays uncached so an
+ * edit shows up on the next request.
+ */
+let allCache: Promise<PodcastCard[]> | null = null;
+type PodcastCard = Awaited<ReturnType<typeof fetchAllPodcasts>>[number];
+
+async function fetchAllPodcasts() {
   return (await sanityClient.fetch(ALL_PODCASTS_QUERY)) ?? [];
 }
 
-// The full episode, for /podcast/[slug]. `related` is the curated override; the
-// helper below tops it up to 3 when it's short. The `seo{…}` projection is spelled
-// out inline (not shared) — TypeGen parses defineQuery statically. See seo.ts.
+export async function getAllPodcasts() {
+  if (!import.meta.env.PROD) return fetchAllPodcasts();
+  allCache ??= fetchAllPodcasts();
+  return allCache;
+}
+
+// The full episode, for /podcast/[slug]. The `seo{…}` projection is spelled out
+// inline (not shared) — TypeGen parses defineQuery statically. See seo.ts.
 const PODCAST_QUERY = defineQuery(`*[_type == "podcast" && slug.current == $slug][0]{
   _id,
   title,
-  episodeNumber,
-  tag,
+  youtubeId,
   summary,
   "slug": slug.current,
   "date": coalesce(publishedAt, _createdAt),
   coverImage,
   body,
-  spotifyUrl,
-  chapters,
   _updatedAt,
   seo{
     metaTitle,
@@ -48,23 +59,17 @@ const PODCAST_QUERY = defineQuery(`*[_type == "podcast" && slug.current == $slug
 }`);
 
 /**
- * One episode, for /podcast/[slug]. Related episodes: the editor's curated list,
- * topped up to 3 with the newest OTHER episodes (same tag first) when short — the
- * same "derive the rest in JS" pattern as the homepage News band (getHomeNews).
+ * One episode, for /podcast/[slug], plus the 3 newest others as "related".
+ *
+ * There is no curated override — an earlier version read `episode.related`, a
+ * field that has never existed on the schema and was never projected. It only
+ * compiled because `npm run build` is a bare `astro build` with no `astro check`.
  */
 export async function getPodcast(slug: string) {
   const episode = await sanityClient.fetch(PODCAST_QUERY, { slug });
   if (!episode) return null;
 
-  let related = episode.related ?? [];
-  if (related.length < 3) {
-    const others = (await getAllPodcasts()).filter(
-      (p) => p.slug !== slug && !related.some((r) => r._id === p._id),
-    );
-    const sameTag = others.filter((p) => p.tag === episode.tag);
-    const rest = others.filter((p) => p.tag !== episode.tag);
-    related = [...related, ...sameTag, ...rest].slice(0, 3);
-  }
+  const related = (await getAllPodcasts()).filter((p) => p.slug !== slug).slice(0, 3);
 
   return { ...episode, related };
 }
