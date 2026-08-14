@@ -76,6 +76,11 @@ const AREAS_WE_SERVE_NAV_QUERY = defineQuery(`*[_type == "serviceCity"] | order(
   "pages": *[_type == "locationPage" && references(^._id)] | order(orderRank){
     "navLabel": navLabel,
     "slug": slug.current
+  },
+  practiceAreaLinks[]->{
+    title,
+    "slug": slug.current,
+    "parentSlug": parent->slug.current
   }
 }`);
 
@@ -175,13 +180,31 @@ export async function getAreasWeServeNav(): Promise<NavItem> {
   const cities = (await sanityClient.fetch(AREAS_WE_SERVE_NAV_QUERY)) ?? [];
   return {
     label: "Areas We Frequently Serve",
-    children: cities.map((city): NavItem => ({
-      label: city.city!,
-      children: (city.pages ?? []).map((page) => ({
+    children: cities.map((city): NavItem => {
+      // A city's own location pages come first — they're the pages written for
+      // that city, and every one of them is the destination of an inherited
+      // FindLaw redirect, so they must keep their internal links.
+      const own: NavItem[] = (city.pages ?? []).map((page) => ({
         label: page.navLabel!,
         href: `/${city.citySlug}/${page.slug}`,
-      })),
-    })),
+      }));
+
+      // Then the firm-wide practice areas the editor has added, to flesh the
+      // submenu out for services this city has no page of its own for. Labels
+      // come from the practice area document rather than being retyped here, so
+      // the menu can't drift from the page it points at.
+      const taken = new Set(own.map((item) => item.label.toLowerCase()));
+      const extra: NavItem[] = (city.practiceAreaLinks ?? [])
+        .filter((area) => area?.slug && !taken.has((area.title ?? "").toLowerCase()))
+        .map((area) => ({
+          label: area.title!,
+          href: area.parentSlug
+            ? `/practice-areas/${area.parentSlug}/${area.slug}`
+            : `/practice-areas/${area.slug}`,
+        }));
+
+      return { label: city.city!, children: [...own, ...extra] };
+    }),
   };
 }
 
