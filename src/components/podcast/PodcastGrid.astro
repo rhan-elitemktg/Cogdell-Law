@@ -212,40 +212,63 @@ const BATCH = 9;
     let limit = BATCH;
     let tokens: string[] = [];
 
-    /** Chars of `needle` appear in `hay` in order, gaps allowed. */
-    const isSubsequence = (hay: string, needle: string) => {
-      let i = 0;
-      for (let h = 0; h < hay.length && i < needle.length; h++) {
-        if (hay[h] === needle[i]) i++;
+    /**
+     * Within one edit of each other, transpositions included — so "durts" still
+     * finds "durst", which a plain Levenshtein check would score as two edits.
+     */
+    function withinOneEdit(a: string, b: string): boolean {
+      if (a === b) return true;
+      if (Math.abs(a.length - b.length) > 1) return false;
+      if (a.length === b.length) {
+        const diff: number[] = [];
+        for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) diff.push(i);
+        if (diff.length === 1) return true;
+        return (
+          diff.length === 2 &&
+          diff[1] === diff[0] + 1 &&
+          a[diff[0]] === b[diff[1]] &&
+          a[diff[1]] === b[diff[0]]
+        );
       }
-      return i === needle.length;
-    };
-
-    /** Tolerate one mistyped/extra character — "durts" should still find "durst". */
-    const nearSubsequence = (hay: string, needle: string) => {
-      for (let k = 0; k < needle.length; k++) {
-        if (isSubsequence(hay, needle.slice(0, k) + needle.slice(k + 1))) return true;
+      const [short, long] = a.length < b.length ? [a, b] : [b, a];
+      for (let i = 0; i < long.length; i++) {
+        if (short === long.slice(0, i) + long.slice(i + 1)) return true;
       }
       return false;
-    };
+    }
 
-    // Higher is better. 0 means "no match", and one unmatched token rejects the
-    // whole card — searching two words should narrow, not widen.
-    function tokenScore(hay: string, t: string): number {
-      const at = hay.indexOf(t);
-      if (at === 0 || (at > 0 && hay[at - 1] === " ")) return 100 + t.length; // word start
-      if (at > 0) return 60 + t.length; // mid-word substring
-      if (isSubsequence(hay, t)) return 25;
-      if (t.length >= 4 && nearSubsequence(hay, t)) return 12;
-      return 0;
+    /**
+     * Match a token against WHOLE WORDS, never across the haystack.
+     *
+     * An earlier version accepted a subsequence anywhere in the string — chars
+     * in order with unlimited gaps. That works for filename pickers, where the
+     * haystack is short and dense; over a sentence it matches almost anything.
+     * Measured against these 82 episodes, "rhan" hit 70 of them and "waco" hit
+     * 57 without appearing in a single title.
+     *
+     * Higher is better; 0 rejects. One unmatched token rejects the whole card,
+     * so adding a word narrows rather than widens.
+     */
+    function tokenScore(words: string[], t: string): number {
+      const numeric = /^\d+$/.test(t);
+      let best = 0;
+      for (const w of words) {
+        if (w === t) best = Math.max(best, 100);
+        else if (w.startsWith(t)) best = Math.max(best, 80);
+        else if (t.length >= 3 && w.includes(t)) best = Math.max(best, 50);
+        // Typo tolerance is for words, not numbers: without this guard a search
+        // for "2026" also returns every 2025 episode, one substitution away.
+        else if (t.length >= 4 && !numeric && withinOneEdit(w, t)) best = Math.max(best, 20);
+      }
+      return best;
     }
 
     function scoreOf(card: HTMLElement): number {
       if (!tokens.length) return 1; // no query — everything matches equally
-      const hay = card.dataset.search ?? "";
+      const words = (card.dataset.search ?? "").split(" ");
       let total = 0;
       for (const t of tokens) {
-        const s = tokenScore(hay, t);
+        const s = tokenScore(words, t);
         if (!s) return 0;
         total += s;
       }
