@@ -24,6 +24,14 @@ export const serviceCity = defineType({
       options: { source: "city", maxLength: 96 },
       validation: (rule) => rule.required(),
     }),
+    defineField({
+      name: "practiceAreaLinks",
+      title: "Extra practice areas in the menu",
+      type: "array",
+      of: [{ type: "reference", to: [{ type: "practiceArea" }] }],
+      description:
+        "Fleshes out this city's submenu under Areas We Frequently Serve. These link to the firm-wide practice area page, not a city-specific one — use them for services this city has no page of its own for. Its real location pages are listed first automatically; anything here that duplicates one is skipped.",
+    }),
   ],
   preview: { select: { title: "city", subtitle: "citySlug.current" } },
 });

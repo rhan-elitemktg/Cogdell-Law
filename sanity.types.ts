@@ -415,6 +415,13 @@ export type Slug = {
   source?: string;
 };
 
+export type PracticeAreaReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "practiceArea";
+};
+
 export type ServiceCity = {
   _id: string;
   _type: "serviceCity";
@@ -424,13 +431,11 @@ export type ServiceCity = {
   orderRank?: string;
   city: string;
   citySlug: Slug;
-};
-
-export type PracticeAreaReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "practiceArea";
+  practiceAreaLinks?: Array<
+    {
+      _key: string;
+    } & PracticeAreaReference
+  >;
 };
 
 export type PracticeArea = {
@@ -1102,8 +1107,8 @@ export type AllSanitySchemaTypes =
   | SanityImageCrop
   | SanityImageHotspot
   | Slug
-  | ServiceCity
   | PracticeAreaReference
+  | ServiceCity
   | PracticeArea
   | LegalPage
   | Podcast
@@ -1159,7 +1164,7 @@ export type PRACTICE_AREAS_NAV_QUERY_RESULT = Array<{
 
 // Source: src/data/navigation.ts
 // Variable: AREAS_WE_SERVE_NAV_QUERY
-// Query: *[_type == "serviceCity"] | order(orderRank){  "city": city,  "citySlug": citySlug.current,  "pages": *[_type == "locationPage" && references(^._id)] | order(orderRank){    "navLabel": navLabel,    "slug": slug.current  }}
+// Query: *[_type == "serviceCity"] | order(orderRank){  "city": city,  "citySlug": citySlug.current,  "pages": *[_type == "locationPage" && references(^._id)] | order(orderRank){    "navLabel": navLabel,    "slug": slug.current  },  practiceAreaLinks[]->{    title,    "slug": slug.current,    "parentSlug": parent->slug.current  }}
 export type AREAS_WE_SERVE_NAV_QUERY_RESULT = Array<{
   city: string;
   citySlug: string;
@@ -1167,6 +1172,11 @@ export type AREAS_WE_SERVE_NAV_QUERY_RESULT = Array<{
     navLabel: string;
     slug: string;
   }>;
+  practiceAreaLinks: Array<{
+    title: string;
+    slug: string;
+    parentSlug: string | null;
+  }> | null;
 }>;
 
 // Source: src/sanity/lib/areasWeServe.ts
@@ -2400,7 +2410,7 @@ declare module "@sanity/client" {
   interface SanityQueries {
     '*[_type == "attorney"] | order(orderRank){\n  "label": name,\n  "slug": slug.current,\n  "group": teamGroup\n}': ATTORNEYS_NAV_QUERY_RESULT;
     '*[_type == "practiceArea"] | order(orderRank){\n  _id,\n  title,\n  "slug": slug.current,\n  "parentId": parent._ref\n}': PRACTICE_AREAS_NAV_QUERY_RESULT;
-    '*[_type == "serviceCity"] | order(orderRank){\n  "city": city,\n  "citySlug": citySlug.current,\n  "pages": *[_type == "locationPage" && references(^._id)] | order(orderRank){\n    "navLabel": navLabel,\n    "slug": slug.current\n  }\n}': AREAS_WE_SERVE_NAV_QUERY_RESULT;
+    '*[_type == "serviceCity"] | order(orderRank){\n  "city": city,\n  "citySlug": citySlug.current,\n  "pages": *[_type == "locationPage" && references(^._id)] | order(orderRank){\n    "navLabel": navLabel,\n    "slug": slug.current\n  },\n  practiceAreaLinks[]->{\n    title,\n    "slug": slug.current,\n    "parentSlug": parent->slug.current\n  }\n}': AREAS_WE_SERVE_NAV_QUERY_RESULT;
     '*[_type == "locationPage"] | order(orderRank){\n  _id,\n  title,\n  navLabel,\n  heroTitle,\n  heroImage,\n  lede,\n  body[]{\n    ...,\n    _type == "bodyAttorney" => { attorney->{ name, photo, photoAlt } },\n    _type == "bodyQuoteCta" => { attorney->{ name, photo, photoAlt } },\n    _type == "bodyTestimonial" => { testimonial->{ quote, author, reviewedAt } }\n  },\n  faqs[]{ _key, question, answer },\n  "slug": slug.current,\n  "cityName": city->city,\n  "citySlug": city->citySlug.current,\n  _updatedAt,\n  seo{\n    metaTitle,\n    metaDescription,\n    canonicalUrl,\n    noIndex,\n    ogImage\n  }\n}': PATHS_QUERY_RESULT;
     '*[_type == "attorney"] | order(orderRank){\n  _id,\n  name,\n  role,\n  credential,\n  photo,\n  photoAlt,\n  "slug": slug.current\n}': ATTORNEY_CARDS_QUERY_RESULT;
     '*[_type == "attorney" && defined(slug.current)]{"slug": slug.current, _updatedAt, "noIndex": seo.noIndex}': ATTORNEY_SLUGS_QUERY_RESULT;
