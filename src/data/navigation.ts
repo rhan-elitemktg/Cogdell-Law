@@ -92,9 +92,16 @@ const AREAS_WE_SERVE_NAV_QUERY = defineQuery(`*[_type == "serviceCity"] | order(
  * already render them as toggle-only rows. Order within each group is the
  * Studio's drag order, since the query is ranked and filtered in place.
  */
+/**
+ * Both forms of each heading, because the group is headed by however many people
+ * are actually in it — "Paralegal" while Laken is the only one, "Paralegals" the
+ * day a second is hired, with no code change either time. A fixed plural is the
+ * F17 trap in miniature: correct for exactly today's roster, wrong silently
+ * afterwards, and nobody notices because nothing errors.
+ */
 const TEAM_GROUPS = [
-  { key: "attorney", label: "Attorneys" },
-  { key: "paralegal", label: "Paralegals" },
+  { key: "attorney", singular: "Attorney", plural: "Attorneys" },
+  { key: "paralegal", singular: "Paralegal", plural: "Paralegals" },
 ] as const;
 
 async function getAttorneysNav(): Promise<NavItem> {
@@ -105,14 +112,14 @@ async function getAttorneysNav(): Promise<NavItem> {
     href: "/our-team",
     // flatMap so a group with nobody in it disappears rather than rendering an
     // empty heading that opens onto nothing.
-    children: TEAM_GROUPS.flatMap(({ key, label }): NavItem[] => {
+    children: TEAM_GROUPS.flatMap(({ key, singular, plural }): NavItem[] => {
       // Default to `attorney` so a document saved before `teamGroup` existed
       // still appears somewhere instead of dropping out of the menu.
       const members = people.filter((p) => (p.group ?? "attorney") === key);
       if (!members.length) return [];
       return [
         {
-          label,
+          label: members.length === 1 ? singular : plural,
           children: members.map((p) => ({
             label: p.label!,
             href: `/our-team/${p.slug}`,
@@ -167,7 +174,7 @@ export async function getPracticeAreasNav(): Promise<NavItem> {
 export async function getAreasWeServeNav(): Promise<NavItem> {
   const cities = (await sanityClient.fetch(AREAS_WE_SERVE_NAV_QUERY)) ?? [];
   return {
-    label: "Areas We Serve",
+    label: "Areas We Frequently Serve",
     children: cities.map((city): NavItem => ({
       label: city.city!,
       children: (city.pages ?? []).map((page) => ({
