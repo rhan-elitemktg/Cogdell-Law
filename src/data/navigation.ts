@@ -167,7 +167,7 @@ export async function getPracticeAreasNav(): Promise<NavItem> {
 export async function getAreasWeServeNav(): Promise<NavItem> {
   const cities = (await sanityClient.fetch(AREAS_WE_SERVE_NAV_QUERY)) ?? [];
   return {
-    label: "Areas We Serve",
+    label: "Areas We Frequently Serve",
     children: cities.map((city): NavItem => ({
       label: city.city!,
       children: (city.pages ?? []).map((page) => ({

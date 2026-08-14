@@ -72,7 +72,7 @@ type LocationDoc = Awaited<ReturnType<typeof fetchPages>>[number];
 
 /** The breadcrumb trail for a location page. City is a grouping label — no href. */
 const trailFor = (p: LocationDoc) => [
-  { title: "Areas We Serve" },
+  { title: "Areas We Frequently Serve" },
   { title: p.cityName! },
   { title: p.navLabel!, href: `/${p.citySlug}/${p.slug}` },
 ];
