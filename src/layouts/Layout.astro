@@ -60,12 +60,41 @@ const organization = legalServiceSchema(firm, siteUrl, logoUrl);
 // a code change: unset PUBLIC_PAGEPROOFER_SITE_ID and the next build ships
 // without the tag at all. See "Before launch" in the README.
 const pageProoferSiteId = import.meta.env.PUBLIC_PAGEPROOFER_SITE_ID;
+
+// Google Tag Manager. The container id is public — it ships in the page source —
+// and permanent, so it is hardcoded rather than an env var. That is the whole
+// point of GTM per the README: this is the ONE tag that goes in the repo, and
+// every tag after it is a GTM change with no rebuild and no deploy.
+//
+// PRODUCTION ONLY. Vercel sets VERCEL_ENV on every build; without this gate each
+// branch preview would report the team's own browsing into the firm's analytics,
+// and `npm run dev` would too.
+//
+// Snippets are injected with set:html and kept verbatim. Astro would otherwise
+// bundle a bare <script> — hoisting it, making it type="module" and deferring it
+// — and GTM's loader has to run synchronously, in the head, as written. The
+// noscript iframe keeps its inline style for the same reason: it is vendor
+// markup, and the house no-inline-styles rule is about our design, not about
+// editing a third party's snippet until it breaks.
+const GTM_ID = "GTM-NCPC4MK6";
+const gtmEnabled = process.env.VERCEL_ENV === "production";
+
+const GTM_HEAD = `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','${GTM_ID}');`;
+
+const GTM_BODY = `<iframe src="https://www.googletagmanager.com/ns.html?id=${GTM_ID}"
+height="0" width="0" style="display:none;visibility:hidden"></iframe>`;
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    {/* GTM, as high in the head as GTM asks for — only charset outranks it. */}
+    {gtmEnabled && <script is:inline set:html={GTM_HEAD} />}
     {/* Flag JS up front so the lazy-image fade only hides images when it can un-hide them. */}
     <script is:inline>document.documentElement.classList.add("js");</script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -115,6 +144,8 @@ const pageProoferSiteId = import.meta.env.PUBLIC_PAGEPROOFER_SITE_ID;
     {organization && <JsonLd data={organization} />}
   </head>
   <body>
+    {/* GTM's no-JS fallback. Its own docs put this immediately after <body>. */}
+    {gtmEnabled && <noscript set:html={GTM_BODY} />}
     <Header />
     <slot />
     <Footer />
